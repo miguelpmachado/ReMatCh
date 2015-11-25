@@ -15,7 +15,6 @@ def main():
 
 	parser = argparse.ArgumentParser(description="This program calls for alleles")
 	parser.add_argument('-s', nargs='?', type=str, help="sam file path", required=True)
-	parser.add_argument('-b', nargs='?', type=str, help="bam file path", required=True)
 	parser.add_argument('-bs', nargs='?', type=str, help='bam sorted path', required=True)
 	parser.add_argument('-t', nargs='?', type=str, help='coverage tab file', required=True)
 	parser.add_argument('-cov', nargs='?', type=str, help='cov path', required=True)
@@ -26,9 +25,9 @@ def main():
 	runTest(args)
 
 def runTest(args):
-	convertToBAM(args.s, args.b, args.bs)
-	rawCoverage(args.bs, args.t)
-	checkCoverage(args.t, args.cov)
+	sortedPath = convertToBAM(args.s)
+	rawCoverage(sortedPath)
+	checkCoverage(sortedPath, args.cov)
 
 
 if __name__ == "__main__":

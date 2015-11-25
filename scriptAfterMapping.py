@@ -16,17 +16,19 @@ def convertToBAM(samPath):
 	os.system("rm "+ filename +'.bam')
 	os.system("samtools index " + filename +'_sorted.bam')
 
+	return (filename +'_sorted')
 
-def rawCoverage(bamSortedPath, outputPath):
 
-	os.system("bedtools genomecov -d -ibam " + bamSortedPath + " > " + outputPath)
+def rawCoverage(bamSortedPath):
+
+	os.system("bedtools genomecov -d -ibam " + bamSortedPath + ".bam > " + outputPath+".tab")
 
 
 def checkCoverage(outputPath, coverageThreshold):
 
 	import csv
 
-	with open(outputPath) as tsv:
+	with open(outputPath+'.tab') as tsv:
 		prevSampleName = '';
 		for line in csv.reader(tsv, delimiter="\t"):
 			if int(line[2]) < int(coverageThreshold):
