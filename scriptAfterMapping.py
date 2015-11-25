@@ -21,7 +21,7 @@ def convertToBAM(samPath):
 
 def rawCoverage(bamSortedPath):
 
-	os.system("bedtools genomecov -d -ibam " + bamSortedPath + ".bam > " + outputPath+".tab")
+	os.system("bedtools genomecov -d -ibam " + bamSortedPath + ".bam > " + bamSortedPath+".tab")
 
 
 def checkCoverage(outputPath, coverageThreshold):
