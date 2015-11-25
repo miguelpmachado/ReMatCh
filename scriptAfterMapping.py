@@ -6,13 +6,15 @@ import argparse
 from datetime import datetime
 import sys
 
-def convertToBAM(samPath, bamPath, bamSortedPath):
+def convertToBAM(samPath):
 
-	os.system("samtools view -buh -o " + bamPath + " " + samPath)
+	filename, samfile_extension = os.path.splitext(samPath)
+
+	os.system("samtools view -buh -o " + filename +'.bam' + " " + samPath)
 	os.system("rm " + samPath)
-	os.system("samtools sort " + bamPath + " " + bamSortedPath)
-	os.system("rm "+ bamPath)
-	os.system("samtools index " + bamSortedPath + '.bam')
+	os.system("samtools sort " + filename +'.bam' + " " + filename +'_sorted')
+	os.system("rm "+ filename +'.bam')
+	os.system("samtools index " + filename +'_sorted.bam')
 
 
 def rawCoverage(bamSortedPath, outputPath):
