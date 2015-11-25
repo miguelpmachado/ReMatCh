@@ -15,8 +15,6 @@ def main():
 
 	parser = argparse.ArgumentParser(description="This program calls for alleles")
 	parser.add_argument('-s', nargs='?', type=str, help="sam file path", required=True)
-	parser.add_argument('-bs', nargs='?', type=str, help='bam sorted path', required=True)
-	parser.add_argument('-t', nargs='?', type=str, help='coverage tab file', required=True)
 	parser.add_argument('-cov', nargs='?', type=str, help='cov path', required=True)
 
 
