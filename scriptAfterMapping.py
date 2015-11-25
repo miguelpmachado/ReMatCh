@@ -12,7 +12,7 @@ def convertToBAM(samPath, bamPath, bamSortedPath):
 	os.system("rm " + samPath)
 	os.system("samtools sort " + bamPath + " " + bamSortedPath)
 	os.system("rm "+ bamPath)
-	os.system("samtools index " + bamSortedPath)
+	os.system("samtools index " + bamSortedPath + '.bam')
 
 
 def rawCoverage(bamSortedPath, outputPath):
