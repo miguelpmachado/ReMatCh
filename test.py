@@ -29,8 +29,8 @@ def main():
 
 def runTest(args):
 	sortedPath = convertToBAM(args.s)
-	sequenceNames, sequenceMedObject = rawCoverage(sortedPath)
-	checkCoverage(sortedPath, args.cov)
+	rawCoverage(sortedPath)
+	sequenceNames, sequenceMedObject = checkCoverage(sortedPath, args.cov)
 	alleleCalling(sortedPath, args.r, sequenceNames, args.gatk, 'ERR504756', args.qual, args.cov, args.mul, sequenceMedObject)
 
 
