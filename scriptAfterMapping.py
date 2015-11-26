@@ -71,7 +71,7 @@ def checkCoverage(outputPath, coverageThreshold):
 
 	return sequenceNames
     		
-def alleleCalling(bamSortedPath, referencePath, sequenceNames):
+def alleleCalling(bamSortedPath, referencePath, sequenceNames, gatkPath):
 
 	ploidytempFile = bamSortedPath+'_temp_ploi.tab'
 
@@ -81,7 +81,7 @@ def alleleCalling(bamSortedPath, referencePath, sequenceNames):
 		tempFile.write('ERR504756' + '\t' + str(1))
 
 	os.system("samtools mpileup --no-BAQ --fasta-ref " + referencePath + " --uncompressed -t DP,DPR " + bamSortedPath + ".bam | bcftools call --consensus-caller --gvcf 2 --samples-file "+ ploidytempFile + " --output-type v --output " + bamSortedPath + ".vcf")
-	os.system("java -jar GenomeAnalysisTK.jar -T FastaAlternateReferenceMaker -R "+ referencePath +" -o "+ testFile +" -V "+ bamSortedPath + ".vcf")
+	os.system("java -jar " + gatkPath + " -T FastaAlternateReferenceMaker -R "+ referencePath +" -o "+ testFile +" -V "+ bamSortedPath + ".vcf")
 
 	#bcftools filter --SnpGap 3 --IndelGap 10 --include 'TYPE="snp" && QUAL>=10 && MIN(FORMAT/DP)>=10 && MAX(FORMAT/DP)<=920' --output-type z --output CC23_comOutgroup.filtered.gap_snp_qual10_MINformatDP10_MAXformatDP920.vcf.gz CC23_comOutgroup.bcf &&
 	#bcftools index CC23_comOutgroup.filtered.gap_snp_qual10_MINformatDP10_MAXformatDP920.vcf.gz &&

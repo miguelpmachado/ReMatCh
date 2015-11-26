@@ -17,6 +17,7 @@ def main():
 	parser = argparse.ArgumentParser(description="This program calls for alleles")
 	parser.add_argument('-s', nargs='?', type=str, help="sam file path", required=True)
 	parser.add_argument('-r', nargs='?', type=str, help='reference path', required=True)
+	parser.add_argument('-gatk', nargs='?', type=str, help='gatk jar path', required=True)
 	parser.add_argument('-cov', nargs='?', type=str, help='cov path', required=True)
 
 
@@ -28,7 +29,7 @@ def runTest(args):
 	sortedPath = convertToBAM(args.s)
 	sequenceNames = rawCoverage(sortedPath)
 	checkCoverage(sortedPath, args.cov)
-	alleleCalling(sortedPath, args.r, sequenceNames)
+	alleleCalling(sortedPath, args.r, sequenceNames, args.gatk)
 
 
 if __name__ == "__main__":
