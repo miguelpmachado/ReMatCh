@@ -38,13 +38,13 @@ def checkCoverage(outputPath, coverageThreshold):
 		for line in csv.reader(tsv, delimiter="\t"):
 			countlines += 1
 			if prevName != line[0] and countlines != 1:
-
 				sequenceMedObject[prevName] = [numpy.average(arrayOfpositionValues), numpy.std(arrayOfpositionValues), arrayOfpositionValues]
 				arrayOfpositionValues = []
 				prevName = line[0]
 			else:
 				arrayOfpositionValues.append(int(line[2]))
-				prevName = line[0]
+				if countlines == 1:
+					prevName = line[0]
 
 	with open(outputPath+'_coverageCheck.tab', 'w') as coverageCheckFile:
 
@@ -65,7 +65,7 @@ def checkCoverage(outputPath, coverageThreshold):
 			coverageCheckFile.write(sequence + '\t' + str(countDuplication/sequenceLength) + '\t' + str(countDeletion/sequenceLength) + '\t' + str(countLowCoverage/sequenceLength)+"\n")
 
     		
-'''def alleleCalling(bamSortedPath, referencePath):
+def alleleCalling(bamSortedPath, referencePath):
 
 	ploidytempFile = bamSortedPath+'_temp_ploi.tab'
 
@@ -77,11 +77,11 @@ def checkCoverage(outputPath, coverageThreshold):
 
 	
 
-	bcftools filter --SnpGap 3 --IndelGap 10 --include 'TYPE="snp" && QUAL>=10 && MIN(FORMAT/DP)>=10 && MAX(FORMAT/DP)<=920' --output-type z --output CC23_comOutgroup.filtered.gap_snp_qual10_MINformatDP10_MAXformatDP920.vcf.gz CC23_comOutgroup.bcf &&
-	bcftools index CC23_comOutgroup.filtered.gap_snp_qual10_MINformatDP10_MAXformatDP920.vcf.gz &&
-	bcftools view --output-type v CC23_comOutgroup.filtered.gap_snp_qual10_MINformatDP10_MAXformatDP920.vcf.gz | grep --invert-match '#' | wc -l
+	#bcftools filter --SnpGap 3 --IndelGap 10 --include 'TYPE="snp" && QUAL>=10 && MIN(FORMAT/DP)>=10 && MAX(FORMAT/DP)<=920' --output-type z --output CC23_comOutgroup.filtered.gap_snp_qual10_MINformatDP10_MAXformatDP920.vcf.gz CC23_comOutgroup.bcf &&
+	#bcftools index CC23_comOutgroup.filtered.gap_snp_qual10_MINformatDP10_MAXformatDP920.vcf.gz &&
+	#bcftools view --output-type v CC23_comOutgroup.filtered.gap_snp_qual10_MINformatDP10_MAXformatDP920.vcf.gz | grep --invert-match '#' | wc -l
 
-	sampleArray = []'''
+	#sampleArray = []'''
 
 
 
