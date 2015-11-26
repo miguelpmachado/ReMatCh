@@ -48,7 +48,7 @@ def checkCoverage(outputPath, coverageThreshold):
 				if countlines == 1:
 					prevName = line[0]
 
-		sequenceNames-append[prevName]
+		sequenceNames.append(prevName)
 		sequenceMedObject[prevName] = [numpy.average(arrayOfpositionValues), numpy.std(arrayOfpositionValues), arrayOfpositionValues]
 
 	with open(outputPath+'_coverageCheck.tab', 'w') as coverageCheckFile:
