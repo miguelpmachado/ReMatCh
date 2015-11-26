@@ -39,7 +39,7 @@ def checkCoverage(outputPath, coverageThreshold):
 		for line in csv.reader(tsv, delimiter="\t"):
 			countlines += 1
 			if prevName != line[0] and countlines != 1:
-				sequenceNames-append[prevName]
+				sequenceNames.append[prevName]
 				sequenceMedObject[prevName] = [numpy.average(arrayOfpositionValues), numpy.std(arrayOfpositionValues), arrayOfpositionValues]
 				arrayOfpositionValues = []
 				prevName = line[0]
