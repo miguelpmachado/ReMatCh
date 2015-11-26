@@ -13,7 +13,7 @@ def convertToBAM(samPath):
 	filename, samfile_extension = os.path.splitext(samPath)
 
 	os.system("samtools view -buh -o " + filename +'.bam' + " " + samPath)
-	os.system("rm " + samPath)
+	#os.system("rm " + samPath)
 	os.system("samtools sort " + filename +'.bam' + " " + filename +'_sorted')
 	os.system("rm "+ filename +'.bam')
 	os.system("samtools index " + filename +'_sorted.bam')
@@ -34,10 +34,12 @@ def checkCoverage(outputPath, coverageThreshold):
 		prevName = '';
 		countlines = 0
 		arrayOfpositionValues = []
+		sequenceNames = []
 
 		for line in csv.reader(tsv, delimiter="\t"):
 			countlines += 1
 			if prevName != line[0] and countlines != 1:
+				sequenceNames-append[prevName]
 				sequenceMedObject[prevName] = [numpy.average(arrayOfpositionValues), numpy.std(arrayOfpositionValues), arrayOfpositionValues]
 				arrayOfpositionValues = []
 				prevName = line[0]
@@ -46,6 +48,7 @@ def checkCoverage(outputPath, coverageThreshold):
 				if countlines == 1:
 					prevName = line[0]
 
+		sequenceNames-append[prevName]
 		sequenceMedObject[prevName] = [numpy.average(arrayOfpositionValues), numpy.std(arrayOfpositionValues), arrayOfpositionValues]
 
 	with open(outputPath+'_coverageCheck.tab', 'w') as coverageCheckFile:
@@ -66,18 +69,19 @@ def checkCoverage(outputPath, coverageThreshold):
 			
 			coverageCheckFile.write(sequence + '\t' + str(float(countDuplication)/sequenceLength) + '\t' + str(float(countDeletion)/float(sequenceLength)) + '\t' + str(float(countLowCoverage)/float(sequenceLength))+"\n")
 
+	return sequenceNames
     		
-def alleleCalling(bamSortedPath, referencePath):
+def alleleCalling(bamSortedPath, referencePath, sequenceNames):
 
 	ploidytempFile = bamSortedPath+'_temp_ploi.tab'
+
+	testFile = bamSortedPath + 'test.fasta'
 
 	with open(ploidytempFile, 'w') as tempFile:
 		tempFile.write(bamSortedPath + '\t' + 1)
 
-	os.system("samtools mpileup --no-BAQ --fasta-ref" + referencePath + "--uncompressed -t DP,DPR" + bamSortedPath + ".bam | bcftools call --consensus-caller --gvcf 2 --samples-file "+ ploidytempFile + " --output-type u --output " + bamSortedPath + ".bcf")
-	os.system("bcftools index " + bamSortedPath + ".bcf.gz")
-
-	
+	os.system("samtools mpileup --no-BAQ --fasta-ref" + referencePath + "--uncompressed -t DP,DPR" + bamSortedPath + ".bam | bcftools call --consensus-caller --gvcf 2 --samples-file "+ ploidytempFile + " --output-type v --output " + bamSortedPath + ".vcf")
+	os.system("java -jar GenomeAnalysisTK.jar -T FastaAlternateReferenceMaker -R "+ referencePath +" -o "+ testFile +" -V "+ bamSortedPath + ".vcf")
 
 	#bcftools filter --SnpGap 3 --IndelGap 10 --include 'TYPE="snp" && QUAL>=10 && MIN(FORMAT/DP)>=10 && MAX(FORMAT/DP)<=920' --output-type z --output CC23_comOutgroup.filtered.gap_snp_qual10_MINformatDP10_MAXformatDP920.vcf.gz CC23_comOutgroup.bcf &&
 	#bcftools index CC23_comOutgroup.filtered.gap_snp_qual10_MINformatDP10_MAXformatDP920.vcf.gz &&

@@ -24,8 +24,8 @@ def main():
 
 def runTest(args):
 	sortedPath = convertToBAM(args.s)
-	rawCoverage(sortedPath)
-	checkCoverage(sortedPath, args.cov)
+	sequenceNames = rawCoverage(sortedPath)
+	checkCoverage(sortedPath, args.cov, sequenceNames)
 
 
 if __name__ == "__main__":
