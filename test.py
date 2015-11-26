@@ -21,6 +21,7 @@ def main():
 	parser.add_argument('-cov', nargs='?', type=str, help='coverage', required=True)
 	parser.add_argument('-qual', nargs='?', type=str, help='mapping quality', required=True)
 	parser.add_argument('-mul', nargs='?', type=str, help='multiple alleles', required=True)
+	parser.add_argument('-sr', nargs='?', type=str, help='sample reference', required=True)
 
 
 	args = parser.parse_args()
@@ -31,7 +32,7 @@ def runTest(args):
 	sortedPath = convertToBAM(args.s)
 	rawCoverage(sortedPath)
 	sequenceNames, sequenceMedObject = checkCoverage(sortedPath, args.cov)
-	alleleCalling(sortedPath, args.r, sequenceNames, args.gatk, 'ERR504756', args.qual, args.cov, args.mul, sequenceMedObject)
+	alleleCalling(sortedPath, args.r, sequenceNames, args.gatk, args.sr, args.qual, args.cov, args.mul, sequenceMedObject)
 
 
 if __name__ == "__main__":
