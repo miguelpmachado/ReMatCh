@@ -78,7 +78,7 @@ def alleleCalling(bamSortedPath, referencePath, sequenceNames):
 	testFile = bamSortedPath + 'test.fasta'
 
 	with open(ploidytempFile, 'w') as tempFile:
-		tempFile.write('ERR504756_sorted.bam' + '\t' + str(1))
+		tempFile.write('ERR504756_sorted' + '\t' + str(1))
 
 	os.system("samtools mpileup --no-BAQ --fasta-ref " + referencePath + " --uncompressed -t DP,DPR " + bamSortedPath + ".bam | bcftools call --consensus-caller --gvcf 2 --samples-file "+ ploidytempFile + " --output-type v --output " + bamSortedPath + ".vcf")
 	os.system("java -jar GenomeAnalysisTK.jar -T FastaAlternateReferenceMaker -R "+ referencePath +" -o "+ testFile +" -V "+ bamSortedPath + ".vcf")
