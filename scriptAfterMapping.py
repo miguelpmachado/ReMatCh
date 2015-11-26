@@ -63,7 +63,7 @@ def checkCoverage(outputPath, coverageThreshold):
 			coverageCheckFile.write(sequence + '\t' + str(countDuplication/sequenceLength) + '\t' + str(countDeletion/sequenceLength) + '\t' + str(countLowCoverage/sequenceLength))
 
     		
-def alleleCalling(bamSortedPath, referencePath):
+'''def alleleCalling(bamSortedPath, referencePath):
 
 	ploidytempFile = bamSortedPath+'_temp_ploi.tab'
 
@@ -79,7 +79,7 @@ def alleleCalling(bamSortedPath, referencePath):
 	bcftools index CC23_comOutgroup.filtered.gap_snp_qual10_MINformatDP10_MAXformatDP920.vcf.gz &&
 	bcftools view --output-type v CC23_comOutgroup.filtered.gap_snp_qual10_MINformatDP10_MAXformatDP920.vcf.gz | grep --invert-match '#' | wc -l
 
-	sampleArray = []
+	sampleArray = []'''
 
 
 
