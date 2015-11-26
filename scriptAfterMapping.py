@@ -54,10 +54,10 @@ def checkCoverage(outputPath, coverageThreshold):
 			countLowCoverage = 0
 			countDeletion = 0
 			countDuplication = 0
-			sequenceLength = len(arrayOfpositionValues)
+			sequenceLength = len(sequenceMedObject[sequence][2])
 
 			for coverageAtPosition in sequenceMedObject[sequence][2]:
-				if coverageAtPosition >= 1.25 * sequenceMedObject[sequence][0]:
+				if coverageAtPosition >= 1.5 * sequenceMedObject[sequence][0]:
 					countDuplication += 1
 				elif coverageAtPosition < 0.1 * sequenceMedObject[sequence][0]:
 					countDeletion += 1
