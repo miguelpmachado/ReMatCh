@@ -115,7 +115,7 @@ def alleleCalling(bamSortedPath, referencePath, sequenceNames, gatkPath, sampleI
 	with open(bamSortedPath + "_mappingCheck.tab", 'w') as mappingCheckFile:
 		mappingCheckFile.write('#Sequence\tDuplication\tIndel\tRawCoverage\tAlternativeQualityScore\tCoverage\tMultipleAllele\n')
 		for sequence in sequenceMedObject:
-			mappingCheckFile.write(sequence + '\t' + sequenceMedObject[sequence][7] + '\t' +sequenceMedObject[sequence][8] + '\t' +sequenceMedObject[sequence][9] + '\t' +sequenceMedObject[sequence][4] + '\t' +sequenceMedObject[sequence][5] + '\t' +sequenceMedObject[sequence][6] + '\n')
+			mappingCheckFile.write(sequence + '\t' + str(sequenceMedObject[sequence][7]) + '\t' + str(sequenceMedObject[sequence][8]) + '\t' + str(sequenceMedObject[sequence][9]) + '\t' +str(sequenceMedObject[sequence][4]) + '\t' +str(sequenceMedObject[sequence][5]) + '\t' +str(sequenceMedObject[sequence][6]) + '\n')
 
 
 
