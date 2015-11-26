@@ -88,7 +88,7 @@ def alleleCalling(bamSortedPath, referencePath, sequenceNames, gatkPath, sampleI
 
 
 	with open(bamSortedPath + ".vcf", 'r') as vcfFile:
-		for line in csv.reader(tsv, delimiter="\t"):
+		for line in csv.reader(vcfFile, delimiter="\t"):
 			if not line[0].startswith("#"):
 				if not line[7].startswith('END'):
 					quality = line[5]
