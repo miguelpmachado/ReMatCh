@@ -46,6 +46,8 @@ def checkCoverage(outputPath, coverageThreshold):
 				if countlines == 1:
 					prevName = line[0]
 
+		sequenceMedObject[prevName] = [numpy.average(arrayOfpositionValues), numpy.std(arrayOfpositionValues), arrayOfpositionValues]
+
 	with open(outputPath+'_coverageCheck.tab', 'w') as coverageCheckFile:
 
 		for sequence in sequenceMedObject:
@@ -62,7 +64,7 @@ def checkCoverage(outputPath, coverageThreshold):
 				elif coverageAtPosition < coverageThreshold:
 					countLowCoverage += 1
 			
-			coverageCheckFile.write(sequence + '\t' + str(countDuplication/sequenceLength) + '\t' + str(countDeletion/sequenceLength) + '\t' + str(countLowCoverage/sequenceLength)+"\n")
+			coverageCheckFile.write(sequence + '\t' + str(float(countDuplication)/sequenceLength) + '\t' + str(float(countDeletion)/float(sequenceLength)) + '\t' + str(float(countLowCoverage)/float(sequenceLength))+"\n")
 
     		
 def alleleCalling(bamSortedPath, referencePath):
