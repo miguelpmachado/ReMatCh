@@ -18,7 +18,9 @@ def main():
 	parser.add_argument('-s', nargs='?', type=str, help="sam file path", required=True)
 	parser.add_argument('-r', nargs='?', type=str, help='reference path', required=True)
 	parser.add_argument('-gatk', nargs='?', type=str, help='gatk jar path', required=True)
-	parser.add_argument('-cov', nargs='?', type=str, help='cov path', required=True)
+	parser.add_argument('-cov', nargs='?', type=str, help='coverage', required=True)
+	parser.add_argument('-qual', nargs='?', type=str, help='mapping quality', required=True)
+	parser.add_argument('-mul', nargs='?', type=str, help='multiple alleles', required=True)
 
 
 	args = parser.parse_args()
@@ -27,9 +29,9 @@ def main():
 
 def runTest(args):
 	sortedPath = convertToBAM(args.s)
-	sequenceNames = rawCoverage(sortedPath)
+	sequenceNames, sequenceMedObject = rawCoverage(sortedPath)
 	checkCoverage(sortedPath, args.cov)
-	alleleCalling(sortedPath, args.r, sequenceNames, args.gatk)
+	alleleCalling(sortedPath, args.r, sequenceNames, args.gatk, 'ERR504756', args.qual, args.cov, args.mul, sequenceMedObject)
 
 
 if __name__ == "__main__":

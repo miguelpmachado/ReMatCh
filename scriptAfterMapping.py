@@ -40,7 +40,7 @@ def checkCoverage(outputPath, coverageThreshold):
 			countlines += 1
 			if prevName != line[0] and countlines != 1:
 				sequenceNames.append(prevName)
-				sequenceMedObject[prevName] = [numpy.average(arrayOfpositionValues), numpy.std(arrayOfpositionValues), arrayOfpositionValues]
+				sequenceMedObject[prevName] = [prevName, numpy.average(arrayOfpositionValues), numpy.std(arrayOfpositionValues), arrayOfpositionValues, False, False, False]
 				arrayOfpositionValues = []
 				prevName = line[0]
 			else:
@@ -49,39 +49,81 @@ def checkCoverage(outputPath, coverageThreshold):
 					prevName = line[0]
 
 		sequenceNames.append(prevName)
-		sequenceMedObject[prevName] = [numpy.average(arrayOfpositionValues), numpy.std(arrayOfpositionValues), arrayOfpositionValues]
+		sequenceMedObject[prevName] = [prevName, numpy.average(arrayOfpositionValues), numpy.std(arrayOfpositionValues), arrayOfpositionValues, False, False, False]
 
-	with open(outputPath+'_coverageCheck.tab', 'w') as coverageCheckFile:
+	#with open(outputPath+'_coverageCheck.tab', 'w') as coverageCheckFile:
 
-		for sequence in sequenceMedObject:
-			countLowCoverage = 0
-			countDeletion = 0
-			countDuplication = 0
-			sequenceLength = len(sequenceMedObject[sequence][2])
+	for sequence in sequenceMedObject:
+		countLowCoverage = 0
+		countIndel = 0
+		countDuplication = 0
+		sequenceLength = len(sequenceMedObject[sequence][3])
 
-			for coverageAtPosition in sequenceMedObject[sequence][2]:
-				if coverageAtPosition >= 1.25 * sequenceMedObject[sequence][0]:
-					countDuplication += 1
-				elif coverageAtPosition < 0.1 * sequenceMedObject[sequence][0]:
-					countDeletion += 1
-				elif coverageAtPosition < int(coverageThreshold):
-					countLowCoverage += 1
-			
-			coverageCheckFile.write(sequence + '\t' + str(float(countDuplication)/sequenceLength) + '\t' + str(float(countDeletion)/float(sequenceLength)) + '\t' + str(float(countLowCoverage)/float(sequenceLength))+"\n")
+		for coverageAtPosition in sequenceMedObject[sequence][3]:
+			if coverageAtPosition >= 1.25 * sequenceMedObject[sequence][1]:
+				countDuplication += 1
+			elif coverageAtPosition < 0.1 * sequenceMedObject[sequence][1]:
+				countIndel += 1
+			elif coverageAtPosition < int(coverageThreshold):
+				countLowCoverage += 1
+		
+		sequenceMedObject[sequence].append(str(float(countDuplication)/sequenceLength))
+		sequenceMedObject[sequence].append(str(float(countIndel)/float(sequenceLength)))
+		sequenceMedObject[sequence].append(str(float(countLowCoverage)/float(sequenceLength)))
+			#coverageCheckFile.write(sequence + '\t' + str(float(countDuplication)/sequenceLength) + '\t' + str(float(countcountIndel)/float(sequenceLength)) + '\t' + str(float(countLowCoverage)/float(sequenceLength))+"\n")
 
-	return sequenceNames
+	return sequenceNames, sequenceMedObject
     		
-def alleleCalling(bamSortedPath, referencePath, sequenceNames, gatkPath):
+def alleleCalling(bamSortedPath, referencePath, sequenceNames, gatkPath, sampleID, qualityThreshold, coverageThreshold, multipleAlleles, sequenceMedObject):
 
 	ploidytempFile = bamSortedPath+'_temp_ploi.tab'
 
 	testFile = bamSortedPath + 'test.fasta'
 
 	with open(ploidytempFile, 'w') as tempFile:
-		tempFile.write('ERR504756' + '\t' + str(1))
+		tempFile.write(sampleID + '\t' + str(1))
 
 	os.system("samtools mpileup --no-BAQ --fasta-ref " + referencePath + " --uncompressed -t DP,DPR " + bamSortedPath + ".bam | bcftools call --consensus-caller --gvcf 2 --samples-file "+ ploidytempFile + " --output-type v --output " + bamSortedPath + ".vcf")
 	os.system("java -jar " + gatkPath + " -T FastaAlternateReferenceMaker -R "+ referencePath +" -o "+ testFile +" -V "+ bamSortedPath + ".vcf")
+
+
+	with open(bamSortedPath + ".vcf", 'r') as vcfFile:
+		for line in csv.reader(tsv, delimiter="\t"):
+			if not line[0].startswith("#"):
+				if not line[7].startswith('END'):
+					quality = line[5]
+					if quality < float(qualityThreshold):
+						sequenceMedObject[line[0]][4] = True
+					
+					deepCoverage = float(line[7].split(';')[0].split('=')[1])
+					
+					if deepCoverage < float(coverageThreshold):
+						sequenceMedObject[line[0]][5] = True
+					
+					coverageByAllele = line[9].split(':')[3].split(',')
+					alternativeAlleles = line[4].split(',')
+
+					coverageByAllele = [ int(x) for x in coverageByAllele ]
+
+					dominantSNP = coverageByAllele.index(max(coverageByAllele))
+					coverageAllele = coverageByAllele[dominantSNP]
+					alternativeSNP = alternativeAlleles[dominantSNP-1]
+
+					if coverageAllele/deepCoverage < float(multipleAlleles):
+						sequenceMedObject[line[0]][6] = True
+
+	with open(bamSortedPath + "_mappingCheck.tab", 'r') as mappingCheckFile:
+		mappingCheckFile.write('#Sequence\tDuplication\tIndel\tRawCoverage\tAlternativeQualityScore\tCoverage\tMultipleAllele\n')
+		for sequence in sequenceMedObject:
+			mappingCheckFile.write(sequence + '\t' + sequenceMedObject[sequence][7] + '\t' +sequenceMedObject[sequence][8] + '\t' +sequenceMedObject[sequence][9] + '\t' +sequenceMedObject[sequence][4] + '\t' +sequenceMedObject[sequence][5] + '\t' +sequenceMedObject[sequence][6] + '\n')
+
+
+
+
+
+
+
+
 
 	#bcftools filter --SnpGap 3 --IndelGap 10 --include 'TYPE="snp" && QUAL>=10 && MIN(FORMAT/DP)>=10 && MAX(FORMAT/DP)<=920' --output-type z --output CC23_comOutgroup.filtered.gap_snp_qual10_MINformatDP10_MAXformatDP920.vcf.gz CC23_comOutgroup.bcf &&
 	#bcftools index CC23_comOutgroup.filtered.gap_snp_qual10_MINformatDP10_MAXformatDP920.vcf.gz &&
