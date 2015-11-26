@@ -44,7 +44,7 @@ def checkCoverage(outputPath, coverageThreshold):
 			else:
 				arrayOfpositionValues.append(int(line[2]))
 
-	with open(outputPath+'_coverageCheck.tab') as coverageCheckFile:
+	with open(outputPath+'_coverageCheck.tab', 'w') as coverageCheckFile:
 
 		for sequence in sequenceMedObject:
 			countLowCoverage = 0
