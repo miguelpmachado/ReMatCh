@@ -60,7 +60,7 @@ def checkCoverage(outputPath, coverageThreshold):
 				elif coverageAtPosition < coverageThreshold:
 					countLowCoverage += 1
 			
-			coverageCheckFile.write(sequence + '\t' + str(countDuplication/sequenceLength) + '\t' + str(countDeletion/sequenceLength) + '\t' + str(countLowCoverage/sequenceLength))
+			coverageCheckFile.write(sequence + '\t' + str(countDuplication/sequenceLength) + '\t' + str(countDeletion/sequenceLength) + '\t' + str(countLowCoverage/sequenceLength)+"\n")
 
     		
 '''def alleleCalling(bamSortedPath, referencePath):
