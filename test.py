@@ -9,12 +9,14 @@ import sys
 from scriptAfterMapping import checkCoverage
 from scriptAfterMapping import convertToBAM
 from scriptAfterMapping import rawCoverage
+from scriptAfterMapping import alleleCalling
 
 
 def main():
 
 	parser = argparse.ArgumentParser(description="This program calls for alleles")
 	parser.add_argument('-s', nargs='?', type=str, help="sam file path", required=True)
+	parser.add_argument('-r', nargs='?', type=str, help='reference path', required=True)
 	parser.add_argument('-cov', nargs='?', type=str, help='cov path', required=True)
 
 
@@ -25,7 +27,8 @@ def main():
 def runTest(args):
 	sortedPath = convertToBAM(args.s)
 	sequenceNames = rawCoverage(sortedPath)
-	checkCoverage(sortedPath, args.cov, sequenceNames)
+	checkCoverage(sortedPath, args.cov)
+	alleleCalling(sortedPath, referencePath, sequenceNames)
 
 
 if __name__ == "__main__":
