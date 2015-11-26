@@ -61,7 +61,7 @@ def checkCoverage(outputPath, coverageThreshold):
 					countDuplication += 1
 				elif coverageAtPosition < 0.1 * sequenceMedObject[sequence][0]:
 					countDeletion += 1
-				elif coverageAtPosition < coverageThreshold:
+				elif coverageAtPosition < int(coverageThreshold):
 					countLowCoverage += 1
 			
 			coverageCheckFile.write(sequence + '\t' + str(float(countDuplication)/sequenceLength) + '\t' + str(float(countDeletion)/float(sequenceLength)) + '\t' + str(float(countLowCoverage)/float(sequenceLength))+"\n")
