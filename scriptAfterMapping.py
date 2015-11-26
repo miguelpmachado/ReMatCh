@@ -29,11 +29,6 @@ def rawCoverage(bamSortedPath):
 def checkCoverage(outputPath, coverageThreshold):
 
 	sequenceMedObject = {}
-
-	with open(bamSortedPath+'.tab') as tsv:
-		prevName = ''
-		for line in csv.reader(tsv, delimiter="\t"):
-			if prevName != line[0]
 		
 	with open(outputPath+'.tab') as tsv:
 		prevName = '';
