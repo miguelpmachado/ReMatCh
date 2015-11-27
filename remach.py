@@ -32,6 +32,13 @@ def main():
 	runReMaCh(args)
 
 def runReMaCh(args):
+
+	if not os.path.isdir(args.t):
+		os.mkdir(args.t)
+		print str(args.t) + ' directory created!'
+
+	
+
 	samFilePath = downloadAndBowtie(args.r, args.ri, args.t)
 	
 	sortedPath = convertToBAM(samFilePath)

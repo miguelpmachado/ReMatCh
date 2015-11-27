@@ -98,8 +98,6 @@ def downloadAndBowtie(referencePath, run_id, target_dir):
 
 	subprocess.call(["bowtie2-build", referencePath, bowtieBuildFileName])
 	
-
-	
 	#download ERR
 	
 	download_ERR(run_id, target_dir)
@@ -109,6 +107,7 @@ def downloadAndBowtie(referencePath, run_id, target_dir):
 	numberFilesDowned= len(os.listdir(dir_with_gz))
 	
 	bowtie_output_file=os.path.join(target_dir, "bowtie_out.sam")
+	
 	bowtieLog = os.path.join(target_dir, "bowtie_output.txt")
 	
 		
