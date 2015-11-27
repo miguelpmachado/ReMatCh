@@ -24,7 +24,7 @@ def main():
 	parser.add_argument('-cov', nargs='?', type=str, help='coverage', required=True)
 	parser.add_argument('-qual', nargs='?', type=str, help='mapping quality', required=True)
 	parser.add_argument('-mul', nargs='?', type=str, help='multiple alleles', required=True)
-	parser.add_argument('-sr', nargs='?', type=str, help='run ID', required=True)
+	parser.add_argument('-ri', nargs='?', type=str, help='run ID', required=True)
 
 
 	args = parser.parse_args()
@@ -32,12 +32,12 @@ def main():
 	runTest(args)
 
 def runTest(args):
-	samFilePath = downloadAndBowtie(args.r, args.sr, args.t)
+	samFilePath = downloadAndBowtie(args.r, args.ri, args.t)
 	
 	sortedPath = convertToBAM(samFilePath)
 	rawCoverage(sortedPath)
 	sequenceNames, sequenceMedObject = checkCoverage(sortedPath, args.cov)
-	alleleCalling(sortedPath, args.r, sequenceNames, args.gatk, args.sr, args.qual, args.cov, args.mul, sequenceMedObject)
+	alleleCalling(sortedPath, args.r, sequenceNames, args.gatk, args.ri, args.qual, args.cov, args.mul, sequenceMedObject)
 
 
 if __name__ == "__main__":
