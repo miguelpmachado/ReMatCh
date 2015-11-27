@@ -90,7 +90,8 @@ def alleleCalling(bamSortedPath, referencePath, sequenceNames, gatkPath, sampleI
 	os.system("samtools mpileup --no-BAQ --fasta-ref " + referencePath + " --uncompressed -t DP,DPR " + bamSortedPath + ".bam | bcftools call --consensus-caller --gvcf 2 --samples-file "+ ploidytempFile + " --output-type v --output " + bamSortedPath + ".vcf")
 	os.system("java -jar " + gatkPath + " -T FastaAlternateReferenceMaker -R "+ referencePath +" -o "+ testFile +" -V "+ bamSortedPath + ".vcf")
 
-	os.system("rm " + testFile)
+	#os.system("rm " + testFile)
+	os.system("rm " + ploidytempFile)
 
 	with open(bamSortedPath + ".vcf", 'r') as vcfFile:
 		for line in csv.reader(vcfFile, delimiter="\t"):
