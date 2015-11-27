@@ -1,8 +1,8 @@
-# ReMaChe - Read Mapping and Check-Coverage
+# ReMaCh - Read Mapping and Check-Coverage
 
 # Usage 
 
-`remache.py [-h] [-r REFERENCE_PATH] [-t TARGET_DIR] [-gatk GATK_PATH] [-cov MIN_COVERAGE] [-qual MIN_MAP_QUALITY] [-mul MULTIPLE_ALLELES] [-ri RUN_ID]`
+`remach.py [-h] [-r REFERENCE_PATH] [-t TARGET_DIR] [-gatk GATK_PATH] [-cov MIN_COVERAGE] [-qual MIN_MAP_QUALITY] [-mul MULTIPLE_ALLELES] [-ri RUN_ID]`
 
 # Description 
 
