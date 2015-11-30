@@ -16,13 +16,13 @@ def convertToBAM(samPath):
 
 	filename, samfile_extension = os.path.splitext(samPath)
 
-	os.system("samtools view -buh -o " + filename +'.bam' + " " + samPath)
+	os.system("samtools view -buh -o " + filename +'_temp.bam' + " " + samPath)
 	os.system("rm " + samPath)
-	os.system("samtools sort " + filename +'.bam' + " " + filename +'_sorted')
-	os.system("rm "+ filename +'.bam')
-	os.system("samtools index " + filename +'_sorted.bam')
+	os.system("samtools sort " + filename +'_temp.bam' + " " + filename)
+	os.system("rm "+ filename +'_temp.bam')
+	os.system("samtools index " + filename +'.bam')
 
-	return (filename +'_sorted')
+	return (filename +'')
 
 
 def rawCoverage(bamSortedPath):
@@ -40,10 +40,11 @@ def checkCoverage(outputPath, coverageThreshold):
 		countlines = 0
 		arrayOfpositionValues = []
 		sequenceNames = []
-
+		countSequences = 0
+		
 		for line in csv.reader(tsv, delimiter="\t"):
 			countlines += 1
-			countSequences = 0
+
 			if prevName != line[0] and countlines != 1:
 				countSequences += 1
 				sequenceNames.append(prevName)
@@ -114,7 +115,7 @@ def alleleCalling(bamSortedPath, referencePath, sequenceNames, gatkPath, sampleI
 					lineToUse = '>' + sequenceAndIndex[number] + '\n'
 					tempFile.write(lineToUse)
 				else:
-					tempFile.write(lineToUse)
+					tempFile.write(line)
 
 	os.remove(sequencesFile)
 	os.rename(sequencesFile+".temp", sequencesFile)
