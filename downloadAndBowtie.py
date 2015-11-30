@@ -46,7 +46,7 @@ def download(dirs2,target_dir2,ref2,success2,f2,link2):
 
 def download_ERR(ERR_id,target_dir):
 	
-	if not os.path.exists(target_dir):
+	if not os.path.isdir(target_dir):
 		os.makedirs(target_dir)
 	
 	f=ftplib.FTP('ftp.sra.ebi.ac.uk')
@@ -106,7 +106,7 @@ def downloadAndBowtie(referencePath, run_id, target_dir, buildBowtie, picardJarP
 	
 	#download ERR
 
-	if not os.path.exists(os.path.join(target_dir, run_id, run_id + '.fastq.gz')):
+	if not os.path.isdir(os.path.join(target_dir, run_id)):
 		download_ERR(run_id, target_dir)
 	else:
 		print 'File already exists...'
