@@ -113,7 +113,7 @@ def runReMaCh(args):
 
 				with open(os.path.join(args.t, run_id, run_id + 'runtime.txt'), 'w') as runTimeFile:
 					runTimeFile.write("#runTime\tfileSize\n")
-					runTimeFile.write(run_time + '\t' + gzSizes + '\n')
+					runTimeFile.write(str(run_time) + '\t' + str(gzSizes) + '\n')
 
 
 if __name__ == "__main__":
