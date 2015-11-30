@@ -5,6 +5,7 @@ from os.path import isfile, join
 import argparse
 from datetime import datetime
 import sys
+import glob
 
 from downloadAndBowtie import downloadAndBowtie
 from scriptAfterMapping import checkCoverage
