@@ -23,7 +23,7 @@
 #  
 
 import shlex, subprocess,ftplib
-import os, os.path
+import os, os.path, glob
 
 def download(dirs2,target_dir2,ref2,success2,f2,link2):
 	#new folder for each reference with reference id name
@@ -115,9 +115,9 @@ def downloadAndBowtie(referencePath, run_id, target_dir, buildBowtie, picardJarP
 	
 	dir_with_gz = os.path.join(target_dir,run_id)
 
-	print len(os.listdir(dir_with_gz)) 
+	print len(glob.glob1(dir_with_gz, "*.fastq.gz")) 
 	
-	numberFilesDowned= len(os.listdir(dir_with_gz))
+	numberFilesDowned= len(glob.glob1(dir_with_gz, "*.fastq.gz")) 
 	
 	bowtie_output_file=os.path.join(dir_with_gz, run_id + ".sam")
 	
