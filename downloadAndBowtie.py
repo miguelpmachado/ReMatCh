@@ -89,11 +89,12 @@ def download_ERR(ERR_id,target_dir):
 
 
 
-def downloadAndBowtie(referencePath, run_id, target_dir, buildBowtie, picardJarPath):
+def downloadAndBowtie(referencePath, run_id, target_dir, buildBowtie, picardJarPath, threads):
 
 	print "run picard"
-	picardFileName, extension = os.path.splitext(referencePath)
-        os.system("java -jar "+ picardJarPath +" CreateSequenceDictionary R= " + referencePath + " O= " + picardFileName + ".dict")
+	if buildBowtie == True:
+		picardFileName, extension = os.path.splitext(referencePath)
+		os.system("java -jar "+ picardJarPath +" CreateSequenceDictionary R= " + referencePath + " O= " + picardFileName + ".dict")
 
 
 
@@ -128,7 +129,7 @@ def downloadAndBowtie(referencePath, run_id, target_dir, buildBowtie, picardJarP
 	
 	if numberFilesDowned==1:
 
-		command_line ="bowtie2 -k 2 --quiet --no-unal -x "+bowtieBuildFileName+" -U "+dir_with_gz+"/"+run_id+".fastq.gz --rg-id ENA --rg PL:illumina --rg SM:"+run_id+" --sensitive-local --threads 1 --met-file "+run_id+".bowtie_metrics.txt -S "+bowtie_output_file+" "
+		command_line ="bowtie2 -k 2 --quiet --no-unal -x "+bowtieBuildFileName+" -U "+dir_with_gz+"/"+run_id+".fastq.gz --rg-id ENA --rg PL:illumina --rg SM:"+run_id+" --sensitive-local --threads "+ threads +" --met-file "+run_id+".bowtie_metrics.txt -S "+bowtie_output_file+" "
 
 
 		myoutput = open(bowtieLog, 'w')
@@ -138,7 +139,7 @@ def downloadAndBowtie(referencePath, run_id, target_dir, buildBowtie, picardJarP
 
 
 	elif numberFilesDowned==2:
-		command_line ="bowtie2 -k 2 --quiet --no-unal -x "+bowtieBuildFileName+" -1 "+dir_with_gz+"/"+run_id+"_1.fastq.gz -2 "+dir_with_gz+"/"+run_id+"_2.fastq.gz --rg-id ENA --rg PL:illumina --rg SM:"+run_id+" --sensitive-local --threads 1 --met-file "+run_id+".bowtie_metrics.txt -S "+bowtie_output_file+" "
+		command_line ="bowtie2 -k 2 --quiet --no-unal -x "+bowtieBuildFileName+" -1 "+dir_with_gz+"/"+run_id+"_1.fastq.gz -2 "+dir_with_gz+"/"+run_id+"_2.fastq.gz --rg-id ENA --rg PL:illumina --rg SM:"+run_id+" --sensitive-local --threads "+ threads +" --met-file "+run_id+".bowtie_metrics.txt -S "+bowtie_output_file+" "
 		
 		myoutput = open(bowtieLog, 'w')
 		args = shlex.split(command_line)
