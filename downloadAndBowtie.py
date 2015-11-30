@@ -107,18 +107,19 @@ def downloadAndBowtie(referencePath, run_id, target_dir, buildBowtie, picardJarP
 	
 	#download ERR
 
-	if not os.path.isdir(os.path.join(target_dir, run_id)):
+	dir_with_gz = os.path.join(target_dir,run_id)
+
+	numberFilesDowned= len(glob.glob1(dir_with_gz, "*.fastq.gz")) 
+
+	if numberFilesDowned < 1:
 		download_ERR(run_id, target_dir)
 	else:
 		print 'File already exists...'
 	
 	#download_ERR(run_id, target_dir)
-	
-	dir_with_gz = os.path.join(target_dir,run_id)
+
 
 	#print len(glob.glob1(dir_with_gz, "*.fastq.gz")) 
-	
-	numberFilesDowned= len(glob.glob1(dir_with_gz, "*.fastq.gz")) 
 	
 	bowtie_output_file=os.path.join(dir_with_gz, run_id + ".sam")
 	
