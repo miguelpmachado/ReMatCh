@@ -55,10 +55,11 @@ def runReMaCh(args):
 
 		count_runs = 0
 		buildBowtie = True
+		firstLine = True
 		for run_id in run_ids:
 			run=False
-			if args.tax and count_runs==0:
-				count_runs+=1
+			if args.tax and firstLine == True:
+				firstLine = False
 				continue
 			
 			elif args.tax and platform:
