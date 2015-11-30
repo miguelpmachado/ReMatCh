@@ -44,6 +44,8 @@ def runReMaCh(args):
 	if args.tax:
 		GetSequencesFromTaxon(args.tax,args.l,True)
 	
+	plataform="Illumina"
+	
 	
 	
 	with open(args.l, 'r') as run_ids:
@@ -51,31 +53,49 @@ def runReMaCh(args):
 		count_runs = 0
 		buildBowtie = True
 		for run_id in run_ids:
+			run=False
+			if args.tax and count_runs==0:
+				count_runs+=1
+				continue
 			
-			if args.tax:
+			elif args.tax and plataform:
+					run_info=run_id.split("\t")
+					run_id=run_info[0]
+					run_plat=run_info[1]
+					
+					if plataform in run_plat:
+						run=True
+			
+			elif args.tax:
 				run_info=run_id.split("\t")
 				run_id=run_info[0]
 				run_plat=run_info[1]
+						
+				run=True
 			
-			
-			count_runs += 1
+			else:
+				run=True
+				
+			if run:		
+				
+				count_runs += 1
 
-			if count_runs > 1:
-				buildBowtie = False
+				if count_runs > 1:
+					buildBowtie = False
 
-			run_id = run_id.strip()
+				run_id = run_id.strip()
 
-			samFilePath = downloadAndBowtie(args.r, run_id, args.t, buildBowtie, args.picard, args.threads)
-	
-			sortedPath = convertToBAM(samFilePath)
-			rawCoverage(sortedPath)
-			sequenceNames, sequenceMedObject, sequenceAndIndex = checkCoverage(sortedPath, args.cov)
-			alleleCalling(sortedPath, args.r, sequenceNames, args.gatk, run_id, args.qual, args.cov, args.mul, sequenceMedObject, sequenceAndIndex)
+				samFilePath = downloadAndBowtie(args.r, run_id, args.t, buildBowtie, args.picard, args.threads)
+		
+				sortedPath = convertToBAM(samFilePath)
+				rawCoverage(sortedPath)
+				sequenceNames, sequenceMedObject, sequenceAndIndex = checkCoverage(sortedPath, args.cov)
+				alleleCalling(sortedPath, args.r, sequenceNames, args.gatk, run_id, args.qual, args.cov, args.mul, sequenceMedObject, sequenceAndIndex)
 
-			if args.rmFastq == True:
-				filesToRemove = glob.glob(os.path.join(args.t, run_id) + '/*.fastq.gz')
-				for i in filesToRemove:
-					os.remove(i)
+				if args.rmFastq == True:
+					filesToRemove = glob.glob(os.path.join(args.t, run_id) + '/*.fastq.gz')
+					for i in filesToRemove:
+						os.remove(i)
 
 
 if __name__ == "__main__":
