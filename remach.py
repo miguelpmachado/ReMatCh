@@ -80,7 +80,9 @@ def runReMaCh(args):
 			else:
 				run=True
 				
-			if run==True:		
+			if run==True:	
+
+				startTime = datetime.now()	
 				
 				count_runs += 1
 
@@ -96,10 +98,22 @@ def runReMaCh(args):
 				sequenceNames, sequenceMedObject, sequenceAndIndex = checkCoverage(sortedPath, args.cov)
 				alleleCalling(sortedPath, args.r, sequenceNames, args.gatk, run_id, args.qual, args.cov, args.mul, sequenceMedObject, sequenceAndIndex)
 
+				gzSizes = 0
+
+				filesToRemove = glob.glob(os.path.join(args.t, run_id) + '/*.fastq.gz')
+
+				for files in filesToRemove:
+					gzSizes += float(os.path.getsize(files))
+
 				if args.rmFastq == True:
-					filesToRemove = glob.glob(os.path.join(args.t, run_id) + '/*.fastq.gz')
 					for i in filesToRemove:
 						os.remove(i)
+
+				run_time = str(datetime.now() - startTime)
+
+				with open(os.path.join(args.t, run_id, run_id + 'runtime.txt'), 'w') as runTimeFile:
+					runTimeFile.write("#runTime\tfileSize\n")
+					runTimeFile.write(run_time + '\t' + gzSizes + '\n')
 
 
 if __name__ == "__main__":
