@@ -114,6 +114,8 @@ def downloadAndBowtie(referencePath, run_id, target_dir, buildBowtie, picardJarP
 	#download_ERR(run_id, target_dir)
 	
 	dir_with_gz = os.path.join(target_dir,run_id)
+
+	print len(os.listdir(dir_with_gz)) 
 	
 	numberFilesDowned= len(os.listdir(dir_with_gz))
 	

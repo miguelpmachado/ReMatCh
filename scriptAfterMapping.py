@@ -53,7 +53,7 @@ def checkCoverage(outputPath, coverageThreshold):
 				arrayOfpositionValues = []
 				prevName = line[0]
 			else:
-				if countLines != 1:
+				if countlines != 1:
 					arrayOfpositionValues.append(int(line[2]))
 				if countlines == 1:
 					prevName = line[0]
