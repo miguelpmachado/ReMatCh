@@ -30,6 +30,7 @@ def main():
 	parser.add_argument('-rmFastq', nargs='?', type=bool, help='Remove fastq files after the analysis', required=False, default = False)
 	parser.add_argument('-l', nargs='?', type=str, help='Path to a list with ids of the sequencing run', required=True)
 	parser.add_argument('-tax', nargs='?', type=str, help='Name taxon to download sequences', required=False)
+	parser.add_argument('-allplat', nargs='?', type=bool, help='Use all platforms', required=False, default = False)
 
 	args = parser.parse_args()
 
@@ -44,8 +45,10 @@ def runReMaCh(args):
 	if args.tax:
 		GetSequencesFromTaxon(args.tax,args.l,True)
 	
-	plataform="Illumina"
-	
+	if args.allplat == False:
+		platform="Illumina"
+	else:
+		platform=''
 	
 	
 	with open(args.l, 'r') as run_ids:
@@ -58,12 +61,12 @@ def runReMaCh(args):
 				count_runs+=1
 				continue
 			
-			elif args.tax and plataform:
+			elif args.tax and platform:
 					run_info=run_id.split("\t")
 					run_id=run_info[0]
 					run_plat=run_info[1]
 					
-					if plataform in run_plat:
+					if platform in run_plat and not "Analyzer" in run_plat:
 						run=True
 			
 			elif args.tax:
