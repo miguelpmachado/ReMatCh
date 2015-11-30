@@ -65,7 +65,7 @@ def checkCoverage(outputPath, coverageThreshold):
 		countSequences += 1
 		sequenceAndIndex[str(countSequences)] = prevName
 
-	print sequenceAndIndex
+	#print sequenceAndIndex
 	#with open(outputPath+'_coverageCheck.tab', 'w') as coverageCheckFile:
 
 	for sequence in sequenceMedObject:
