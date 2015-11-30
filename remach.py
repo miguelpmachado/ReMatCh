@@ -21,7 +21,7 @@ def main():
 	parser.add_argument('-r', nargs='?', type=str, help='Path for the reference sequence', required=True)
 	parser.add_argument('-t', nargs='?', type=str, help='Output directory path', required=True)
 	parser.add_argument('-gatk', nargs='?', type=str, help='Path for the Genome Analysis Toolkit jar file', required=True)
-	parser.add_argument('-pic', nargs='?', type=str, help='Path for the Picard jar file', required=True)
+	parser.add_argument('-picard', nargs='?', type=str, help='Path for the Picard jar file', required=True)
 	parser.add_argument('-cov', nargs='?', type=str, help='Minimum coverage', required=True)
 	parser.add_argument('-qual', nargs='?', type=str, help='Minimum mapping quality', required=True)
 	parser.add_argument('-mul', nargs='?', type=str, help='Multiple alleles', required=True)
@@ -52,7 +52,7 @@ def runReMaCh(args):
 
 			run_id = run_id.strip()
 
-			samFilePath = downloadAndBowtie(args.r, run_id, args.t, buildBowtie, picardJarPath)
+			samFilePath = downloadAndBowtie(args.r, run_id, args.t, buildBowtie, args.picard)
 	
 			sortedPath = convertToBAM(samFilePath)
 			rawCoverage(sortedPath)
