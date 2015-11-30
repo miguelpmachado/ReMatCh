@@ -42,7 +42,7 @@ def runReMaCh(args):
 		print str(args.t) + ' directory created!'
 	
 	if args.tax:
-		GetSequencesFromTaxon(arg.tax,args.l,True)
+		GetSequencesFromTaxon(args.tax,args.l,True)
 	
 	
 	
