@@ -76,7 +76,7 @@ def runReMaCh(args):
 			else:
 				run=True
 				
-			if run:		
+			if run==True:		
 				
 				count_runs += 1
 
