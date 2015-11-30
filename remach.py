@@ -62,11 +62,10 @@ def runReMaCh(args):
 			sequenceNames, sequenceMedObject, sequenceAndIndex = checkCoverage(sortedPath, args.cov)
 			alleleCalling(sortedPath, args.r, sequenceNames, args.gatk, run_id, args.qual, args.cov, args.mul, sequenceMedObject, sequenceAndIndex)
 
-			filesToRemove = glob.glob(os.path.join(args.t, run_id) + '/*.fastq.gz')
-
-			for i in filesToRemove:
-				print i
-				os.remove(i)
+			if args.rmFastq:
+				filesToRemove = glob.glob(os.path.join(args.t, run_id) + '/*.fastq.gz')
+				for i in filesToRemove:
+					os.remove(i)
 
 
 if __name__ == "__main__":
