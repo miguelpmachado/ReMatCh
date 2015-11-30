@@ -74,7 +74,7 @@ def checkCoverage(outputPath, coverageThreshold):
 		countDuplication = 0
 		sequenceLength = len(sequenceMedObject[sequence][3])
 
-		print "%s: %s bp; %s meanCoverage." % (sequence, sequenceLength, sequenceMedObject[sequence][1])
+		#print "%s: %s bp; %s meanCoverage." % (sequence, sequenceLength, sequenceMedObject[sequence][1])
 
 		for coverageAtPosition in sequenceMedObject[sequence][3]:
 			if coverageAtPosition >= 1.25 * sequenceMedObject[sequence][1]:

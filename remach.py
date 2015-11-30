@@ -111,7 +111,7 @@ def runReMaCh(args):
 
 				run_time = str(datetime.now() - startTime)
 
-				with open(os.path.join(args.t, run_id, run_id + 'runtime.txt'), 'w') as runTimeFile:
+				with open(os.path.join(args.t, run_id, run_id + '_runtime.txt'), 'w') as runTimeFile:
 					runTimeFile.write("#runTime\tfileSize\n")
 					runTimeFile.write(str(run_time) + '\t' + str(gzSizes) + '\n')
 
