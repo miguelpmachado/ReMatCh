@@ -118,6 +118,7 @@ def downloadAndBowtie(referencePath, run_id, target_dir, buildBowtie, picardJarP
 	
 	#download_ERR(run_id, target_dir)
 
+	numberFilesDowned= len(glob.glob1(dir_with_gz, "*.fastq.gz")) 
 
 	#print len(glob.glob1(dir_with_gz, "*.fastq.gz")) 
 	
