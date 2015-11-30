@@ -12,7 +12,7 @@ from scriptAfterMapping import checkCoverage
 from scriptAfterMapping import convertToBAM
 from scriptAfterMapping import rawCoverage
 from scriptAfterMapping import alleleCalling
-
+from SeqFromWebTaxon import GetSequencesFromTaxon
 
 def main():
 
@@ -29,7 +29,7 @@ def main():
 	parser.add_argument('-threads', nargs='?', type=int, help='Number of threads', required=False, default= 1)
 	parser.add_argument('-rmFastq', nargs='?', type=bool, help='Remove fastq files after the analysis', required=False, default = False)
 	parser.add_argument('-l', nargs='?', type=str, help='Path to a list with ids of the sequencing run', required=True)
-
+	parser.add_argument('-tax', nargs='?', type=str, help='Name taxon to download sequences', required=False)
 
 	args = parser.parse_args()
 
@@ -40,14 +40,24 @@ def runReMaCh(args):
 	if not os.path.isdir(args.t):
 		os.mkdir(args.t)
 		print str(args.t) + ' directory created!'
-
+	
+	if args.tax:
+		GetSequencesFromTaxon(arg.tax,args.l,True)
+	
+	
 	
 	with open(args.l, 'r') as run_ids:
 
 		count_runs = 0
 		buildBowtie = True
 		for run_id in run_ids:
-
+			
+			if args.tax:
+				run_info=run_id.split("\t")
+				run_id=run_info[0]
+				run_plat=run_info[1]
+			
+			
 			count_runs += 1
 
 			if count_runs > 1:
