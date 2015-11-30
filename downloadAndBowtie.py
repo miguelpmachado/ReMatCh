@@ -89,7 +89,12 @@ def download_ERR(ERR_id,target_dir):
 
 
 
-def downloadAndBowtie(referencePath, run_id, target_dir, buildBowtie):
+def downloadAndBowtie(referencePath, run_id, target_dir, buildBowtie, picardJarPath):
+
+	print "run picard"
+	picardFileName, extension = os.path.splitext(referencePath)
+        os.system("java -jar "+ picardJarPath +" CreateSequenceDictionary R= " + referencePath + " O= " + picardFileName + ".dict")
+
 
 
 	bowtieBuildFileName, extension = os.path.splitext(referencePath)
@@ -112,9 +117,9 @@ def downloadAndBowtie(referencePath, run_id, target_dir, buildBowtie):
 	
 	numberFilesDowned= len(os.listdir(dir_with_gz))
 	
-	bowtie_output_file=os.path.join(dir_with_gz, "bowtie_out.sam")
+	bowtie_output_file=os.path.join(dir_with_gz, run_id + ".sam")
 	
-	bowtieLog = os.path.join(dir_with_gz, "bowtie_output.txt")
+	bowtieLog = os.path.join(dir_with_gz, run_id + "bowtie_output.txt")
 	
 		
 	

@@ -33,6 +33,7 @@ def rawCoverage(bamSortedPath):
 def checkCoverage(outputPath, coverageThreshold):
 
 	sequenceMedObject = {}
+	sequenceAndIndex = {}
 		
 	with open(outputPath+'.tab') as tsv:
 		prevName = '';
@@ -42,9 +43,13 @@ def checkCoverage(outputPath, coverageThreshold):
 
 		for line in csv.reader(tsv, delimiter="\t"):
 			countlines += 1
+			countSequences = 0
 			if prevName != line[0] and countlines != 1:
+				countSequences += 1
 				sequenceNames.append(prevName)
+				arrayOfpositionValues.append(int(line[2]))
 				sequenceMedObject[prevName] = [prevName, numpy.average(arrayOfpositionValues), numpy.std(arrayOfpositionValues), arrayOfpositionValues, False, False, False]
+				sequenceAndIndex[prevName] = str(countSequences)
 				arrayOfpositionValues = []
 				prevName = line[0]
 			else:
@@ -54,7 +59,8 @@ def checkCoverage(outputPath, coverageThreshold):
 
 		sequenceNames.append(prevName)
 		sequenceMedObject[prevName] = [prevName, numpy.average(arrayOfpositionValues), numpy.std(arrayOfpositionValues), arrayOfpositionValues, False, False, False]
-
+		countSequences += 1
+		sequenceAndIndex[prevName] = str(countSequences)
 	#with open(outputPath+'_coverageCheck.tab', 'w') as coverageCheckFile:
 
 	for sequence in sequenceMedObject:
@@ -62,6 +68,8 @@ def checkCoverage(outputPath, coverageThreshold):
 		countIndel = 0
 		countDuplication = 0
 		sequenceLength = len(sequenceMedObject[sequence][3])
+
+		print "%s: %s bp; %s meanCoverage." % (sequence, sequenceLength, sequenceMedObject[sequence][1])
 
 		for coverageAtPosition in sequenceMedObject[sequence][3]:
 			if coverageAtPosition >= 1.25 * sequenceMedObject[sequence][1]:
@@ -76,50 +84,65 @@ def checkCoverage(outputPath, coverageThreshold):
 		sequenceMedObject[sequence].append(str(float(countLowCoverage)/float(sequenceLength)))
 			#coverageCheckFile.write(sequence + '\t' + str(float(countDuplication)/sequenceLength) + '\t' + str(float(countcountIndel)/float(sequenceLength)) + '\t' + str(float(countLowCoverage)/float(sequenceLength))+"\n")
 
-	return sequenceNames, sequenceMedObject
+	return sequenceNames, sequenceMedObject, sequenceAndIndex
     		
-def alleleCalling(bamSortedPath, referencePath, sequenceNames, gatkPath, sampleID, qualityThreshold, coverageThreshold, multipleAlleles, sequenceMedObject):
+def alleleCalling(bamSortedPath, referencePath, sequenceNames, gatkPath, sampleID, qualityThreshold, coverageThreshold, multipleAlleles, sequenceMedObject, sequenceAndIndex):
 
 	ploidytempFile = bamSortedPath+'_temp_ploi.tab'
 
-	testFile = bamSortedPath + 'test.fasta'
+	sequencesFile = bamSortedPath + '_sequences.fasta'
 
 	with open(ploidytempFile, 'w') as tempFile:
 		tempFile.write(sampleID + '\t' + str(1))
 
-	os.system("samtools mpileup --no-BAQ --fasta-ref " + referencePath + " --uncompressed -t DP,DPR " + bamSortedPath + ".bam | bcftools call --consensus-caller --gvcf 2 --samples-file "+ ploidytempFile + " --output-type v --output " + bamSortedPath + ".vcf")
-	os.system("java -jar " + gatkPath + " -T FastaAlternateReferenceMaker -R "+ referencePath +" -o "+ testFile +" -V "+ bamSortedPath + ".vcf")
+	os.system("samtools mpileup --no-BAQ --fasta-ref " + referencePath + " --uncompressed -t DP,DPR " + bamSortedPath + ".bam | bcftools call --multiallelic-caller --variants-only --samples-file " + ploidytempFile + " --output-type v --output " + bamSortedPath + ".vcf")
+	os.system("bcftools filter --include 'QUAL>=" + qualityThreshold + " && FORMAT/DP>=" + coverageThreshold + "' --output-type v --output " + bamSortedPath + "_filtered.vcf " + bamSortedPath + ".vcf")
+	os.system("java -jar " + gatkPath + " -T FastaAlternateReferenceMaker -R "+ referencePath +" -o "+ sequencesFile +" -V "+ bamSortedPath + "_filtered.vcf")
 
 	#os.system("rm " + testFile)
 	os.system("rm " + ploidytempFile)
 
+	with open(sequencesFile, 'r') as seqFile:
+		with open(sequencesFile+".temp", 'w') as tempFile:
+			for line in seqFile:
+				if '>' in line:
+					number = line.split('>')[1].strip("\n")
+					lineToUse = '>' + sequenceAndIndex[number] + '\n'
+					tempFile.write(lineToUse)
+				else:
+					tempFile.write(lineToUse)
+
+	os.remove(sequencesFile)
+	os.rename(sequencesFile+".temp", sequencesFile)
+
+
+
 	with open(bamSortedPath + ".vcf", 'r') as vcfFile:
 		for line in csv.reader(vcfFile, delimiter="\t"):
 			if not line[0].startswith("#"):
-				if not line[7].startswith('END'):
-					quality = line[5]
-					if quality < float(qualityThreshold):
-						sequenceMedObject[line[0]][4] = True
-					
-					deepCoverage = float(line[7].split(';')[0].split('=')[1])
-					
-					if deepCoverage < float(coverageThreshold):
-						sequenceMedObject[line[0]][5] = True
-					
-					coverageByAllele = line[9].split(':')[3].split(',')
-					alternativeAlleles = line[4].split(',')
+				quality = line[5]
+				if quality < float(qualityThreshold):
+					sequenceMedObject[line[0]][4] = True
+				
+				deepCoverage = float(line[7].split(';')[0].split('=')[1])
+				
+				if deepCoverage < float(coverageThreshold):
+					sequenceMedObject[line[0]][5] = True
+				
+				coverageByAllele = line[9].split(':')[3].split(',')
+				alternativeAlleles = line[4].split(',')
 
-					coverageByAllele = [ int(x) for x in coverageByAllele ]
+				coverageByAllele = [ int(x) for x in coverageByAllele ]
 
-					dominantSNP = coverageByAllele.index(max(coverageByAllele))
-					coverageAllele = coverageByAllele[dominantSNP]
-					alternativeSNP = alternativeAlleles[dominantSNP-1]
+				dominantSNP = coverageByAllele.index(max(coverageByAllele))
+				coverageAllele = coverageByAllele[dominantSNP]
+				alternativeSNP = alternativeAlleles[dominantSNP-1]
 
-					if coverageAllele/deepCoverage < float(multipleAlleles):
-						sequenceMedObject[line[0]][6] = True
+				if coverageAllele/deepCoverage < float(multipleAlleles):
+					sequenceMedObject[line[0]][6] = True
 
 	check_fileName = bamSortedPath.replace('_sorted', '')
-	
+
 	with open(check_fileName + "_mappingCheck.tab", 'w') as mappingCheckFile:
 		mappingCheckFile.write('#Sequence\tDuplication\tIndel\tRawCoverage\tAlternativeQualityScore\tCoverage\tMultipleAllele\n')
 		for sequence in sequenceMedObject:

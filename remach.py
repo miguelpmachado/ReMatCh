@@ -21,10 +21,11 @@ def main():
 	parser.add_argument('-r', nargs='?', type=str, help='Path for the reference sequence', required=True)
 	parser.add_argument('-t', nargs='?', type=str, help='Output directory path', required=True)
 	parser.add_argument('-gatk', nargs='?', type=str, help='Path for the Genome Analysis Toolkit jar file', required=True)
+	parser.add_argument('-pic', nargs='?', type=str, help='Path for the Picard jar file', required=True)
 	parser.add_argument('-cov', nargs='?', type=str, help='Minimum coverage', required=True)
 	parser.add_argument('-qual', nargs='?', type=str, help='Minimum mapping quality', required=True)
 	parser.add_argument('-mul', nargs='?', type=str, help='Multiple alleles', required=True)
-	parser.add_argument('-l', nargs='?', type=str, help='list with ids of the sequencing run', required=True)
+	parser.add_argument('-l', nargs='?', type=str, help='Path to a list with ids of the sequencing run', required=True)
 
 
 	args = parser.parse_args()
@@ -51,12 +52,12 @@ def runReMaCh(args):
 
 			run_id = run_id.strip()
 
-			samFilePath = downloadAndBowtie(args.r, run_id, args.t, buildBowtie)
+			samFilePath = downloadAndBowtie(args.r, run_id, args.t, buildBowtie, picardJarPath)
 	
 			sortedPath = convertToBAM(samFilePath)
 			rawCoverage(sortedPath)
-			sequenceNames, sequenceMedObject = checkCoverage(sortedPath, args.cov)
-			alleleCalling(sortedPath, args.r, sequenceNames, args.gatk, run_id, args.qual, args.cov, args.mul, sequenceMedObject)
+			sequenceNames, sequenceMedObject, sequenceAndIndex = checkCoverage(sortedPath, args.cov)
+			alleleCalling(sortedPath, args.r, sequenceNames, args.gatk, run_id, args.qual, args.cov, args.mul, sequenceMedObject, sequenceAndIndex)
 
 
 if __name__ == "__main__":
