@@ -43,11 +43,13 @@ Mapping of the run ERR012354 against the reference.fasta file:
 
 * Bowtie http://bowtie-bio.sourceforge.net/index.shtml
 
-* NumPy http://www.numpy.org/
-
 * SAMtools http://samtools.sourceforge.net/
 
 * BEDtools http://bedtools.readthedocs.org/en/latest/
+
+* Genome Analysis Toolkit (GATK)  https://www.broadinstitute.org/gatk/
+
+* Picard  http://broadinstitute.github.io/picard/
 
 #Modules used
 
