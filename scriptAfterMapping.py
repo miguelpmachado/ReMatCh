@@ -53,9 +53,11 @@ def checkCoverage(outputPath, coverageThreshold):
 				arrayOfpositionValues = []
 				prevName = line[0]
 			else:
-				arrayOfpositionValues.append(int(line[2]))
+				if countLines != 1:
+					arrayOfpositionValues.append(int(line[2]))
 				if countlines == 1:
 					prevName = line[0]
+
 
 		sequenceNames.append(prevName)
 		sequenceMedObject[prevName] = [prevName, numpy.average(arrayOfpositionValues), numpy.std(arrayOfpositionValues), arrayOfpositionValues, False, False, False]

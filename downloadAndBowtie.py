@@ -119,7 +119,7 @@ def downloadAndBowtie(referencePath, run_id, target_dir, buildBowtie, picardJarP
 	
 	bowtie_output_file=os.path.join(dir_with_gz, run_id + ".sam")
 	
-	bowtieLog = os.path.join(dir_with_gz, run_id + "bowtie_output.txt")
+	bowtieLog = os.path.join(dir_with_gz, run_id + "_bowtie_output.txt")
 	
 		
 	
