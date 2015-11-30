@@ -24,7 +24,7 @@ def main():
 	parser.add_argument('-cov', nargs='?', type=str, help='Minimum coverage', required=True)
 	parser.add_argument('-qual', nargs='?', type=str, help='Minimum mapping quality', required=True)
 	parser.add_argument('-mul', nargs='?', type=str, help='Multiple alleles', required=True)
-	parser.add_argument('-ri', nargs='?', type=str, help='Id of the sequencing run', required=True)
+	parser.add_argument('-l', nargs='?', type=str, help='list with ids of the sequencing run', required=True)
 
 
 	args = parser.parse_args()
@@ -38,13 +38,25 @@ def runReMaCh(args):
 		print str(args.t) + ' directory created!'
 
 	
+	with open(args.l, 'r') as run_ids:
 
-	samFilePath = downloadAndBowtie(args.r, args.ri, args.t)
+		count_runs = 0
+		buildBowtie = True
+		for run_id in run_ids:
+
+			count_runs += 1
+
+			if count_runs > 1:
+				buildBowtie = False
+
+			run_id = run_id.strip()
+
+			samFilePath = downloadAndBowtie(args.r, run_id, args.t, buildBowtie)
 	
-	sortedPath = convertToBAM(samFilePath)
-	rawCoverage(sortedPath)
-	sequenceNames, sequenceMedObject = checkCoverage(sortedPath, args.cov)
-	alleleCalling(sortedPath, args.r, sequenceNames, args.gatk, args.ri, args.qual, args.cov, args.mul, sequenceMedObject)
+			sortedPath = convertToBAM(samFilePath)
+			rawCoverage(sortedPath)
+			sequenceNames, sequenceMedObject = checkCoverage(sortedPath, args.cov)
+			alleleCalling(sortedPath, args.r, sequenceNames, args.gatk, run_id, args.qual, args.cov, args.mul, sequenceMedObject)
 
 
 if __name__ == "__main__":

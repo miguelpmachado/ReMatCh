@@ -118,7 +118,9 @@ def alleleCalling(bamSortedPath, referencePath, sequenceNames, gatkPath, sampleI
 					if coverageAllele/deepCoverage < float(multipleAlleles):
 						sequenceMedObject[line[0]][6] = True
 
-	with open(bamSortedPath + "_mappingCheck.tab", 'w') as mappingCheckFile:
+	check_fileName = bamSortedPath.replace('_sorted', '')
+	
+	with open(check_fileName + "_mappingCheck.tab", 'w') as mappingCheckFile:
 		mappingCheckFile.write('#Sequence\tDuplication\tIndel\tRawCoverage\tAlternativeQualityScore\tCoverage\tMultipleAllele\n')
 		for sequence in sequenceMedObject:
 			mappingCheckFile.write(sequence + '\t' + str(sequenceMedObject[sequence][7]) + '\t' + str(sequenceMedObject[sequence][8]) + '\t' + str(sequenceMedObject[sequence][9]) + '\t' +str(sequenceMedObject[sequence][4]) + '\t' +str(sequenceMedObject[sequence][5]) + '\t' +str(sequenceMedObject[sequence][6]) + '\n')

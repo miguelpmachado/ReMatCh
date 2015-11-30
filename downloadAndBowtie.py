@@ -89,26 +89,32 @@ def download_ERR(ERR_id,target_dir):
 
 
 
-def downloadAndBowtie(referencePath, run_id, target_dir):
+def downloadAndBowtie(referencePath, run_id, target_dir, buildBowtie):
 
 
 	bowtieBuildFileName, extension = os.path.splitext(referencePath)
 	
 	print "run bowtie"
 
-	subprocess.call(["bowtie2-build", referencePath, bowtieBuildFileName])
+	if buildBowtie == True:
+		subprocess.call(["bowtie2-build", referencePath, bowtieBuildFileName])
 	
 	#download ERR
+
+	if not os.path.exists(os.path.join(target_dir, run_id, run_id + '.fastq.gz')):
+		download_ERR(run_id, target_dir)
+	else:
+		print 'File already exists...'
 	
-	download_ERR(run_id, target_dir)
+	#download_ERR(run_id, target_dir)
 	
 	dir_with_gz = os.path.join(target_dir,run_id)
 	
 	numberFilesDowned= len(os.listdir(dir_with_gz))
 	
-	bowtie_output_file=os.path.join(target_dir, "bowtie_out.sam")
+	bowtie_output_file=os.path.join(dir_with_gz, "bowtie_out.sam")
 	
-	bowtieLog = os.path.join(target_dir, "bowtie_output.txt")
+	bowtieLog = os.path.join(dir_with_gz, "bowtie_output.txt")
 	
 		
 	
