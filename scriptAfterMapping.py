@@ -129,22 +129,29 @@ def alleleCalling(bamSortedPath, referencePath, sequenceNames, gatkPath, sampleI
 				if quality < float(qualityThreshold):
 					sequenceMedObject[line[0]][4] = True
 				
-				deepCoverage = float(line[7].split(';')[0].split('=')[1])
+				if line[7].startswith("INDEL"):
+					
+					deepCoverage = float(line[7].split(';')[3].split('=')[1])
 				
-				if deepCoverage < float(coverageThreshold):
-					sequenceMedObject[line[0]][5] = True
+					if deepCoverage < float(coverageThreshold):
+						sequenceMedObject[line[0]][5] = True
+				else:
+					deepCoverage = float(line[7].split(';')[0].split('=')[1])
+					
+					if deepCoverage < float(coverageThreshold):
+						sequenceMedObject[line[0]][5] = True
 				
-				coverageByAllele = line[9].split(':')[3].split(',')
-				alternativeAlleles = line[4].split(',')
+					coverageByAllele = line[9].split(':')[3].split(',')
+					alternativeAlleles = line[4].split(',')
 
-				coverageByAllele = [ int(x) for x in coverageByAllele ]
+					coverageByAllele = [ int(x) for x in coverageByAllele ]
 
-				dominantSNP = coverageByAllele.index(max(coverageByAllele))
-				coverageAllele = coverageByAllele[dominantSNP]
-				alternativeSNP = alternativeAlleles[dominantSNP-1]
+					dominantSNP = coverageByAllele.index(max(coverageByAllele))
+					coverageAllele = coverageByAllele[dominantSNP]
+					alternativeSNP = alternativeAlleles[dominantSNP-1]
 
-				if coverageAllele/deepCoverage < float(multipleAlleles):
-					sequenceMedObject[line[0]][6] = True
+					if coverageAllele/deepCoverage < float(multipleAlleles):
+						sequenceMedObject[line[0]][6] = True
 
 	check_fileName = bamSortedPath.replace('_sorted', '')
 
