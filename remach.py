@@ -103,9 +103,9 @@ def runReMaCh(args):
 					sortedPath = convertToBAM(samFilePath)
 					rawCoverage(sortedPath)
 					print "Checking coverage"
-					sequenceNames, sequenceMedObject, sequenceAndIndex = checkCoverage(sortedPath, args.cov,args.xtraSeq)
+					sequenceNames, sequenceMedObject = checkCoverage(sortedPath, args.cov,args.xtraSeq)
 					print "Checked coverage goint to perform allele call"
-					alleleCalling(sortedPath, args.r, sequenceNames, args.gatk, run_id, args.qual, args.cov, args.mul, sequenceMedObject, sequenceAndIndex, args.threads,args.xtraSeq)
+					alleleCalling(sortedPath, args.r, sequenceNames, args.gatk, run_id, args.qual, args.cov, args.mul, sequenceMedObject, args.threads,args.xtraSeq)
 					print "allele called everything"	
 					
 					

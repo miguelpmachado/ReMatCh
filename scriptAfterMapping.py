@@ -72,7 +72,7 @@ def changeFastaHeaders(FastasequencesFile,TrimmExtraSeq,referencePath):
 def checkCoverage(outputPath, coverageThreshold,extraSeq):
 
 	sequenceMedObject = {}
-	sequenceAndIndex = {}
+	#sequenceAndIndex = {}
 		
 	with open(outputPath+'.tab') as tsv:
 		prevName = '';
