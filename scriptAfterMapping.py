@@ -30,30 +30,39 @@ def rawCoverage(bamSortedPath):
 	os.system("bedtools genomecov -d -ibam " + bamSortedPath + ".bam > " + bamSortedPath+".tab")
 
 
-def changeFastaHeaders(FastasequencesFile,TrimmExtraSeq,sequenceAndIndex):
+def changeFastaHeaders(FastasequencesFile,TrimmExtraSeq,referencePath):
+	
+	
+	
+	
+	
 	print sequenceAndIndex
-	with open(FastasequencesFile, 'r') as seqFile:
-		with open(FastasequencesFile+".temp", 'w') as tempFile:
-			tempStr=''
-			for line in seqFile:
-				
-				if '>' in line:
+	with open(referencePath, 'r') as seqFileRef:
+		Reflines=seqFileRef.readlines()
+		with open(FastasequencesFile, 'r') as seqFile:
+			with open(FastasequencesFile+".temp", 'w') as tempFile:
+				tempStr=''
+				linenumber=0
+				for line in seqFile:
 					
-					if TrimmExtraSeq!=0 and len(tempStr)>0:
-						tempStr=tempStr[TrimmExtraSeq+1:len(tempStr)-TrimmExtraSeq]
+					if '>' in line:
+						
+						if TrimmExtraSeq!=0 and len(tempStr)>0:
+							tempStr=tempStr[TrimmExtraSeq+1:len(tempStr)-TrimmExtraSeq]
+						
+						tempFile.write(tempStr+"\n")
+						#number = line.split('>')[1].strip("\n").strip("\r")
+						#lineToUse = '>' + sequenceAndIndex[number] + '\n'
+						
+						tempFile.write(Reflines[linenumber])
+					else:
+						tempStr+=line.replace('\n', '').replace('\r', '')
+						#tempFile.write(line)
 					
-					tempFile.write(tempStr+"\n")
-					number = line.split('>')[1].strip("\n").strip("\r")
-					print number
-					lineToUse = '>' + sequenceAndIndex[number] + '\n'
-					tempFile.write(lineToUse)
-				else:
-					tempStr+=line.replace('\n', '').replace('\r', '')
-					#tempFile.write(line)
-			
-			if TrimmExtraSeq!=0 and len(tempStr)>0:
-				tempStr=tempStr[TrimmExtraSeq:len(tempStr)-TrimmExtraSeq-1]	
-			tempFile.write(tempStr)
+					linenumber+=1
+				if TrimmExtraSeq!=0 and len(tempStr)>0:
+					tempStr=tempStr[TrimmExtraSeq:len(tempStr)-TrimmExtraSeq-1]	
+				tempFile.write(tempStr)
 			
 	os.remove(FastasequencesFile)
 	os.rename(FastasequencesFile+".temp", FastasequencesFile)
@@ -82,7 +91,7 @@ def checkCoverage(outputPath, coverageThreshold,extraSeq):
 				arrayOfcoverageValues.append(int(line[2]))
 				arrayOfpositionValues.append(int(line[1]))
 				sequenceMedObject[prevName] = [prevName, numpy.average(arrayOfcoverageValues), numpy.std(arrayOfcoverageValues), arrayOfcoverageValues, False, False, False,arrayOfpositionValues]
-				sequenceAndIndex[str(countSequences)] = prevName
+				#sequenceAndIndex[str(countSequences)] = prevName
 				arrayOfcoverageValues = []
 				arrayOfpositionValues = []
 				prevName = line[0]
@@ -97,7 +106,7 @@ def checkCoverage(outputPath, coverageThreshold,extraSeq):
 		sequenceNames.append(prevName)
 		sequenceMedObject[prevName] = [prevName, numpy.average(arrayOfcoverageValues), numpy.std(arrayOfcoverageValues), arrayOfcoverageValues, False, False, False,arrayOfpositionValues]
 		countSequences += 1
-		sequenceAndIndex[str(countSequences)] = prevName
+		#sequenceAndIndex[str(countSequences)] = prevName
 
 	#print sequenceAndIndex
 	#with open(outputPath+'_coverageCheck.tab', 'w') as coverageCheckFile:
@@ -128,9 +137,11 @@ def checkCoverage(outputPath, coverageThreshold,extraSeq):
 		sequenceMedObject[sequence].append(str(float(countLowCoverage)/float(sequenceLength)))
 			#coverageCheckFile.write(sequence + '\t' + str(float(countDuplication)/sequenceLength) + '\t' + str(float(countcountIndel)/float(sequenceLength)) + '\t' + str(float(countLowCoverage)/float(sequenceLength))+"\n")
 
-	return sequenceNames, sequenceMedObject, sequenceAndIndex
+	#return sequenceNames, sequenceMedObject, sequenceAndIndex
+
+	return sequenceNames, sequenceMedObject
     		
-def alleleCalling(bamSortedPath, referencePath, sequenceNames, gatkPath, sampleID, qualityThreshold, coverageThreshold, multipleAlleles, sequenceMedObject, sequenceAndIndex,threadnumb,extraSeq):
+def alleleCalling(bamSortedPath, referencePath, sequenceNames, gatkPath, sampleID, qualityThreshold, coverageThreshold, multipleAlleles, sequenceMedObject,threadnumb,extraSeq):
 
 	ploidytempFile = bamSortedPath+'_temp_ploi.tab'
 
@@ -159,9 +170,9 @@ def alleleCalling(bamSortedPath, referencePath, sequenceNames, gatkPath, sampleI
 	os.system("rm " + ploidytempFile)
 
 	
-	changeFastaHeaders(filteredsequencesFile, extraSeq,sequenceAndIndex)
-	changeFastaHeaders(bamSortedPath + "_sequences_filtered_without_indels.fasta", extraSeq,sequenceAndIndex)
-	changeFastaHeaders(sequencesFile, extraSeq,sequenceAndIndex)
+	changeFastaHeaders(filteredsequencesFile, extraSeq,referencePath)
+	changeFastaHeaders(bamSortedPath + "_sequences_filtered_without_indels.fasta", extraSeq,referencePath)
+	changeFastaHeaders(sequencesFile, extraSeq,referencePath)
 
 
 	with open(bamSortedPath + ".vcf", 'r') as vcfFile:
