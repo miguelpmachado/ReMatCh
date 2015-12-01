@@ -30,7 +30,7 @@ def rawCoverage(bamSortedPath):
 	os.system("bedtools genomecov -d -ibam " + bamSortedPath + ".bam > " + bamSortedPath+".tab")
 
 
-def changeFastaHeaders(FastasequencesFile,TrimmExtraSeq):
+def changeFastaHeaders(FastasequencesFile,TrimmExtraSeq,sequenceAndIndex):
 	with open(FastasequencesFile, 'r') as seqFile:
 		with open(FastasequencesFile+".temp", 'w') as tempFile:
 			tempStr=''
@@ -157,9 +157,9 @@ def alleleCalling(bamSortedPath, referencePath, sequenceNames, gatkPath, sampleI
 	os.system("rm " + ploidytempFile)
 
 	
-	changeFastaHeaders(filteredsequencesFile, extraSeq)
-	changeFastaHeaders(bamSortedPath + "_sequences_filtered_without_indels.fasta", extraSeq)
-	changeFastaHeaders(sequencesFile, extraSeq)
+	changeFastaHeaders(filteredsequencesFile, extraSeq,sequenceAndIndex)
+	changeFastaHeaders(bamSortedPath + "_sequences_filtered_without_indels.fasta", extraSeq,sequenceAndIndex)
+	changeFastaHeaders(sequencesFile, extraSeq,sequenceAndIndex)
 
 
 	with open(bamSortedPath + ".vcf", 'r') as vcfFile:
