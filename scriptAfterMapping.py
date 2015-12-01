@@ -34,7 +34,6 @@ def changeFastaHeaders(FastasequencesFile,TrimmExtraSeq,sequenceAndIndex):
 	with open(FastasequencesFile, 'r') as seqFile:
 		with open(FastasequencesFile+".temp", 'w') as tempFile:
 			tempStr=''
-			SequencesDict={}
 			for line in seqFile:
 				
 				if '>' in line:
@@ -43,13 +42,13 @@ def changeFastaHeaders(FastasequencesFile,TrimmExtraSeq,sequenceAndIndex):
 						tempStr=tempStr[TrimmExtraSeq:len(tempStr)-TrimmExtraSeq-1]
 					
 					tempFile.write(tempStr)
-					tempStr=''
-					number = line.split('>')[1].strip("\n")
+					tempStr='\n'
+					number = line.split('>')[1].strip("\n").strip("\r")
 					lineToUse = '>' + sequenceAndIndex[number] + '\n'
 					tempFile.write(lineToUse)
 				else:
 					tempStr+=line.replace('\n', '').replace('\r', '')
-					tempFile.write(line)
+					#tempFile.write(line)
 				
 			tempFile.write(tempStr)
 			
