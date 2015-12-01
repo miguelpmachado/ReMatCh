@@ -32,36 +32,40 @@ def rawCoverage(bamSortedPath):
 
 def changeFastaHeaders(FastasequencesFile,TrimmExtraSeq,referencePath):
 	
+	headersArray=[]
 	
 	with open(referencePath, 'r') as seqFileRef:
-		Reflines=seqFileRef.readlines()
-		with open(FastasequencesFile, 'r') as seqFile:
-			with open(FastasequencesFile+".temp", 'w') as tempFile:
-				tempStr=''
-				linenumber=0
-				for line in seqFile:
+		for line in seqFileRef:
+			if '>' in line:
+				headersArray.append(line)
+			
+	with open(FastasequencesFile, 'r') as seqFile:
+		with open(FastasequencesFile+".temp", 'w') as tempFile:
+			tempStr=''
+			headercounter=0
+			for line in seqFile:
+				
+				if '>' in line:
 					
-					if '>' in line:
+					if TrimmExtraSeq!=0 and len(tempStr)>0:
+						tempStr=tempStr[TrimmExtraSeq+1:len(tempStr)-TrimmExtraSeq]
+					if headercounter>0:
+						tempFile.write(tempStr+"\n")
 						
-						if TrimmExtraSeq!=0 and len(tempStr)>0:
-							tempStr=tempStr[TrimmExtraSeq+1:len(tempStr)-TrimmExtraSeq]
-						if linenumber>0:
-							tempFile.write(tempStr+"\n")
-							
-						tempStr=''
-						#number = line.split('>')[1].strip("\n").strip("\r")
-						#lineToUse = '>' + sequenceAndIndex[number] + '\n'
-						
-						tempFile.write(Reflines[linenumber])
+					tempStr=''
+					#number = line.split('>')[1].strip("\n").strip("\r")
+					#lineToUse = '>' + sequenceAndIndex[number] + '\n'
 					
-					else:
-						tempStr+=line.replace('\n', '').replace('\r', '')
-						#tempFile.write(line)
-					
-					linenumber+=1
-				if TrimmExtraSeq!=0 and len(tempStr)>0:
-					tempStr=tempStr[TrimmExtraSeq:len(tempStr)-TrimmExtraSeq-1]	
-				tempFile.write(tempStr)
+					tempFile.write(headersArray[headercounter])
+					headercounter+=1
+				
+				else:
+					tempStr+=line.replace('\n', '').replace('\r', '')
+					#tempFile.write(line)
+				
+			if TrimmExtraSeq!=0 and len(tempStr)>0:
+				tempStr=tempStr[TrimmExtraSeq:len(tempStr)-TrimmExtraSeq-1]	
+			tempFile.write(tempStr)
 			
 	os.remove(FastasequencesFile)
 	os.rename(FastasequencesFile+".temp", FastasequencesFile)
