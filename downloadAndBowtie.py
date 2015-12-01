@@ -126,7 +126,7 @@ def downloadAndBowtie(referencePath, run_id, target_dir, buildBowtie, picardJarP
 	
 	bowtieLog = os.path.join(dir_with_gz, run_id + "_bowtie_error.txt")
 	
-		
+	pairedOrSingle="Single_end"	
 	
 	
 	if numberFilesDowned==1:
@@ -139,22 +139,22 @@ def downloadAndBowtie(referencePath, run_id, target_dir, buildBowtie, picardJarP
 		p = subprocess.call(args,stdout=myoutput,stderr=myoutput)
 
 
-
 	elif numberFilesDowned==2:
 		command_line ="bowtie2 -k 2 --quiet --no-unal -x "+bowtieBuildFileName+" -1 "+dir_with_gz+"/"+run_id+"_1.fastq.gz -2 "+dir_with_gz+"/"+run_id+"_2.fastq.gz --rg-id ENA --rg SM:"+run_id+" --sensitive-local --threads "+ str(threads) +" --met-file "+ os.path.join(dir_with_gz, run_id+".bowtie_metrics.txt") + " -S "+bowtie_output_file+" "
 		
 		myoutput = open(bowtieLog, 'w')
 		args = shlex.split(command_line)
 		p = subprocess.call(args,stdout=myoutput,stderr=myoutput)
-
+		pairedOrSingle="Paired_end"	
 		
 		
 	
 	else:
 		
 		print "0 or more than 2 fastq files"
+		return False
 
-
-	return bowtie_output_file
+	
+	return bowtie_output_file,pairedOrSingle
 
 

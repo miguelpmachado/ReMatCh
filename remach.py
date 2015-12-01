@@ -31,6 +31,7 @@ def main():
 	parser.add_argument('-l', nargs='?', type=str, help='Path to a list with ids of the sequencing run', required=True)
 	parser.add_argument('-tax', nargs='?', type=str, help='Name taxon to download sequences', required=False)
 	parser.add_argument('-allplat', nargs='?', type=bool, help='Use all platforms', required=False, default = False)
+	parser.add_argument('-xtraSeq', nargs='?', type=int, help='For trimming extra sequence lenght 5\' and 3\' ', required=False, default = 0)
 
 	args = parser.parse_args()
 
@@ -91,29 +92,34 @@ def runReMaCh(args):
 
 				run_id = run_id.strip()
 
-				samFilePath = downloadAndBowtie(args.r, run_id, args.t, buildBowtie, args.picard, args.threads)
-		
-				sortedPath = convertToBAM(samFilePath)
-				rawCoverage(sortedPath)
-				sequenceNames, sequenceMedObject, sequenceAndIndex = checkCoverage(sortedPath, args.cov)
-				alleleCalling(sortedPath, args.r, sequenceNames, args.gatk, run_id, args.qual, args.cov, args.mul, sequenceMedObject, sequenceAndIndex)
+				samFilePath,singOrPaired = downloadAndBowtie(args.r, run_id, args.t, buildBowtie, args.picard, args.threads)
+				
+				if not samFilePath==False:
+				
+					sortedPath = convertToBAM(samFilePath)
+					rawCoverage(sortedPath)
+					sequenceNames, sequenceMedObject, sequenceAndIndex = checkCoverage(sortedPath, args.cov,args.xtraSeq)
+					alleleCalling(sortedPath, args.r, sequenceNames, args.gatk, run_id, args.qual, args.cov, args.mul, sequenceMedObject, sequenceAndIndex, args.threads,args.xtraSeq)
 
-				gzSizes = 0
+					gzSizes = 0
 
-				filesToRemove = glob.glob(os.path.join(args.t, run_id) + '/*.fastq.gz')
+					filesToRemove = glob.glob(os.path.join(args.t, run_id) + '/*.fastq.gz')
 
-				for files in filesToRemove:
-					gzSizes += float(os.path.getsize(files))
+					for files in filesToRemove:
+						gzSizes += float(os.path.getsize(files))
 
-				if args.rmFastq == True:
-					for i in filesToRemove:
-						os.remove(i)
+					if args.rmFastq == True:
+						for i in filesToRemove:
+							os.remove(i)
 
-				run_time = str(datetime.now() - startTime)
+					run_time = str(datetime.now() - startTime)
 
-				with open(os.path.join(args.t, run_id, run_id + '_runtime.txt'), 'w') as runTimeFile:
-					runTimeFile.write("#runTime\tfileSize\n")
-					runTimeFile.write(str(run_time) + '\t' + str(gzSizes) + '\n')
+					with open(os.path.join(args.t, run_id, run_id + '_runtime.txt'), 'w') as runTimeFile:
+						runTimeFile.write("#runTime\tfileSize\tlibraryLayout\n")
+						runTimeFile.write(str(run_time) + '\t' + str(gzSizes) +"\t"+singOrPaired+ '\n')
+				else:
+					print run_id+" not downloaded sucessfully"
+					pass
 
 
 if __name__ == "__main__":
