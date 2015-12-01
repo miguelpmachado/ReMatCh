@@ -94,7 +94,7 @@ def downloadAndBowtie(referencePath, run_id, target_dir, buildBowtie, picardJarP
 	if buildBowtie == True:
 		print "run picard"
 		picardFileName, extension = os.path.splitext(referencePath)
-		os.system("java -jar "+ picardJarPath +" CreateSequenceDictionary R= " + referencePath + " O= " + picardFileName + ".dict 1> "+picardFileName+"_picard_out.txt")
+		os.system("java -jar "+ picardJarPath +" CreateSequenceDictionary R= " + referencePath + " O= " + picardFileName + ".dict 2> "+picardFileName+"_picard_out.txt")
 
 
 
@@ -154,7 +154,7 @@ def downloadAndBowtie(referencePath, run_id, target_dir, buildBowtie, picardJarP
 	else:
 		
 		print "0 or more than 2 fastq files"
-		return False
+		return False, False
 
 	
 	return bowtie_output_file,pairedOrSingle
