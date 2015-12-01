@@ -31,6 +31,7 @@ def rawCoverage(bamSortedPath):
 
 
 def changeFastaHeaders(FastasequencesFile,TrimmExtraSeq,sequenceAndIndex):
+	print sequenceAndIndex
 	with open(FastasequencesFile, 'r') as seqFile:
 		with open(FastasequencesFile+".temp", 'w') as tempFile:
 			tempStr=''
@@ -39,17 +40,19 @@ def changeFastaHeaders(FastasequencesFile,TrimmExtraSeq,sequenceAndIndex):
 				if '>' in line:
 					
 					if TrimmExtraSeq!=0 and len(tempStr)>0:
-						tempStr=tempStr[TrimmExtraSeq:len(tempStr)-TrimmExtraSeq-1]
+						tempStr=tempStr[TrimmExtraSeq+1:len(tempStr)-TrimmExtraSeq]
 					
-					tempFile.write(tempStr)
-					tempStr='\n'
+					tempFile.write(tempStr+"\n")
 					number = line.split('>')[1].strip("\n").strip("\r")
+					print number
 					lineToUse = '>' + sequenceAndIndex[number] + '\n'
 					tempFile.write(lineToUse)
 				else:
 					tempStr+=line.replace('\n', '').replace('\r', '')
 					#tempFile.write(line)
-				
+			
+			if TrimmExtraSeq!=0 and len(tempStr)>0:
+				tempStr=tempStr[TrimmExtraSeq:len(tempStr)-TrimmExtraSeq-1]	
 			tempFile.write(tempStr)
 			
 	os.remove(FastasequencesFile)

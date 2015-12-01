@@ -114,7 +114,7 @@ def downloadAndBowtie(referencePath, run_id, target_dir, buildBowtie, picardJarP
 	if numberFilesDowned < 1:
 		download_ERR(run_id, target_dir)
 	else:
-		print 'File already exists...'
+		print 'File '+ run_id+' already exists...' 
 	
 	#download_ERR(run_id, target_dir)
 

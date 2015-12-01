@@ -92,15 +92,23 @@ def runReMaCh(args):
 
 				run_id = run_id.strip()
 
+
+				print "downloading and bowtieying"
 				samFilePath,singOrPaired = downloadAndBowtie(args.r, run_id, args.t, buildBowtie, args.picard, args.threads)
+				print "downloaded and bowtied"
+				
 				
 				if not samFilePath==False:
 				
 					sortedPath = convertToBAM(samFilePath)
 					rawCoverage(sortedPath)
+					print "Checking coverage"
 					sequenceNames, sequenceMedObject, sequenceAndIndex = checkCoverage(sortedPath, args.cov,args.xtraSeq)
+					print "Checked coverage goint to perform allele call"
 					alleleCalling(sortedPath, args.r, sequenceNames, args.gatk, run_id, args.qual, args.cov, args.mul, sequenceMedObject, sequenceAndIndex, args.threads,args.xtraSeq)
-
+					print "allele called everything"	
+					
+					
 					gzSizes = 0
 
 					filesToRemove = glob.glob(os.path.join(args.t, run_id) + '/*.fastq.gz')
