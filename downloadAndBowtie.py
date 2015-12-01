@@ -94,7 +94,7 @@ def downloadAndBowtie(referencePath, run_id, target_dir, buildBowtie, picardJarP
 	if buildBowtie == True:
 		print "run picard"
 		picardFileName, extension = os.path.splitext(referencePath)
-		os.system("java -jar "+ picardJarPath +" CreateSequenceDictionary R= " + referencePath + " O= " + picardFileName + ".dict")
+		os.system("java -jar "+ picardJarPath +" CreateSequenceDictionary R= " + referencePath + " O= " + picardFileName + ".dict 1> "+picardFileName+"_picard_out.txt")
 
 
 
@@ -103,7 +103,9 @@ def downloadAndBowtie(referencePath, run_id, target_dir, buildBowtie, picardJarP
 
 	if buildBowtie == True:
 		print "run bowtie"
-		subprocess.call(["bowtie2-build", referencePath, bowtieBuildFileName])
+		bowtiBuildeLog=bowtieBuildFileName+"_bowtiBuildeLog.txt"
+		myoutput = open(bowtiBuildeLog, 'w')
+		subprocess.call(["bowtie2-build", referencePath, bowtieBuildFileName],stdout=myoutput,stderr=myoutput)
 	
 	#download ERR
 

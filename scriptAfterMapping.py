@@ -30,7 +30,7 @@ def rawCoverage(bamSortedPath):
 	os.system("bedtools genomecov -d -ibam " + bamSortedPath + ".bam > " + bamSortedPath+".tab")
 
 
-def changeFastaHeaders(FastasequencesFile,TrimmExtraSeq,referencePath):
+def changeFastaHeadersAndTrimm(FastasequencesFile,TrimmExtraSeq,referencePath):
 	
 	headersArray=[]
 	
@@ -160,22 +160,25 @@ def alleleCalling(bamSortedPath, referencePath, sequenceNames, gatkPath, sampleI
 
 	os.system("samtools mpileup --no-BAQ --fasta-ref " + referencePath + " --uncompressed -t DP,DPR,DV " + bamSortedPath + ".bam | bcftools call --multiallelic-caller --variants-only --samples-file " + ploidytempFile + " --output-type v --output " + bamSortedPath + ".vcf")
 	
+	print "running bcf"
+	
 	#os.system("bcftools filter --include 'QUAL>=" + str(qualityThreshold) + " && FORMAT/DP>=" + str(coverageThreshold) + "' --output-type v --output " + bamSortedPath + "_filtered.vcf " + bamSortedPath + ".vcf")
 	os.system("bcftools filter --SnpGap 3 --IndelGap 10 --include 'QUAL>=" + str(qualityThreshold) + " && FORMAT/DV>=" + str(coverageThreshold) + " && (FORMAT/DV)/(FORMAT/DP)>=" + str(multipleAlleles) + "' --output-type v --output " + bamSortedPath + "_filtered.vcf " + bamSortedPath + ".vcf")
 	os.system("bcftools filter --SnpGap 3 --IndelGap 10 --include 'TYPE=\"snp\" && QUAL>=" + str(qualityThreshold) + " && FORMAT/DV>=" + str(coverageThreshold) + " && (FORMAT/DV)/(FORMAT/DP)>=" + str(multipleAlleles) + "' --output-type v --output " + bamSortedPath + "_filtered_without_indels.vcf " + bamSortedPath + ".vcf")
-
-	os.system("java -jar " + gatkPath + " -T FastaAlternateReferenceMaker -R "+ referencePath +" -o "+ filteredsequencesFile +" -V "+ bamSortedPath + "_filtered.vcf")
-	os.system("java -jar " + gatkPath + " -T FastaAlternateReferenceMaker -R "+ referencePath +" -o "+ bamSortedPath + "_sequences_filtered_without_indels.fasta -V "+ bamSortedPath + "_filtered.vcf")
-
-	os.system("java -jar " + gatkPath + " -T FastaAlternateReferenceMaker -R "+ referencePath +" -o "+ sequencesFile +" -V "+ bamSortedPath + ".vcf")
+	
+	print "running gatk"
+	
+	os.system("java -jar " + gatkPath + " -T FastaAlternateReferenceMaker -R "+ referencePath +" -o "+ filteredsequencesFile +" -V "+ bamSortedPath + "_filtered.vcf 1> "+sequencesFile+"Log_gatk.txt")
+	os.system("java -jar " + gatkPath + " -T FastaAlternateReferenceMaker -R "+ referencePath +" -o "+ bamSortedPath + "_sequences_filtered_without_indels.fasta -V "+ bamSortedPath + "_filtered.vcf 1>> "+sequencesFile+"Log_gatk.txt")
+	os.system("java -jar " + gatkPath + " -T FastaAlternateReferenceMaker -R "+ referencePath +" -o "+ sequencesFile +" -V "+ bamSortedPath + ".vcf 1>> "+sequencesFile+"Log_gatk.txt")
 
 	#os.system("rm " + testFile)
 	os.system("rm " + ploidytempFile)
 
 	
-	changeFastaHeaders(filteredsequencesFile, extraSeq,referencePath)
-	changeFastaHeaders(bamSortedPath + "_sequences_filtered_without_indels.fasta", extraSeq,referencePath)
-	changeFastaHeaders(sequencesFile, 0,referencePath)
+	changeFastaHeadersAndTrimm(filteredsequencesFile, extraSeq,referencePath)
+	changeFastaHeadersAndTrimm(bamSortedPath + "_sequences_filtered_without_indels.fasta", extraSeq,referencePath)
+	changeFastaHeadersAndTrimm(sequencesFile, 0,referencePath)
 
 
 	with open(bamSortedPath + ".vcf", 'r') as vcfFile:
