@@ -48,7 +48,7 @@ def changeFastaHeaders(FastasequencesFile,TrimmExtraSeq,referencePath):
 				if '>' in line:
 					
 					if TrimmExtraSeq!=0 and len(tempStr)>0:
-						tempStr=tempStr[TrimmExtraSeq+1:len(tempStr)-TrimmExtraSeq]
+						tempStr=tempStr[TrimmExtraSeq:len(tempStr)-TrimmExtraSeq]
 					if headercounter>0:
 						tempFile.write(tempStr+"\n")
 						
