@@ -175,7 +175,7 @@ def alleleCalling(bamSortedPath, referencePath, sequenceNames, gatkPath, sampleI
 	
 	changeFastaHeaders(filteredsequencesFile, extraSeq,referencePath)
 	changeFastaHeaders(bamSortedPath + "_sequences_filtered_without_indels.fasta", extraSeq,referencePath)
-	changeFastaHeaders(sequencesFile, extraSeq,referencePath)
+	changeFastaHeaders(sequencesFile, 0,referencePath)
 
 
 	with open(bamSortedPath + ".vcf", 'r') as vcfFile:

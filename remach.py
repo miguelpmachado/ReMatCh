@@ -93,20 +93,20 @@ def runReMaCh(args):
 				run_id = run_id.strip()
 
 
-				print "downloading and bowtieying"
+				print "\n######\ndownloading and bowtieying\n######\n"
 				samFilePath,singOrPaired = downloadAndBowtie(args.r, run_id, args.t, buildBowtie, args.picard, args.threads)
-				print "downloaded and bowtied"
+				print "\n######\ndownloaded and bowtied\n######\n"
 				
 				
 				if not samFilePath==False:
 				
 					sortedPath = convertToBAM(samFilePath)
 					rawCoverage(sortedPath)
-					print "Checking coverage"
+					print "\n######\nChecking coverage\n######\n"
 					sequenceNames, sequenceMedObject = checkCoverage(sortedPath, args.cov,args.xtraSeq)
-					print "Checked coverage goint to perform allele call"
+					print "\n######\nChecked coverage goint to perform allele call\n######\n"
 					alleleCalling(sortedPath, args.r, sequenceNames, args.gatk, run_id, args.qual, args.cov, args.mul, sequenceMedObject, args.threads,args.xtraSeq)
-					print "allele called everything"	
+					print "\n######\nallele called everything\n######\n"	
 					
 					
 					gzSizes = 0
