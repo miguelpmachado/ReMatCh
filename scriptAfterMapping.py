@@ -53,8 +53,8 @@ def changeFastaHeaders(FastasequencesFile,TrimmExtraSeq,sequenceAndIndex):
 				
 			tempFile.write(tempStr)
 			
-	os.remove(sequencesFile)
-	os.rename(sequencesFile+".temp", sequencesFile)
+	os.remove(FastasequencesFile)
+	os.rename(FastasequencesFile+".temp", FastasequencesFile)
 
 
 
