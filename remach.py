@@ -101,6 +101,7 @@ def runReMaCh(args):
 				if not samFilePath==False:
 				
 					sortedPath = convertToBAM(samFilePath)
+					print sortedPath
 					rawCoverage(sortedPath)
 					print "\n######\nChecking coverage\n######\n"
 					sequenceNames, sequenceMedObject = checkCoverage(sortedPath, args.cov,args.xtraSeq)
