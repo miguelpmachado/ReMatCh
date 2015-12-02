@@ -235,9 +235,9 @@ def filter_vcf(pathToVcf, extraSeq, sequenceMedObject):
 			for line in csv.reader(vcfFile, delimiter="\t"):
 				if not line[0].startswith("#"):
 					if int(line[1]) > extraSeq and int(line[1]) <= len(sequenceMedObject[line[0]][3]) - extraSeq:
-						vcfTemp.write(line)
+						vcfTemp.write('\t'.join([str(x) for x in line]) + '\n')
 				else:
-					vcfTemp.write(line)
+					vcfTemp.write('\t'.join([str(x) for x in line]) + '\n')
 
 	os.remove(pathToVcf)
 	os.rename(pathToVcf + '.temp', pathToVcf)
