@@ -105,7 +105,7 @@ def checkCoverage(outputPath, coverageThreshold,extraSeq):
 				if countlines == 1:
 					prevName = line[0]
 
-
+		print arrayOfcoverageValues
 		sequenceNames.append(prevName)
 		sequenceMedObject[prevName] = [prevName, numpy.average(arrayOfcoverageValues), numpy.std(arrayOfcoverageValues), arrayOfcoverageValues, False, False, False,arrayOfpositionValues]
 		countSequences += 1
@@ -137,7 +137,7 @@ def checkCoverage(outputPath, coverageThreshold,extraSeq):
 			index+=1
 		
 		print sequenceLength
-		
+
 		sequenceMedObject[sequence].append(str(float(countDuplication)/sequenceLength))
 		sequenceMedObject[sequence].append(str(float(countIndel)/float(sequenceLength)))
 		sequenceMedObject[sequence].append(str(float(countLowCoverage)/float(sequenceLength)))
