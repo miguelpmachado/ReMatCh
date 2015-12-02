@@ -105,7 +105,7 @@ def runReMaCh(args):
 					print "\n######\nChecking coverage\n######\n"
 					sequenceNames, sequenceMedObject = checkCoverage(sortedPath, args.cov,args.xtraSeq)
 					print "\n######\nChecked coverage goint to perform allele call\n######\n"
-					alleleCalling(sortedPath, args.r, sequenceNames, args.gatk, run_id, args.qual, args.cov, args.mul, sequenceMedObject, args.threads,args.xtraSeq)
+					alleleCalling(sortedPath, args.r, sequenceNames, args.gatk, run_id, args.qual, args.cov, args.mul, sequenceMedObject,args.xtraSeq)
 					print "\n######\nallele called everything\n######\n"	
 					
 					

@@ -157,6 +157,6 @@ def downloadAndBowtie(referencePath, run_id, target_dir, buildBowtie, picardJarP
 		return False, False
 
 	
-	return bowtie_output_file,pairedOrSingle
+	return bowtie_output_file, pairedOrSingle
 
 

@@ -125,13 +125,13 @@ def checkCoverage(outputPath, coverageThreshold,extraSeq):
 		index=0
 		for coverageAtPosition in sequenceMedObject[sequence][3]:
 			
-			if (sequenceMedObject[sequence][7])[index]> extraSeq and (sequenceMedObject[sequence][7])[index]<= sequenceLength-extraSeq:
+			if (sequenceMedObject[sequence][7])[index] > extraSeq and (sequenceMedObject[sequence][7])[index] <= sequenceLength-extraSeq:
 			
 				if coverageAtPosition >= 1.25 * sequenceMedObject[sequence][1]:
 					countDuplication += 1
-				elif coverageAtPosition < 0.1 * sequenceMedObject[sequence][1]:
+				if coverageAtPosition < 0.1 * sequenceMedObject[sequence][1]:
 					countIndel += 1
-				elif coverageAtPosition < int(coverageThreshold):
+				if coverageAtPosition < int(coverageThreshold):
 					countLowCoverage += 1
 			index+=1
 		
@@ -144,15 +144,13 @@ def checkCoverage(outputPath, coverageThreshold,extraSeq):
 
 	return sequenceNames, sequenceMedObject
     		
-def alleleCalling(bamSortedPath, referencePath, sequenceNames, gatkPath, sampleID, qualityThreshold, coverageThreshold, multipleAlleles, sequenceMedObject,threadnumb,extraSeq):
+def alleleCalling(bamSortedPath, referencePath, sequenceNames, gatkPath, sampleID, qualityThreshold, coverageThreshold, multipleAlleles, sequenceMedObject,extraSeq):
 
 	ploidytempFile = bamSortedPath+'_temp_ploi.tab'
 
 	sequencesFile = bamSortedPath + '_sequences.fasta'
 
 	filteredsequencesFile = bamSortedPath + '_sequences_filtered.fasta'
-	
-	
 	
 
 	with open(ploidytempFile, 'w') as tempFile:
@@ -166,6 +164,41 @@ def alleleCalling(bamSortedPath, referencePath, sequenceNames, gatkPath, sampleI
 	os.system("bcftools filter --SnpGap 3 --IndelGap 10 --include 'QUAL>=" + str(qualityThreshold) + " && FORMAT/DV>=" + str(coverageThreshold) + " && (FORMAT/DV)/(FORMAT/DP)>=" + str(multipleAlleles) + "' --output-type v --output " + bamSortedPath + "_filtered.vcf " + bamSortedPath + ".vcf")
 	os.system("bcftools filter --SnpGap 3 --IndelGap 10 --include 'TYPE=\"snp\" && QUAL>=" + str(qualityThreshold) + " && FORMAT/DV>=" + str(coverageThreshold) + " && (FORMAT/DV)/(FORMAT/DP)>=" + str(multipleAlleles) + "' --output-type v --output " + bamSortedPath + "_filtered_without_indels.vcf " + bamSortedPath + ".vcf")
 	
+
+	filter_vcf(bamSortedPath + "_filtered.vcf", extraSeq, sequenceMedObject)
+	filter_vcf(bamSortedPath + "_filtered_without_indels.vcf", extraSeq, sequenceMedObject)
+
+
+	
+	with open(bamSortedPath + ".vcf", 'r') as vcfFile:
+		for line in csv.reader(vcfFile, delimiter="\t"):
+			if not line[0].startswith("#"):
+				quality = line[5]
+
+				if int(line[1]) > extraSeq and int(line[1]) <= len(sequenceMedObject[line[0]][3]) - extraSeq:
+
+					if quality < float(qualityThreshold):
+						sequenceMedObject[line[0]][4] = True
+					
+					qualityCoverage = float(line[9].split(':')[2])
+					
+					if qualityCoverage < float(coverageThreshold):
+						sequenceMedObject[line[0]][5] = True
+				
+					coverageByAllele = line[9].split(':')[3].split(',')
+					alternativeAlleles = line[4].split(',')
+
+					coverageByAllele = [ int(x) for x in coverageByAllele ]
+
+					dominantSNP = coverageByAllele.index(max(coverageByAllele))
+					coverageAllele = coverageByAllele[dominantSNP]
+					#alternativeSNP = alternativeAlleles[dominantSNP-1] ??
+
+					if coverageAllele/qualityCoverage < float(multipleAlleles):
+						sequenceMedObject[line[0]][6] = True
+
+
+
 	print "running gatk"
 	
 	os.system("java -jar " + gatkPath + " -T FastaAlternateReferenceMaker -R "+ referencePath +" -o "+ filteredsequencesFile +" -V "+ bamSortedPath + "_filtered.vcf 2> "+sequencesFile+"Log_gatk.txt")
@@ -181,68 +214,32 @@ def alleleCalling(bamSortedPath, referencePath, sequenceNames, gatkPath, sampleI
 	changeFastaHeadersAndTrimm(sequencesFile, 0,referencePath)
 
 
-	with open(bamSortedPath + ".vcf", 'r') as vcfFile:
-		for line in csv.reader(vcfFile, delimiter="\t"):
-			if not line[0].startswith("#"):
-				quality = line[5]
-				if quality < float(qualityThreshold):
-					sequenceMedObject[line[0]][4] = True
-				
-				'''if line[7].startswith("INDEL"):
-					
-					deepCoverage = float(line[9].split(':')[1].split('=')[1])
-				
-					if deepCoverage < float(coverageThreshold):
-						sequenceMedObject[line[0]][5] = True'''
-				#else:
-				qualityCoverage = float(line[9].split(':')[2])
-				
-				if qualityCoverage < float(coverageThreshold):
-					sequenceMedObject[line[0]][5] = True
-			
-				coverageByAllele = line[9].split(':')[3].split(',')
-				alternativeAlleles = line[4].split(',')
-
-				coverageByAllele = [ int(x) for x in coverageByAllele ]
-
-				dominantSNP = coverageByAllele.index(max(coverageByAllele))
-				coverageAllele = coverageByAllele[dominantSNP]
-				#alternativeSNP = alternativeAlleles[dominantSNP-1] ??
-
-				if coverageAllele/qualityCoverage < float(multipleAlleles):
-					sequenceMedObject[line[0]][6] = True
-
 	check_fileName = bamSortedPath.replace('_sorted', '')
 
 	with open(check_fileName + "_mappingCheck.tab", 'w') as mappingCheckFile:
 		mappingCheckFile.write('#Sequence\tDuplication\tIndel\tRawCoverage\tAlternativeQualityScore\tCoverage\tMultipleAllele\n')
 		for sequence in sequenceMedObject:
-			mappingCheckFile.write(sequence + '\t' + str(sequenceMedObject[sequence][8]) + '\t' + str(sequenceMedObject[sequence][9]) + '\t' + str(sequenceMedObject[sequence][10]) + '\t' +str(sequenceMedObject[sequence][4]) + '\t' +str(sequenceMedObject[sequence][5]) + '\t' +str(sequenceMedObject[sequence][6]) + '\n')
+			mappingCheckFile.write(sequence + '\t' + str(round(sequenceMedObject[sequence][8], 3)) + '\t' + str(round(sequenceMedObject[sequence][9],3)) + '\t' + str(round(sequenceMedObject[sequence][10],3)) + '\t' +str(sequenceMedObject[sequence][4]) + '\t' +str(sequenceMedObject[sequence][5]) + '\t' +str(sequenceMedObject[sequence][6]) + '\n')
 
 
 
 
 
+def filter_vcf(pathToVcf, extraSeq, sequenceMedObject):
 
+	with open(pathToVcf, 'r') as vcfFile:
+		with open(pathToVcf + '.temp', 'w') as vcfTemp:
 
+			for line in csv.reader(vcfFile, delimiter="\t"):
+				if not line[0].startswith("#"):
+					if int(line[1]) > extraSeq and int(line[1]) <= len(sequenceMedObject[line[0]][3]) - extraSeq:
+						vcfTemp.write(line)
+				else:
+					vcfTemp.write(line)
 
+	os.remove(pathToVcf)
+	os.rename(pathToVcf + '.temp', pathToVcf)
 
-	#bcftools filter --SnpGap 3 --IndelGap 10 --include 'TYPE="snp" && QUAL>=10 && MIN(FORMAT/DP)>=10 && MAX(FORMAT/DP)<=920' --output-type z --output CC23_comOutgroup.filtered.gap_snp_qual10_MINformatDP10_MAXformatDP920.vcf.gz CC23_comOutgroup.bcf &&
-	#bcftools index CC23_comOutgroup.filtered.gap_snp_qual10_MINformatDP10_MAXformatDP920.vcf.gz &&
-	#bcftools view --output-type v CC23_comOutgroup.filtered.gap_snp_qual10_MINformatDP10_MAXformatDP920.vcf.gz | grep --invert-match '#' | wc -l
-
-	#sampleArray = []'''
-
-
-
-'''bcftools convert --regions 'GAS_emm81_H293_completeGenome|gki_region|1136072_1137770:601-1098' --output-type v --output gas_$subgroup.gki.vcf gas_$subgroup.bcf.gz
-bcftools convert --regions 'GAS_emm81_H293_completeGenome|gtr_region|1114559_1116209:601-1050' --output-type v --output gas_$subgroup.gtr.vcf gas_$subgroup.bcf.gz
-bcftools convert --regions 'GAS_emm81_H293_completeGenome|murI_region|314208_315846:601-1038' --output-type v --output gas_$subgroup.murI.vcf gas_$subgroup.bcf.gz
-bcftools convert --regions 'GAS_emm81_H293_completeGenome|mutS_region|1660766_1662371:601-1005' --output-type v --output gas_$subgroup.mutS.vcf gas_$subgroup.bcf.gz
-bcftools convert --regions 'GAS_emm81_H293_completeGenome|recP_region|1269857_1271516:601-1059' --output-type v --output gas_$subgroup.recP.vcf gas_$subgroup.bcf.gz
-bcftools convert --regions 'GAS_emm81_H293_completeGenome|xpt_region|842025_843675:601-1050' --output-type v --output gas_$subgroup.xpt.vcf gas_$subgroup.bcf.gz
-bcftools convert --regions 'GAS_emm81_H293_completeGenome|yqiL_region|134461_136095:601-1034' --output-type v --output gas_$subgroup.yqiL.vcf gas_$subgroup.bcf.gz
-done &&'''
 
 
         
