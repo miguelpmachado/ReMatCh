@@ -94,10 +94,10 @@ def runReMaCh(args):
 
 
 				print "\n######\ndownloading and bowtieying\n######\n"
-				samFilePath,singOrPaired = downloadAndBowtie(args.r, run_id, args.t, buildBowtie, args.picard, args.threads)
+				samFilePath, singOrPaired = downloadAndBowtie(args.r, run_id, args.t, buildBowtie, args.picard, args.threads)
 				print "\n######\ndownloaded and bowtied\n######\n"
 				
-				
+				print samFilePath
 				if not samFilePath==False:
 				
 					sortedPath = convertToBAM(samFilePath)
