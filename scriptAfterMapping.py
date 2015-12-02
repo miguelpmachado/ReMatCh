@@ -137,9 +137,9 @@ def checkCoverage(outputPath, coverageThreshold,extraSeq):
 		
 		print sequenceLength
 
-		sequenceMedObject[sequence].append(str(float(countDuplication)/sequenceLength))
-		sequenceMedObject[sequence].append(str(float(countIndel)/float(sequenceLength)))
-		sequenceMedObject[sequence].append(str(float(countLowCoverage)/float(sequenceLength)))
+		sequenceMedObject[sequence].append(float(countDuplication)/sequenceLength)
+		sequenceMedObject[sequence].append(float(countIndel)/float(sequenceLength))
+		sequenceMedObject[sequence].append(float(countLowCoverage)/float(sequenceLength))
 			#coverageCheckFile.write(sequence + '\t' + str(float(countDuplication)/sequenceLength) + '\t' + str(float(countcountIndel)/float(sequenceLength)) + '\t' + str(float(countLowCoverage)/float(sequenceLength))+"\n")
 
 	#return sequenceNames, sequenceMedObject, sequenceAndIndex
