@@ -97,11 +97,11 @@ def runReMaCh(args):
 				samFilePath, singOrPaired = downloadAndBowtie(args.r, run_id, args.t, buildBowtie, args.picard, args.threads)
 				print "\n######\ndownloaded and bowtied\n######\n"
 				
-				print samFilePath
+
 				if not samFilePath==False:
 				
 					sortedPath = convertToBAM(samFilePath)
-					print sortedPath
+
 					rawCoverage(sortedPath)
 					print "\n######\nChecking coverage\n######\n"
 					sequenceNames, sequenceMedObject = checkCoverage(sortedPath, args.cov,args.xtraSeq)
