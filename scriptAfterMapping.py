@@ -64,7 +64,7 @@ def changeFastaHeadersAndTrimm(FastasequencesFile,TrimmExtraSeq,referencePath):
 					#tempFile.write(line)
 				
 			if TrimmExtraSeq!=0 and len(tempStr)>0:
-				tempStr=tempStr[TrimmExtraSeq:len(tempStr)-TrimmExtraSeq-1]	
+				tempStr=tempStr[TrimmExtraSeq:len(tempStr)-TrimmExtraSeq]	
 			tempFile.write(tempStr)
 			
 	os.remove(FastasequencesFile)
@@ -120,7 +120,7 @@ def checkCoverage(outputPath, coverageThreshold,extraSeq):
 		countDuplication = 0
 		sequenceLength = len(sequenceMedObject[sequence][3])
 
-		print sequence + ' ' + str(sequenceLength)
+		#print sequence + ' ' + str(sequenceLength)
 
 
 		#print "%s: %s bp; %s meanCoverage." % (sequence, sequenceLength, sequenceMedObject[sequence][1])
