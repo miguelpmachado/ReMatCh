@@ -120,6 +120,7 @@ def checkCoverage(outputPath, coverageThreshold,extraSeq):
 		countDuplication = 0
 		sequenceLength = len(sequenceMedObject[sequence][3])
 
+
 		#print "%s: %s bp; %s meanCoverage." % (sequence, sequenceLength, sequenceMedObject[sequence][1])
 		
 		index=0
@@ -134,6 +135,8 @@ def checkCoverage(outputPath, coverageThreshold,extraSeq):
 				if coverageAtPosition < int(coverageThreshold):
 					countLowCoverage += 1
 			index+=1
+		
+		print sequenceLength
 		
 		sequenceMedObject[sequence].append(str(float(countDuplication)/sequenceLength))
 		sequenceMedObject[sequence].append(str(float(countIndel)/float(sequenceLength)))
