@@ -138,7 +138,7 @@ def runReMaCh(args):
 						runTimeFile.write(str(run_time) + '\t' + str(gzSizes) +"\t"+singOrPaired+ '\n')
 				else:
 					print run_id+" not downloaded sucessfully"
-					logFile.write(run_id+" not downloaded sucessfully")
+					logFile.write(run_id+" not downloaded sucessfully" + '\n')
 					pass
 
 		ids_with_problems.close()

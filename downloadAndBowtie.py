@@ -37,7 +37,7 @@ def download(dirs2,target_dir2,ref2,success2,f2,link2, logFile):
 
 	if numFilesInDir > 2:
 		print "more than 2 files"
-		logFile.write("more than 2 files")
+		logFile.write("more than 2 files" + '\n')
 		return success2
 
 	for item in dirs2:
@@ -46,12 +46,12 @@ def download(dirs2,target_dir2,ref2,success2,f2,link2, logFile):
 		final_target_dir=target_dir2+"/"+ref2 +"/"+ item
 		file = open(final_target_dir, 'wb')
 		print "Downloading: %s" % item
-		logFile.write("Downloading: %s" % item)
+		logFile.write("Downloading: %s\n" % item)
 
 		f2.retrbinary('RETR %s' % item, file.write)
 		file.close()
 		print "Downloaded %s" % item
-		logFile.write("Downloaded %s" % item)
+		logFile.write("Downloaded %s\n" % item)
 		success2+=1		
 
 	return success2
@@ -89,7 +89,7 @@ def download_ERR(ERR_id,target_dir, logFile):
 		except Exception, e:
 			failed +=1
 			print "Bad ID: " + ref
-			logFile.write("Bad ID: " + ref)
+			logFile.write("Bad ID: " + ref + '\n')
 		else:
 			success=download(dirs,target_dir,ref,success,f,link, logFile)	
 			
@@ -99,7 +99,7 @@ def download_ERR(ERR_id,target_dir, logFile):
 	
 	f.quit()	
 	print "Successfully downloaded %s files and %s ID references were wrong" % (success,failed)	
-	logFile.write("Successfully downloaded %s files and %s ID references were wrong" % (success,failed))
+	logFile.write("Successfully downloaded %s files and %s ID references were wrong\n" % (success,failed))
 
 
 
@@ -133,7 +133,7 @@ def downloadAndBowtie(referencePath, run_id, target_dir, buildBowtie, picardJarP
 		download_ERR(run_id, target_dir, logFile)
 	else:
 		print 'File '+ run_id+' already exists...' 
-		logFile.write('File '+ run_id+' already exists...')
+		logFile.write('File '+ run_id+' already exists...' + '\n')
 	
 	#download_ERR(run_id, target_dir)
 
@@ -171,7 +171,7 @@ def downloadAndBowtie(referencePath, run_id, target_dir, buildBowtie, picardJarP
 	else:
 		
 		print "0 or more than 2 fastq files"
-		logFile.write("0 or more than 2 fastq files")
+		logFile.write("0 or more than 2 fastq files" + '\n')
 		os.rmdir(dir_with_gz)
 		return False, False, numberFilesDowned
 
