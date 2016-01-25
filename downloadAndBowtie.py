@@ -36,6 +36,7 @@ def download(dirs2,target_dir2,ref2,success2,f2,link2):
 	numFilesInDir = len(dirs2)
 
 	if numFilesInDir > 2:
+		print "more than 2 files"
 		return success2
 
 	for item in dirs2:

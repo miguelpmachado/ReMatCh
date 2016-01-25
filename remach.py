@@ -94,12 +94,9 @@ def runReMaCh(args):
 
 
 				print "\n######\ndownloading and bowtieying\n######\n"
-				samFilePath, singOrPaired, NumfilesInDir = downloadAndBowtie(args.r, run_id, args.t, buildBowtie, args.picard, args.threads)
+				samFilePath, singOrPaired = downloadAndBowtie(args.r, run_id, args.t, buildBowtie, args.picard, args.threads)
 				print "\n######\ndownloaded and bowtied\n######\n"
 				
-				if NumfilesInDir > 2:
-					print "More than 2 files"
-					pass
 				if not samFilePath==False:
 				
 					sortedPath = convertToBAM(samFilePath)
