@@ -51,7 +51,8 @@ def runReMaCh(args):
 	else:
 		platform=''
 	
-	
+	ids_with_problems = open('ids_with_problems.txt', 'w')
+
 	with open(args.l, 'r') as run_ids:
 
 		count_runs = 0
@@ -94,9 +95,13 @@ def runReMaCh(args):
 
 
 				print "\n######\ndownloading and bowtieying\n######\n"
-				samFilePath, singOrPaired = downloadAndBowtie(args.r, run_id, args.t, buildBowtie, args.picard, args.threads)
+				samFilePath, singOrPaired, numFilesDownloaded = downloadAndBowtie(args.r, run_id, args.t, buildBowtie, args.picard, args.threads)
 				print "\n######\ndownloaded and bowtied\n######\n"
 				
+				if numFilesDownloaded == 0:
+					ids_with_problems.write(run_id + '\n')
+					pass
+
 				if not samFilePath==False:
 				
 					sortedPath = convertToBAM(samFilePath)
@@ -128,6 +133,8 @@ def runReMaCh(args):
 				else:
 					print run_id+" not downloaded sucessfully"
 					pass
+
+		ids_with_problems.close()
 
 
 if __name__ == "__main__":

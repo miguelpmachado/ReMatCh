@@ -129,7 +129,7 @@ def downloadAndBowtie(referencePath, run_id, target_dir, buildBowtie, picardJarP
 	
 	#download_ERR(run_id, target_dir)
 
-	numberFilesDowned= len(glob.glob1(dir_with_gz, "*.fastq.gz")) 
+	numberFilesDowned = len(glob.glob1(dir_with_gz, "*.fastq.gz")) 
 
 	#print len(glob.glob1(dir_with_gz, "*.fastq.gz")) 
 	
@@ -139,7 +139,6 @@ def downloadAndBowtie(referencePath, run_id, target_dir, buildBowtie, picardJarP
 	
 	pairedOrSingle="Single_end"	
 
-	print numberFilesDowned
 	
 	if numberFilesDowned==1:
 
@@ -164,9 +163,10 @@ def downloadAndBowtie(referencePath, run_id, target_dir, buildBowtie, picardJarP
 	else:
 		
 		print "0 or more than 2 fastq files"
-		return False, False
+		os.rmdir(dir_with_gz)
+		return False, False, numberFilesDowned
 
 	
-	return bowtie_output_file, pairedOrSingle
+	return bowtie_output_file, pairedOrSingle, numberFilesDowned
 
 
