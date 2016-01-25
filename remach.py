@@ -51,7 +51,7 @@ def runReMaCh(args):
 	else:
 		platform=''
 	
-	ids_with_problems = open('ids_with_problems.txt', 'w')
+	ids_with_problems = open(os.path.join(args.t,'ids_with_problems.txt'), 'w')
 
 	with open(args.l, 'r') as run_ids:
 
