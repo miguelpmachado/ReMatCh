@@ -33,6 +33,11 @@ def download(dirs2,target_dir2,ref2,success2,f2,link2):
 	subprocess.call(['mkdir', target_dir2+"/"+ref2])
 				
 	#get fasta file for each read file name
+	numFilesInDir = len(dirs2)
+
+	if numFilesInDir > 2:
+		return success2
+
 	for item in dirs2:
 					
 		f2.cwd(link2)
@@ -132,10 +137,6 @@ def downloadAndBowtie(referencePath, run_id, target_dir, buildBowtie, picardJarP
 	bowtieLog = os.path.join(dir_with_gz, run_id + "_bowtie_error.txt")
 	
 	pairedOrSingle="Single_end"	
-
-	onlyfiles = [f for f in listdir(mypath) if isfile(join(mypath, f))]
-	
-	NumfilesInDir = len(onlyfiles)
 	
 	if numberFilesDowned==1:
 
@@ -159,9 +160,9 @@ def downloadAndBowtie(referencePath, run_id, target_dir, buildBowtie, picardJarP
 	else:
 		
 		print "0 or more than 2 fastq files"
-		return False, False, NumfilesInDir
+		return False, False
 
 	
-	return bowtie_output_file, pairedOrSingle, NumfilesInDir
+	return bowtie_output_file, pairedOrSingle
 
 
