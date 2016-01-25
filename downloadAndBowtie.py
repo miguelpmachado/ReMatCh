@@ -25,6 +25,9 @@
 import shlex, subprocess,ftplib
 import os, os.path, glob
 
+from os import listdir
+from os.path import isfile, join
+
 def download(dirs2,target_dir2,ref2,success2,f2,link2):
 	#new folder for each reference with reference id name
 	subprocess.call(['mkdir', target_dir2+"/"+ref2])
@@ -129,7 +132,10 @@ def downloadAndBowtie(referencePath, run_id, target_dir, buildBowtie, picardJarP
 	bowtieLog = os.path.join(dir_with_gz, run_id + "_bowtie_error.txt")
 	
 	pairedOrSingle="Single_end"	
+
+	onlyfiles = [f for f in listdir(mypath) if isfile(join(mypath, f))]
 	
+	NumfilesInDir = len(onlyfiles)
 	
 	if numberFilesDowned==1:
 
@@ -148,15 +154,14 @@ def downloadAndBowtie(referencePath, run_id, target_dir, buildBowtie, picardJarP
 		args = shlex.split(command_line)
 		p = subprocess.call(args,stdout=myoutput,stderr=myoutput)
 		pairedOrSingle="Paired_end"	
-		
-		
+
 	
 	else:
 		
 		print "0 or more than 2 fastq files"
-		return False, False
+		return False, False, NumfilesInDir
 
 	
-	return bowtie_output_file, pairedOrSingle
+	return bowtie_output_file, pairedOrSingle, NumfilesInDir
 
 

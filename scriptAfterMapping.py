@@ -10,6 +10,9 @@ import numpy
 import shlex, subprocess,ftplib
 import os.path
 
+from remach_utils import changeFastaHeadersAndTrimm
+from remach_utils import filter_vcf
+from remach_utils import createCheckFile
 
 
 def convertToBAM(samPath):
@@ -26,50 +29,7 @@ def convertToBAM(samPath):
 
 
 def rawCoverage(bamSortedPath):
-
 	os.system("bedtools genomecov -d -ibam " + bamSortedPath + ".bam > " + bamSortedPath+".tab")
-
-
-def changeFastaHeadersAndTrimm(FastasequencesFile,TrimmExtraSeq,referencePath):
-	
-	headersArray=[]
-	
-	with open(referencePath, 'r') as seqFileRef:
-		for line in seqFileRef:
-			if '>' in line:
-				headersArray.append(line)
-			
-	with open(FastasequencesFile, 'r') as seqFile:
-		with open(FastasequencesFile+".temp", 'w') as tempFile:
-			tempStr=''
-			headercounter=0
-			for line in seqFile:
-				
-				if '>' in line:
-					
-					if TrimmExtraSeq!=0 and len(tempStr)>0:
-						tempStr=tempStr[TrimmExtraSeq:len(tempStr)-TrimmExtraSeq]
-					if headercounter>0:
-						tempFile.write(tempStr+"\n")
-						
-					tempStr=''
-					#number = line.split('>')[1].strip("\n").strip("\r")
-					#lineToUse = '>' + sequenceAndIndex[number] + '\n'
-					
-					tempFile.write(headersArray[headercounter])
-					headercounter+=1
-				
-				else:
-					tempStr+=line.replace('\n', '').replace('\r', '')
-					#tempFile.write(line)
-				
-			if TrimmExtraSeq!=0 and len(tempStr)>0:
-				tempStr=tempStr[TrimmExtraSeq:len(tempStr)-TrimmExtraSeq]	
-			tempFile.write(tempStr)
-			
-	os.remove(FastasequencesFile)
-	os.rename(FastasequencesFile+".temp", FastasequencesFile)
-
 
 
 def checkCoverage(outputPath, coverageThreshold,extraSeq):
@@ -94,7 +54,6 @@ def checkCoverage(outputPath, coverageThreshold,extraSeq):
 				arrayOfcoverageValues.append(int(line[2]))
 				arrayOfpositionValues.append(int(line[1]))
 				sequenceMedObject[prevName] = [prevName, numpy.average(arrayOfcoverageValues), numpy.std(arrayOfcoverageValues), arrayOfcoverageValues, False, False, False,arrayOfpositionValues]
-				#sequenceAndIndex[str(countSequences)] = prevName
 				arrayOfcoverageValues = []
 				arrayOfpositionValues = []
 				prevName = line[0]
@@ -109,10 +68,7 @@ def checkCoverage(outputPath, coverageThreshold,extraSeq):
 		sequenceNames.append(prevName)
 		sequenceMedObject[prevName] = [prevName, numpy.average(arrayOfcoverageValues), numpy.std(arrayOfcoverageValues), arrayOfcoverageValues, False, False, False,arrayOfpositionValues]
 		countSequences += 1
-		#sequenceAndIndex[str(countSequences)] = prevName
 
-	#print sequenceAndIndex
-	#with open(outputPath+'_coverageCheck.tab', 'w') as coverageCheckFile:
 
 	for sequence in sequenceMedObject:
 		countLowCoverage = 0
@@ -120,11 +76,6 @@ def checkCoverage(outputPath, coverageThreshold,extraSeq):
 		countDuplication = 0
 		sequenceLength = len(sequenceMedObject[sequence][3])
 
-		#print sequence + ' ' + str(sequenceLength)
-
-
-		#print "%s: %s bp; %s meanCoverage." % (sequence, sequenceLength, sequenceMedObject[sequence][1])
-		
 		index=0
 		for coverageAtPosition in sequenceMedObject[sequence][3]:
 			
@@ -142,21 +93,19 @@ def checkCoverage(outputPath, coverageThreshold,extraSeq):
 		sequenceMedObject[sequence].append(float(countDuplication)/sequenceLength)
 		sequenceMedObject[sequence].append(float(countIndel)/float(sequenceLength))
 		sequenceMedObject[sequence].append(float(countLowCoverage)/float(sequenceLength))
-			#coverageCheckFile.write(sequence + '\t' + str(float(countDuplication)/sequenceLength) + '\t' + str(float(countcountIndel)/float(sequenceLength)) + '\t' + str(float(countLowCoverage)/float(sequenceLength))+"\n")
 
-	#return sequenceNames, sequenceMedObject, sequenceAndIndex
 
 	return sequenceNames, sequenceMedObject
+
+
+
     		
 def alleleCalling(bamSortedPath, referencePath, sequenceNames, gatkPath, sampleID, qualityThreshold, coverageThreshold, multipleAlleles, sequenceMedObject,extraSeq):
 
 	ploidytempFile = bamSortedPath+'_temp_ploi.tab'
-
 	sequencesFile = bamSortedPath + '_sequences.fasta'
-
 	filteredsequencesFile = bamSortedPath + '_sequences_filtered.fasta'
 	
-
 	with open(ploidytempFile, 'w') as tempFile:
 		tempFile.write(sampleID + '\t' + str(1))
 
@@ -164,7 +113,6 @@ def alleleCalling(bamSortedPath, referencePath, sequenceNames, gatkPath, sampleI
 	
 	print "running bcf"
 	
-	#os.system("bcftools filter --include 'QUAL>=" + str(qualityThreshold) + " && FORMAT/DP>=" + str(coverageThreshold) + "' --output-type v --output " + bamSortedPath + "_filtered.vcf " + bamSortedPath + ".vcf")
 	os.system("bcftools filter --SnpGap 3 --IndelGap 10 --include 'QUAL>=" + str(qualityThreshold) + " && FORMAT/DV>=" + str(coverageThreshold) + " && (FORMAT/DV)/(FORMAT/DP)>=" + str(multipleAlleles) + "' --output-type v --output " + bamSortedPath + "_filtered.vcf " + bamSortedPath + ".vcf")
 	os.system("bcftools filter --SnpGap 3 --IndelGap 10 --include 'TYPE=\"snp\" && QUAL>=" + str(qualityThreshold) + " && FORMAT/DV>=" + str(coverageThreshold) + " && (FORMAT/DV)/(FORMAT/DP)>=" + str(multipleAlleles) + "' --output-type v --output " + bamSortedPath + "_filtered_without_indels.vcf " + bamSortedPath + ".vcf")
 	
@@ -173,8 +121,8 @@ def alleleCalling(bamSortedPath, referencePath, sequenceNames, gatkPath, sampleI
 	filter_vcf(bamSortedPath + "_filtered_without_indels.vcf", extraSeq, sequenceMedObject)
 
 
-	
 	with open(bamSortedPath + ".vcf", 'r') as vcfFile:
+
 		for line in csv.reader(vcfFile, delimiter="\t"):
 			if not line[0].startswith("#"):
 				quality = line[5]
@@ -196,7 +144,6 @@ def alleleCalling(bamSortedPath, referencePath, sequenceNames, gatkPath, sampleI
 
 					dominantSNP = coverageByAllele.index(max(coverageByAllele))
 					coverageAllele = coverageByAllele[dominantSNP]
-					#alternativeSNP = alternativeAlleles[dominantSNP-1] ??
 
 					if coverageAllele/qualityCoverage < float(multipleAlleles):
 						sequenceMedObject[line[0]][6] = True
@@ -209,7 +156,6 @@ def alleleCalling(bamSortedPath, referencePath, sequenceNames, gatkPath, sampleI
 	os.system("java -jar " + gatkPath + " -T FastaAlternateReferenceMaker -R "+ referencePath +" -o "+ bamSortedPath + "_sequences_filtered_without_indels.fasta -V "+ bamSortedPath + "_filtered_without_indels.vcf 2>> "+sequencesFile+"Log_gatk.txt")
 	os.system("java -jar " + gatkPath + " -T FastaAlternateReferenceMaker -R "+ referencePath +" -o "+ sequencesFile +" -V "+ bamSortedPath + ".vcf 2>> "+sequencesFile+"Log_gatk.txt")
 
-	#os.system("rm " + testFile)
 	os.system("rm " + ploidytempFile)
 
 	
@@ -218,31 +164,11 @@ def alleleCalling(bamSortedPath, referencePath, sequenceNames, gatkPath, sampleI
 	changeFastaHeadersAndTrimm(sequencesFile, 0,referencePath)
 
 
-	check_fileName = bamSortedPath.replace('_sorted', '')
-
-	with open(check_fileName + "_mappingCheck.tab", 'w') as mappingCheckFile:
-		mappingCheckFile.write('#Sequence\tDuplication\tIndel\tRawCoverage\tAlternativeQualityScore\tCoverage\tMultipleAllele\n')
-		for sequence in sequenceMedObject:
-			mappingCheckFile.write(sequence + '\t' + str(round(sequenceMedObject[sequence][8], 3)) + '\t' + str(round(sequenceMedObject[sequence][9],3)) + '\t' + str(round(sequenceMedObject[sequence][10],3)) + '\t' +str(sequenceMedObject[sequence][4]) + '\t' +str(sequenceMedObject[sequence][5]) + '\t' +str(sequenceMedObject[sequence][6]) + '\n')
+	createCheckFile(bamSortedPath, sequenceMedObject)
 
 
 
 
-
-def filter_vcf(pathToVcf, extraSeq, sequenceMedObject):
-
-	with open(pathToVcf, 'r') as vcfFile:
-		with open(pathToVcf + '.temp', 'w') as vcfTemp:
-
-			for line in csv.reader(vcfFile, delimiter="\t"):
-				if not line[0].startswith("#"):
-					if int(line[1]) > extraSeq and int(line[1]) <= len(sequenceMedObject[line[0]][3]) - extraSeq:
-						vcfTemp.write('\t'.join([str(x) for x in line]) + '\n')
-				else:
-					vcfTemp.write('\t'.join([str(x) for x in line]) + '\n')
-
-	os.remove(pathToVcf)
-	os.rename(pathToVcf + '.temp', pathToVcf)
 
 
 
