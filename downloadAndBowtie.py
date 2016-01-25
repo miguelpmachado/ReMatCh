@@ -138,6 +138,8 @@ def downloadAndBowtie(referencePath, run_id, target_dir, buildBowtie, picardJarP
 	bowtieLog = os.path.join(dir_with_gz, run_id + "_bowtie_error.txt")
 	
 	pairedOrSingle="Single_end"	
+
+	print numberFilesDowned
 	
 	if numberFilesDowned==1:
 
@@ -156,6 +158,7 @@ def downloadAndBowtie(referencePath, run_id, target_dir, buildBowtie, picardJarP
 		args = shlex.split(command_line)
 		p = subprocess.call(args,stdout=myoutput,stderr=myoutput)
 		pairedOrSingle="Paired_end"	
+
 
 	
 	else:
