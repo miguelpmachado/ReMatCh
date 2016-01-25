@@ -28,7 +28,7 @@ import os, os.path, glob
 from os import listdir
 from os.path import isfile, join
 
-def download(dirs2,target_dir2,ref2,success2,f2,link2):
+def download(dirs2,target_dir2,ref2,success2,f2,link2, logFile):
 	#new folder for each reference with reference id name
 	subprocess.call(['mkdir', target_dir2+"/"+ref2])
 				
@@ -37,6 +37,7 @@ def download(dirs2,target_dir2,ref2,success2,f2,link2):
 
 	if numFilesInDir > 2:
 		print "more than 2 files"
+		logFile.write("more than 2 files")
 		return success2
 
 	for item in dirs2:
@@ -45,15 +46,17 @@ def download(dirs2,target_dir2,ref2,success2,f2,link2):
 		final_target_dir=target_dir2+"/"+ref2 +"/"+ item
 		file = open(final_target_dir, 'wb')
 		print "Downloading: %s" % item
+		logFile.write("Downloading: %s" % item)
 
 		f2.retrbinary('RETR %s' % item, file.write)
 		file.close()
 		print "Downloaded %s" % item
+		logFile.write("Downloaded %s" % item)
 		success2+=1		
 
 	return success2
 
-def download_ERR(ERR_id,target_dir):
+def download_ERR(ERR_id,target_dir, logFile):
 	
 	if not os.path.isdir(target_dir):
 		os.makedirs(target_dir)
@@ -86,8 +89,9 @@ def download_ERR(ERR_id,target_dir):
 		except Exception, e:
 			failed +=1
 			print "Bad ID: " + ref
+			logFile.write("Bad ID: " + ref)
 		else:
-			success=download(dirs,target_dir,ref,success,f,link)	
+			success=download(dirs,target_dir,ref,success,f,link, logFile)	
 			
 	else:
 				
@@ -95,13 +99,15 @@ def download_ERR(ERR_id,target_dir):
 	
 	f.quit()	
 	print "Successfully downloaded %s files and %s ID references were wrong" % (success,failed)	
+	logFile.write("Successfully downloaded %s files and %s ID references were wrong" % (success,failed))
 
 
 
-def downloadAndBowtie(referencePath, run_id, target_dir, buildBowtie, picardJarPath, threads):
+def downloadAndBowtie(referencePath, run_id, target_dir, buildBowtie, picardJarPath, threads, logFile):
 
 	if buildBowtie == True:
 		print "run picard"
+		logFile.write("run picard")
 		picardFileName, extension = os.path.splitext(referencePath)
 		os.system("java -jar "+ picardJarPath +" CreateSequenceDictionary R= " + referencePath + " O= " + picardFileName + ".dict 2> "+picardFileName+"_picard_out.txt")
 
@@ -112,6 +118,7 @@ def downloadAndBowtie(referencePath, run_id, target_dir, buildBowtie, picardJarP
 
 	if buildBowtie == True:
 		print "run bowtie"
+		logFile.write("run bowtie")
 		bowtiBuildeLog=bowtieBuildFileName+"_bowtiBuildeLog.txt"
 		myoutput = open(bowtiBuildeLog, 'w')
 		subprocess.call(["bowtie2-build", referencePath, bowtieBuildFileName],stdout=myoutput,stderr=myoutput)
@@ -123,9 +130,10 @@ def downloadAndBowtie(referencePath, run_id, target_dir, buildBowtie, picardJarP
 	numberFilesDowned= len(glob.glob1(dir_with_gz, "*.fastq.gz")) 
 
 	if numberFilesDowned < 1:
-		download_ERR(run_id, target_dir)
+		download_ERR(run_id, target_dir, logFile)
 	else:
 		print 'File '+ run_id+' already exists...' 
+		logFile.write('File '+ run_id+' already exists...')
 	
 	#download_ERR(run_id, target_dir)
 
@@ -163,6 +171,7 @@ def downloadAndBowtie(referencePath, run_id, target_dir, buildBowtie, picardJarP
 	else:
 		
 		print "0 or more than 2 fastq files"
+		logFile.write("0 or more than 2 fastq files")
 		os.rmdir(dir_with_gz)
 		return False, False, numberFilesDowned
 

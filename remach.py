@@ -97,7 +97,7 @@ def runReMaCh(args):
 
 				print "\n######\ndownloading and bowtieying\n######\n"
 				logFile.write("\n######\ndownloading and bowtieying\n######\n")
-				samFilePath, singOrPaired, numFilesDownloaded = downloadAndBowtie(args.r, run_id, args.t, buildBowtie, args.picard, args.threads)
+				samFilePath, singOrPaired, numFilesDownloaded = downloadAndBowtie(args.r, run_id, args.t, buildBowtie, args.picard, args.threads, logFile)
 				print "\n######\ndownloaded and bowtied\n######\n"
 				logFile.write("\n######\ndownloaded and bowtied\n######\n")
 				
@@ -111,10 +111,13 @@ def runReMaCh(args):
 
 					rawCoverage(sortedPath)
 					print "\n######\nChecking coverage\n######\n"
-					sequenceNames, sequenceMedObject = checkCoverage(sortedPath, args.cov,args.xtraSeq)
+					logFile.write("\n######\nChecking coverage\n######\n")
+					sequenceNames, sequenceMedObject = checkCoverage(sortedPath, args.cov,args.xtraSeq, logFile)
 					print "\n######\nChecked coverage goint to perform allele call\n######\n"
-					alleleCalling(sortedPath, args.r, sequenceNames, args.gatk, run_id, args.qual, args.cov, args.mul, sequenceMedObject,args.xtraSeq)
+					logFile.write("\n######\nChecked coverage goint to perform allele call\n######\n")
+					alleleCalling(sortedPath, args.r, sequenceNames, args.gatk, run_id, args.qual, args.cov, args.mul, sequenceMedObject,args.xtraSeq, logFile)
 					print "\n######\nallele called everything\n######\n"	
+					logFile.write("\n######\nallele called everything\n######\n")
 					
 					
 					gzSizes = 0
@@ -135,6 +138,7 @@ def runReMaCh(args):
 						runTimeFile.write(str(run_time) + '\t' + str(gzSizes) +"\t"+singOrPaired+ '\n')
 				else:
 					print run_id+" not downloaded sucessfully"
+					logFile.write(run_id+" not downloaded sucessfully")
 					pass
 
 		ids_with_problems.close()
