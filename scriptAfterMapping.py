@@ -21,7 +21,7 @@ def convertToBAM(samPath):
 
 	os.system("samtools view -buh -o " + filename +'_temp.bam' + " " + samPath)
 	os.system("rm " + samPath)
-	os.system("samtools sort " + filename +'_temp.bam' + " " + filename)
+	os.system("samtools sort -o " + filename +'.bam' + " " + filename +'_temp.bam')
 	os.system("rm "+ filename +'_temp.bam')
 	os.system("samtools index " + filename +'.bam')
 
