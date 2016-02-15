@@ -95,7 +95,7 @@ def download_ERR(ERR_id,target_dir, logFile):
 			
 	else:
 				
-		success=download(dirs,target_dir,ref,success,f,link)
+		success=download(dirs,target_dir,ref,success,f,link, logFile)
 	
 	f.quit()	
 	print "Successfully downloaded %s files and %s ID references were wrong" % (success,failed)	
