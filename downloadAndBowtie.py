@@ -136,8 +136,10 @@ def downloadAndBowtie(referencePath, run_id, target_dir, buildBowtie, picardJarP
 	else:
 		print 'File '+ run_id+' already exists...' 
 		logFile.write('File '+ run_id+' already exists...' + '\n')
+
 	
-	download_ERR(run_id, target_dir)
+	
+	#download_ERR(run_id, target_dir)
 
 	numberFilesDowned = len(glob.glob1(dir_with_gz, "*.fastq.gz")) 
 
