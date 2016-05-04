@@ -159,7 +159,7 @@ def downloadAndBowtie(referencePath, run_id, target_dir, buildBowtie, picardJarP
 
 		print FilesDowned[0]
 
-		command_line ="bowtie2 -k 2 --quiet --no-unal -x "+bowtieBuildFileName+" -U "+dir_with_gz+"/"+run_id+".fastq.gz --rg-id ENA --rg SM:"+run_id+" --sensitive-local --threads "+ str(threads) +" --met-file "+ os.path.join(dir_with_gz, run_id+".bowtie_metrics.txt") + " -S "+bowtie_output_file+" "
+		command_line ="bowtie2 -k 2 --quiet --no-unal -x "+bowtieBuildFileName+" -U "+dir_with_gz+"/"+FilesDowned[0] + " --rg-id ENA --rg SM:"+run_id+" --sensitive-local --threads "+ str(threads) +" --met-file "+ os.path.join(dir_with_gz, run_id+".bowtie_metrics.txt") + " -S "+bowtie_output_file+" "
 
 
 		myoutput = open(bowtieLog, 'w')
@@ -169,7 +169,7 @@ def downloadAndBowtie(referencePath, run_id, target_dir, buildBowtie, picardJarP
 
 	elif len(FilesDowned)==2:
 		print FilesDowned[0]
-		command_line ="bowtie2 -k 2 --quiet --no-unal -x "+bowtieBuildFileName+" -1 "+dir_with_gz+"/"+run_id+"_1.fastq.gz -2 "+dir_with_gz+"/"+run_id+"_2.fastq.gz --rg-id ENA --rg SM:"+run_id+" --sensitive-local --threads "+ str(threads) +" --met-file "+ os.path.join(dir_with_gz, run_id+".bowtie_metrics.txt") + " -S "+bowtie_output_file+" "
+		command_line ="bowtie2 -k 2 --quiet --no-unal -x "+bowtieBuildFileName+" -1 "+dir_with_gz+"/"+FilesDowned[0]+ " -2 "+dir_with_gz+"/"+FilesDowned[1] + " --rg-id ENA --rg SM:"+run_id+" --sensitive-local --threads "+ str(threads) +" --met-file "+ os.path.join(dir_with_gz, run_id+".bowtie_metrics.txt") + " -S "+bowtie_output_file+" "
 		
 		myoutput = open(bowtieLog, 'w')
 		args = shlex.split(command_line)
