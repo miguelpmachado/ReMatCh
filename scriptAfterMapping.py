@@ -10,20 +10,20 @@ import numpy
 import shlex, subprocess,ftplib
 import os.path
 
-from remach_utils import changeFastaHeadersAndTrimm
-from remach_utils import filter_vcf
-from remach_utils import createCheckFile
+from rematch_utils import changeFastaHeadersAndTrimm
+from rematch_utils import filter_vcf
+from rematch_utils import createCheckFile
 
 
 def convertToBAM(samPath):
 
 	filename, samfile_extension = os.path.splitext(samPath)
 
-	os.system("samtools view -buh -o " + filename +'_temp.bam' + " " + samPath)
-	os.system("rm " + samPath)
-	os.system("samtools sort -o " + filename +'.bam' + " " + filename +'_temp.bam')
-	os.system("rm "+ filename +'_temp.bam')
-	os.system("samtools index " + filename +'.bam')
+        os.system("samtools view -buh -o " + filename +'_temp.bam' + " " + samPath)
+        os.system("rm " + samPath)
+        os.system("samtools sort " + filename + "_temp.bam " + filename)
+        os.system("rm "+ filename +'_temp.bam')
+        os.system("samtools index " + filename +'.bam')
 
 	return (filename +'')
 
@@ -70,32 +70,34 @@ def checkCoverage(outputPath, coverageThreshold,extraSeq, logFile):
 		countSequences += 1
 
 
-	for sequence in sequenceMedObject:
-		countLowCoverage = 0
-		countIndel = 0
-		countDuplication = 0
-		sequenceLength = len(sequenceMedObject[sequence][3])
+        for sequence in sequenceMedObject:
+                countLowCoverage = 0
+                countIndel = 0
+                countDuplication = 0
+                sequenceLength = len(sequenceMedObject[sequence][3])
+                sumCoverage = 0
 
-		index=0
-		for coverageAtPosition in sequenceMedObject[sequence][3]:
-			
-			if (sequenceMedObject[sequence][7])[index] > extraSeq and (sequenceMedObject[sequence][7])[index] <= sequenceLength-extraSeq:
-			
-				if coverageAtPosition >= 1.25 * sequenceMedObject[sequence][1]:
-					countDuplication += 1
-				if coverageAtPosition < 0.1 * sequenceMedObject[sequence][1]:
-					countIndel += 1
-				if coverageAtPosition < int(coverageThreshold):
-					countLowCoverage += 1
-			index+=1
-		
+                index=0
+                for coverageAtPosition in sequenceMedObject[sequence][3]:
 
-		sequenceMedObject[sequence].append(float(countDuplication)/sequenceLength)
-		sequenceMedObject[sequence].append(float(countIndel)/float(sequenceLength))
-		sequenceMedObject[sequence].append(float(countLowCoverage)/float(sequenceLength))
+                        if (sequenceMedObject[sequence][7])[index] > extraSeq and (sequenceMedObject[sequence][7])[index] <= sequenceLength-extraSeq:
+                                sumCoverage = sumCoverage + coverageAtPosition
+                                if coverageAtPosition >= 1.25 * sequenceMedObject[sequence][1]:
+                                        countDuplication += 1
+                                if coverageAtPosition < 0.1 * sequenceMedObject[sequence][1]:
+                                        countIndel += 1
+                                if coverageAtPosition < int(coverageThreshold):
+                                        countLowCoverage += 1
+                        index+=1
 
 
-	return sequenceNames, sequenceMedObject
+                sequenceMedObject[sequence].append(float(countDuplication)/float(sequenceLength-2*extraSeq))
+                sequenceMedObject[sequence].append(float(countIndel)/float(sequenceLength-2*extraSeq))
+                sequenceMedObject[sequence].append(float(countLowCoverage)/float(sequenceLength-2*extraSeq))
+                sequenceMedObject[sequence].append(float(sumCoverage)/float(sequenceLength-2*extraSeq))
+
+
+        return sequenceNames, sequenceMedObject
 
 
 

@@ -15,9 +15,9 @@ def createCheckFile(bamSortedPath, sequenceMedObject):
 	check_fileName = bamSortedPath.replace('_sorted', '')
 
 	with open(check_fileName + "_mappingCheck.tab", 'w') as mappingCheckFile:
-		mappingCheckFile.write('#Sequence\tDuplication\tIndel\tRawCoverage\tAlternativeQualityScore\tCoverage\tMultipleAllele\n')
+		mappingCheckFile.write('#Sequence\tDuplication\tIndel\tRawCoverage\tAlternativeQualityScore\tCoverage\tMultipleAllele\tmeanRawCoverageFragmentMapped\tmeanRawCoverageRegionInterest\n')
 		for sequence in sequenceMedObject:
-			mappingCheckFile.write(sequence + '\t' + str(round(sequenceMedObject[sequence][8], 3)) + '\t' + str(round(sequenceMedObject[sequence][9],3)) + '\t' + str(round(sequenceMedObject[sequence][10],3)) + '\t' +str(sequenceMedObject[sequence][4]) + '\t' +str(sequenceMedObject[sequence][5]) + '\t' +str(sequenceMedObject[sequence][6]) + '\n')
+			mappingCheckFile.write(sequence + '\t' + str(round(sequenceMedObject[sequence][8], 3)) + '\t' + str(round(sequenceMedObject[sequence][9],3)) + '\t' + str(round(sequenceMedObject[sequence][10],3)) + '\t' +str(sequenceMedObject[sequence][4]) + '\t' +str(sequenceMedObject[sequence][5]) + '\t' +str(sequenceMedObject[sequence][6]) + '\t' + str(round(sequenceMedObject[sequence][1], 3)) + '\t' + str(round(sequenceMedObject[sequence][11], 3)) + '\n')
 
 
 def filter_vcf(pathToVcf, extraSeq, sequenceMedObject):
