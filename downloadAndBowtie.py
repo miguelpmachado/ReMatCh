@@ -141,7 +141,10 @@ def downloadAndBowtie(referencePath, run_id, target_dir, buildBowtie, picardJarP
 	
 	#download_ERR(run_id, target_dir)
 
-	numberFilesDowned = len(glob.glob1(dir_with_gz, "*.fastq.gz")) 
+	FilesDowned = glob.glob1(dir_with_gz, "*.fastq.gz")
+
+
+
 
 	#print len(glob.glob1(dir_with_gz, "*.fastq.gz")) 
 	
@@ -152,7 +155,9 @@ def downloadAndBowtie(referencePath, run_id, target_dir, buildBowtie, picardJarP
 	pairedOrSingle="Single_end"	
 
 	
-	if numberFilesDowned==1:
+	if len(FilesDowned)==1:
+
+		print FilesDowned[0]
 
 		command_line ="bowtie2 -k 2 --quiet --no-unal -x "+bowtieBuildFileName+" -U "+dir_with_gz+"/"+run_id+".fastq.gz --rg-id ENA --rg SM:"+run_id+" --sensitive-local --threads "+ str(threads) +" --met-file "+ os.path.join(dir_with_gz, run_id+".bowtie_metrics.txt") + " -S "+bowtie_output_file+" "
 
@@ -162,7 +167,8 @@ def downloadAndBowtie(referencePath, run_id, target_dir, buildBowtie, picardJarP
 		p = subprocess.call(args,stdout=myoutput,stderr=myoutput)
 
 
-	elif numberFilesDowned==2:
+	elif len(FilesDowned)==2:
+		print FilesDowned[0]
 		command_line ="bowtie2 -k 2 --quiet --no-unal -x "+bowtieBuildFileName+" -1 "+dir_with_gz+"/"+run_id+"_1.fastq.gz -2 "+dir_with_gz+"/"+run_id+"_2.fastq.gz --rg-id ENA --rg SM:"+run_id+" --sensitive-local --threads "+ str(threads) +" --met-file "+ os.path.join(dir_with_gz, run_id+".bowtie_metrics.txt") + " -S "+bowtie_output_file+" "
 		
 		myoutput = open(bowtieLog, 'w')
