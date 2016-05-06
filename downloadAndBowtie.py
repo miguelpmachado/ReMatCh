@@ -124,7 +124,7 @@ def downloadAndBowtie(referencePath, run_id, target_dir, buildBowtie, picardJarP
 		logFile.write("run bowtie" + '\n')
 		bowtiBuildeLog=bowtieBuildFileName+"_"+run_id+"_bowtiBuildeLog.txt"
 		myoutput = open(bowtiBuildeLog, 'w')
-		subprocess.call(["bowtie2-build", referencePath, bowtieBuildFileName],stdout=myoutput,stderr=myoutput)
+		subprocess.call(["bowtie2-build", referencePath, bowtieBuildFileName+"_"+run_id],stdout=myoutput,stderr=myoutput)
 	
 	#download ERR
 
