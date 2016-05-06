@@ -109,7 +109,7 @@ def downloadAndBowtie(referencePath, run_id, target_dir, buildBowtie, picardJarP
 		print "run picard"
 		logFile.write("run picard" + '\n')
 		picardFileName, extension = os.path.splitext(referencePath)
-		os.system(picardJarPath +" CreateSequenceDictionary R= " + referencePath + " O= " + picardFileName + '_' + run_id + ".dict 2> "+picardFileName+"_picard_out.txt")
+		os.system(picardJarPath +" CreateSequenceDictionary R= " + referencePath + " O= " + picardFileName + ".dict 2> "+picardFileName+"_picard_out.txt")
 
 
 
@@ -121,9 +121,9 @@ def downloadAndBowtie(referencePath, run_id, target_dir, buildBowtie, picardJarP
 	if buildBowtie == True:
 		print "run bowtie"
 		logFile.write("run bowtie" + '\n')
-		bowtiBuildeLog=bowtieBuildFileName + '_' + run_id+"_bowtiBuildeLog.txt"
+		bowtiBuildeLog=bowtieBuildFileName +"_bowtiBuildeLog.txt"
 		myoutput = open(bowtiBuildeLog, 'w')
-		subprocess.call(["bowtie2-build", referencePath, bowtieBuildFileName+'_' + run_id],stdout=myoutput,stderr=myoutput)
+		subprocess.call(["bowtie2-build", referencePath, bowtieBuildFileName],stdout=myoutput,stderr=myoutput)
 	
 	#download ERR
 
@@ -159,7 +159,7 @@ def downloadAndBowtie(referencePath, run_id, target_dir, buildBowtie, picardJarP
 
 		print FilesDowned[0]
 
-		command_line ="bowtie2 -k 2 --quiet --no-unal -x "+bowtieBuildFileName+'_' + run_id+" -U "+dir_with_gz+"/"+FilesDowned[0] + " --rg-id ENA --rg SM:"+run_id+" --sensitive-local --threads "+ str(threads) +" --met-file "+ os.path.join(dir_with_gz, run_id+".bowtie_metrics.txt") + " -S "+bowtie_output_file+" "
+		command_line ="bowtie2 -k 2 --quiet --no-unal -x "+bowtieBuildFileName+" -U "+dir_with_gz+"/"+FilesDowned[0] + " --rg-id ENA --rg SM:"+run_id+" --sensitive-local --threads "+ str(threads) +" --met-file "+ os.path.join(dir_with_gz, run_id+".bowtie_metrics.txt") + " -S "+bowtie_output_file+" "
 
 
 		myoutput = open(bowtieLog, 'w')
@@ -169,7 +169,7 @@ def downloadAndBowtie(referencePath, run_id, target_dir, buildBowtie, picardJarP
 
 	elif len(FilesDowned)==2:
 		print FilesDowned[0]
-		command_line ="bowtie2 -k 2 --quiet --no-unal -x "+bowtieBuildFileName+'_' + run_id+" -1 "+dir_with_gz+"/"+FilesDowned[0]+ " -2 "+dir_with_gz+"/"+FilesDowned[1] + " --rg-id ENA --rg SM:"+run_id+" --sensitive-local --threads "+ str(threads) +" --met-file "+ os.path.join(dir_with_gz, run_id+".bowtie_metrics.txt") + " -S "+bowtie_output_file+" "
+		command_line ="bowtie2 -k 2 --quiet --no-unal -x "+bowtieBuildFileName+" -1 "+dir_with_gz+"/"+FilesDowned[0]+ " -2 "+dir_with_gz+"/"+FilesDowned[1] + " --rg-id ENA --rg SM:"+run_id+" --sensitive-local --threads "+ str(threads) +" --met-file "+ os.path.join(dir_with_gz, run_id+".bowtie_metrics.txt") + " -S "+bowtie_output_file+" "
 		
 		myoutput = open(bowtieLog, 'w')
 		args = shlex.split(command_line)

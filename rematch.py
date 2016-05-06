@@ -32,6 +32,7 @@ def main():
 	parser.add_argument('-tax', nargs='?', type=str, help='Name taxon to download sequences', required=False)
 	parser.add_argument('-allplat', nargs='?', type=bool, help='Use all platforms', required=False, default = False)
 	parser.add_argument('-xtraSeq', nargs='?', type=int, help='For trimming extra sequence lenght 5\' and 3\' ', required=False, default = 0)
+	parser.add_argument('-bowtieBuild', nargs='?', type=bool, help='Run build bowtie', required=False, default = True)
 
 	args = parser.parse_args()
 
@@ -89,7 +90,7 @@ def runReMaCh(args):
 				
 				count_runs += 1
 
-				if count_runs > 1:
+				if count_runs > 1 or args.bowtieBuild == False:
 					buildBowtie = False
 
 				run_id = run_id.strip()
