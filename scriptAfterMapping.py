@@ -20,9 +20,9 @@ def convertToBAM(samPath):
 	filename, samfile_extension = os.path.splitext(samPath)
 
         os.system("samtools view -buh -o " + filename +'_temp.bam' + " " + samPath)
-        os.system("rm " + samPath)
+        #os.system("rm " + samPath)
         os.system("samtools sort " + filename + "_temp.bam " + filename)
-        os.system("rm "+ filename +'_temp.bam')
+        #os.system("rm "+ filename +'_temp.bam')
         os.system("samtools index " + filename +'.bam')
 
 	return (filename +'')
