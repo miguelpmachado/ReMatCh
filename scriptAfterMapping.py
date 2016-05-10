@@ -64,11 +64,13 @@ def checkCoverage(outputPath, coverageThreshold,extraSeq, logFile):
 				if countlines == 1:
 					prevName = line[0]
 
+			print prevName, countSequences
 
 		sequenceNames.append(prevName)
 		sequenceMedObject[prevName] = [prevName, numpy.average(arrayOfcoverageValues), numpy.std(arrayOfcoverageValues), arrayOfcoverageValues, False, False, False,arrayOfpositionValues]
 		countSequences += 1
 
+		print prevName, countSequences
 
         for sequence in sequenceMedObject:
                 countLowCoverage = 0
