@@ -4,13 +4,14 @@ import numpy as np
 
 def mergeResults(workdir):
 
-	sampleList = os.listdir(workdir)
+	#sampleList = os.listdir(workdir)
+	dirs = [d for d in os.listdir(workdir) if os.path.isdir(os.path.join(workdir, d))]
 	sampledict = {}
-	print sampleList
+	print dirs
 
-	for i in sampleList:
+	for i in dirs:
 		sampleName = os.path.basename(i)
-		print os.path.join(workdir, sampleName, sampleName+'_mappingCheck.tab')
+		#print os.path.join(workdir, sampleName, sampleName+'_mappingCheck.tab')
 		if os.path.isfile(os.path.join(workdir, sampleName, sampleName+'_mappingCheck.tab')):
 			sampledict[sampleName] = {}
 			mappingCheckFile = numpy.loadtxt(coveragefile, comments='#', delimiter='\t', converters=None, skiprows=0, usecols=None, unpack=False, ndmin=0)
