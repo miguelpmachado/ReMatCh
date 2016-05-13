@@ -40,10 +40,9 @@ def mergeResults(workdir, sequenceCoverage):
 							countSequences+=1
 						prevNameSeq = nameseq
 					else:
-						print countSequences, prevNameSeq
-						print consensusdict[prevNameSeq]
+						print consensusdict
 						consensusdict[prevNameSeq][countSequences][1] = line 
-						print consensusdict[prevNameSeq][countSequences]
+						#print consensusdict[prevNameSeq][countSequences]
 
 
 	
