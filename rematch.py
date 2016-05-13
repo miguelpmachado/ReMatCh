@@ -45,7 +45,7 @@ def main():
 	args = parser.parse_args()
 
 	if args.mergeResults:
-		mergeResults(args.mergeResults)
+		mergeResults(args.mergeResults[0])
 	else:
 		if not args.r or not args.workdir or not args.gatk or not args.picard or not args.l:
 			parser.error('You must pass all the required arguments. For more information type -h')
