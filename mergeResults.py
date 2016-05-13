@@ -1,5 +1,5 @@
 import os
-import numpy as np
+import numpy
 
 
 def mergeResults(workdir):
@@ -15,6 +15,6 @@ def mergeResults(workdir):
 		mappingFilePath = os.path.join(workdir, sampleName, 'rematch_results', sampleName+'_mappingCheck.tab')
 		if os.path.isfile(mappingFilePath):
 			sampledict[sampleName] = {}
-			mappingCheckFile = np.loadtxt(mappingFilePath, dtype={'formats': (numpy.str_, numpy.float, numpy.float, numpy.str_, numpy.str_, numpy.str_, numpy.float, numpy.float)}, comments='#', delimiter='\t', converters=None, skiprows=0, usecols=None, unpack=False, ndmin=0)
+			mappingCheckFile = numpy.loadtxt(mappingFilePath, dtype={'formats': (numpy.str_, numpy.float, numpy.float, numpy.str_, numpy.str_, numpy.str_, numpy.float, numpy.float)}, comments='#', delimiter='\t', converters=None, skiprows=0, usecols=None, unpack=False, ndmin=0)
 			print mappingCheckFile.shape
 			print mappingCheckFile[1][:]
