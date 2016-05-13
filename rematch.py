@@ -20,16 +20,16 @@ from rematch_utils import removeFromArray
 def main():
 
 	parser = argparse.ArgumentParser(prog='rematch.py', description="ReMatCh is an application which combines a set of bioinformatic tools for reads mapping against a reference, finds the allelic variants and produces a consensus sequence. It also allows direct sample download from ENA database to be used in the analysis.", formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-	parser.add_argument_group('required arguments')
+	requiredNamed = parser.add_argument_group('required arguments')
 	#parser.add_argument('-s', nargs='?', type=str, help="sam file path", required=True)
-	parser.add_argument('-r', nargs=1, type=str, metavar=('/path/reference.fasta'), help='Path for the reference sequence', required=True)
-	parser.add_argument('-d', '--workdir', nargs=1, type=str, metavar=('/path/to/workdir'), help='Working directory. Downloaded files will be stored here, but it can also already contain folders with fastq files. Results will be stored here.', required=True)
-	parser.add_argument('-gatk', nargs=1, type=str, metavar=('/path/to/gatk.jar'), help='Path for the Genome Analysis Toolkit jar file', required=True)
-	parser.add_argument('-picard', nargs=1, metavar=('/path/to/picard'), type=str, help='Path for Picard', required=True)
-	parser.add_argument('-l', nargs=1, metavar=('/path/to/idenfifiersList.txt'), type=str, help='Path to a list with ids to run. IDs can be ENA run accession numbers for download or direcory names where fastqs are stored in --workdir. Run accession numbers retrieved from ENA using -tax will be stored here.' , required=True)
-	parser.add_argument('-cov', '--min-coverage', nargs='?', metavar=('N'), type=int, help='Minimum coverage depth required for base calling and SNP calling.', default = 10, required=False)
-	parser.add_argument('-qual', '--min-quality', nargs='?', metavar=('N'), type=int, help='Minimum mapping quality for SNP calling', default = 10, required=False)
-	parser.add_argument('-mul', '--multiple', nargs='?', metavar=('0.0 - 1.0'), type=float, help='Minimum read mapping frequency to be considered as ', default = 0.75, required=False)
+	requiredNamed.add_argument('-r', nargs=1, type=str, metavar=('/path/reference.fasta'), help='Path for the reference sequence', required=True)
+	requiredNamed.add_argument('-d', '--workdir', nargs=1, type=str, metavar=('/path/to/workdir'), help='Working directory. Downloaded files will be stored here, but it can also already contain folders with fastq files. Results will be stored here.', required=True)
+	requiredNamed.add_argument('-gatk', nargs=1, type=str, metavar=('/path/to/gatk.jar'), help='Path for the Genome Analysis Toolkit jar file', required=True)
+	requiredNamed.add_argument('-picard', nargs=1, metavar=('/path/to/picard'), type=str, help='Path for Picard', required=True)
+	requiredNamed.add_argument('-l', nargs=1, metavar=('/path/to/idenfifiersList.txt'), type=str, help='Path to a list with ids to run. IDs can be ENA run accession numbers for download or direcory names where fastqs are stored in --workdir. Run accession numbers retrieved from ENA using -tax will be stored here.' , required=True)
+	parser.add_argument('-cov', '--minCoverage', nargs='?', metavar=('N'), type=int, help='Minimum coverage depth required for base calling and SNP calling.', default = 10, required=False)
+	parser.add_argument('-qual', '--minQuality', nargs='?', metavar=('N'), type=int, help='Minimum mapping quality for SNP calling', default = 10, required=False)
+	parser.add_argument('-mul', '--multipleAlleles', nargs='?', metavar=('0.0 - 1.0'), type=float, help='Minimum reads frequency (confidence) of dominant nucleotide to consider absence of multiple alleles at a given SNP position.', default = 0.75, required=False)
 	parser.add_argument('-threads', nargs='?', metavar=('N'), type=int, help='Number of threads used to run bowtie2', required=False, default= 1)
 	parser.add_argument('-tax', nargs='?', metavar=('Streptococcus pneumoniae'), type=str, help='Name taxon to download sequences. Results will be stored in /path/to/idenfifiersList.txt', required=False)
 	parser.add_argument('-xtraSeq', nargs='?', type=int, help='For trimming extra sequence lenght 5\' and 3\' ', required=False, default = 0)
@@ -46,9 +46,9 @@ def runReMaCh(args):
 
 	toClear = []
 
-	if not os.path.isdir(args.d):
-		os.mkdir(args.d)
-		print str(args.d) + ' directory created!'
+	if not os.path.isdir(args.workdir):
+		os.mkdir(args.workdir)
+		print str(args.workdir) + ' directory created!'
 	
 	if args.tax:
 		GetSequencesFromTaxon(args.tax,args.l,True)
@@ -58,8 +58,8 @@ def runReMaCh(args):
 	else:
 		platform=''
 	
-	ids_with_problems = open(os.path.join(args.d,'ids_with_problems.txt'), 'w')
-	logFile = open(os.path.join(args.d,'log_file.txt'), 'a')
+	ids_with_problems = open(os.path.join(args.workdir,'ids_with_problems.txt'), 'w')
+	logFile = open(os.path.join(args.workdir,'log_file.txt'), 'a')
 
 	with open(args.l, 'r') as run_ids:
 
@@ -104,7 +104,7 @@ def runReMaCh(args):
 
 				print "\n######\ndownloading and bowtieying\n######\n"
 				logFile.write("\n######\ndownloading and bowtieying\n######\n")
-				samFilePath, singOrPaired, numFilesDownloaded = downloadAndBowtie(args.r, run_id, args.d, buildBowtie, args.picard, args.threads, logFile, toClear)
+				samFilePath, singOrPaired, numFilesDownloaded = downloadAndBowtie(args.r, run_id, args.workdir, buildBowtie, args.picard, args.threads, logFile, toClear)
 				print "\n######\ndownloaded and bowtied\n######\n"
 				logFile.write("\n######\ndownloaded and bowtied\n######\n")
 				
@@ -119,17 +119,17 @@ def runReMaCh(args):
 					rawCoverage(sortedPath, toClear)
 					print "\n######\nChecking coverage\n######\n"
 					logFile.write("\n######\nChecking coverage\n######\n")
-					sequenceNames, sequenceMedObject = checkCoverage(sortedPath, args.cov,args.xtraSeq, logFile, toClear)
+					sequenceNames, sequenceMedObject = checkCoverage(sortedPath, args.minCoverage,args.xtraSeq, logFile, toClear)
 					print "\n######\nChecked coverage goint to perform allele call\n######\n"
 					logFile.write("\n######\nChecked coverage goint to perform allele call\n######\n")
-					alleleCalling(sortedPath, args.r, sequenceNames, args.gatk, run_id, args.qual, args.cov, args.mul, sequenceMedObject,args.xtraSeq, logFile, toClear)
+					alleleCalling(sortedPath, args.r, sequenceNames, args.gatk, run_id, args.minQuality, args.minCoverage, args.multipleAlleles, sequenceMedObject,args.xtraSeq, logFile, toClear)
 					print "\n######\nallele called everything\n######\n"	
 					logFile.write("\n######\nallele called everything\n######\n")
 					
 					
 					gzSizes = 0
 
-					filesToRemove = glob.glob(os.path.join(args.d, run_id) + '/*.fastq.gz')
+					filesToRemove = glob.glob(os.path.join(args.workdir, run_id) + '/*.fastq.gz')
 
 					for files in filesToRemove:
 						gzSizes += float(os.path.getsize(files))
@@ -140,7 +140,7 @@ def runReMaCh(args):
 
 					run_time = str(datetime.now() - startTime)
 
-					with open(os.path.join(args.d, run_id, run_id + '_runtime.txt'), 'w') as runTimeFile:
+					with open(os.path.join(args.workdir, run_id, run_id + '_runtime.txt'), 'w') as runTimeFile:
 						runTimeFile.write("#runTime\tfileSize\tlibraryLayout\n")
 						runTimeFile.write(str(run_time) + '\t' + str(gzSizes) +"\t"+singOrPaired+ '\n')
 				else:
