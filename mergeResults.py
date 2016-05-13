@@ -37,8 +37,10 @@ def mergeResults(workdir, sequenceCoverage):
 						if nameseq not in consensusdict:
 							consensusdict[nameseq] = []
 							consensusdict[nameseq].append(['>' + sampleName + '_' + nameseq, False])
-							countSequences+=1
+						else:
+							consensusdict[nameseq].append(['>' + sampleName + '_' + nameseq, False])
 						prevNameSeq = nameseq
+						countSequences=len(consensusdict[nameseq])-1
 					else:
 						print consensusdict
 						consensusdict[prevNameSeq][countSequences][1] = line 
