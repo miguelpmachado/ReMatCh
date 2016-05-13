@@ -22,6 +22,7 @@ def main():
 
 	parser = argparse.ArgumentParser(prog='rematch.py', description="ReMatCh is an application which combines a set of bioinformatic tools for reads mapping against a reference, finds the allelic variants and produces a consensus sequence. It also allows direct sample download from ENA database to be used in the analysis.", formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 	requiredNamed = parser.add_argument_group('required arguments')
+	
 	#parser.add_argument('-s', nargs='?', type=str, help="sam file path", required=True)
 	requiredNamed.add_argument('-r', nargs="?", type=str, metavar=('/path/reference.fasta'), help='Path for the reference sequence', required=False)
 	requiredNamed.add_argument('-d', '--workdir', nargs="?", type=str, metavar=('/path/to/workdir'), help='Working directory. Downloaded files will be stored here, but it can also already contain folders with fastq files. Results will be stored here.', required=False)
@@ -40,13 +41,15 @@ def main():
 	parser.add_argument('-allplat', help='Use all platforms. By default, only Illumina runs are used', action='store_true')
 
 	#Merge results
-	parser.add_argument('--mergeResults', nargs=1, metavar=('/path/to/workdir'), type=str, help='Merge all rematch results available at --workdir. Option to be used alone or with --sequenceCoverage.', required=False)
-	parser.add_argument('--sequenceCoverage', nargs=1, metavar=('0.0 - 1.0'), type=float, help='Minimum sequence length to consider the gene to be present. This is a relative measure. To be used with --mergeResults', default=0.8, required=False)
+	mergedResults = parser.add_argument_group('merge results arguments')
+	mergedResults.add_argument('--mergeResults', nargs=1, metavar=('/path/to/workdir'), type=str, help='Merge all rematch results available at --workdir. Option to be used alone or with --sequenceCoverage.', required=False)
+	mergedResults.add_argument('--sequenceCoverage', nargs=1, metavar=('0.0 - 1.0'), type=float, help='Minimum sequence length to consider the gene to be present. This is a relative measure. To be used with --mergeResults', default=0.8, required=False)
 
 	args = parser.parse_args()
 	print len(args)
 
 	if args.mergeResults:
+		print 'Running only mergeResults with --mergeResults ' + args.mergeResults[0] + ' and --sequenceCoverage '+ args.sequenceCoverage[0]
 		mergeResults(args.mergeResults[0], args.sequenceCoverage[0])
 	else:
 		if not args.r or not args.workdir or not args.gatk or not args.picard or not args.l:
