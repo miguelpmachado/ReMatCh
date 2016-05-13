@@ -102,10 +102,15 @@ be used in the analysis.
 
 ##Dependencies
 Bowtie2 http://bowtie-bio.sourceforge.net/bowtie2/index.shtml - Reads mapping
+
 SAMtools http://www.htslib.org/ - .sam and .bam manipulation. SNP calling.
+
 BEDtools http://bedtools.readthedocs.org/en/latest/ - Coverage retrieval.
+
 Genome Analysis Toolkit (GATK) https://www.broadinstitute.org/gatk/ - Consensus sequence creation.
+
 Picard http://broadinstitute.github.io/picard/ - Reference sequence indexing. 
+
 Python Module: NumPy http://www.numpy.org/ - Matrix manipulation.
 
 ##Authors
