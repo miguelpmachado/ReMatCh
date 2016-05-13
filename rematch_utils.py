@@ -73,3 +73,7 @@ def changeFastaHeadersAndTrimm(FastasequencesFile,TrimmExtraSeq,referencePath):
 			
 	os.remove(FastasequencesFile)
 	os.rename(FastasequencesFile+".temp", FastasequencesFile)
+
+def removeFromArray(toClear):
+	for i in toClear:
+		os.system('rm ' + i)

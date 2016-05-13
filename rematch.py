@@ -15,6 +15,7 @@ from scriptAfterMapping import convertToBAM
 from scriptAfterMapping import rawCoverage
 from scriptAfterMapping import alleleCalling
 from SeqFromWebTaxon import GetSequencesFromTaxon
+from rematch_utils import removeFromArray
 
 def main():
 
@@ -35,7 +36,7 @@ def main():
 	parser.add_argument('-allplat', nargs='?', type=bool, help='Use all platforms', required=False, default = False)
 	parser.add_argument('-xtraSeq', nargs='?', type=int, help='For trimming extra sequence lenght 5\' and 3\' ', required=False, default = 0)
 	parser.add_argument('-bowtieBuild', nargs='?', type=bool, help='Run build bowtie', required=False, default = False)
-	parser.add_argument('-clean', nargs='?', type=bool, help='Clean intermediate files', required=False, default = False)
+	parser.add_argument('-clean', help='Clean intermediate files', action='store_true')
 
 	args = parser.parse_args()
 
@@ -148,6 +149,9 @@ def runReMaCh(args):
 					pass
 
 		ids_with_problems.close()
+
+	if args.clean:
+		removeFromArray(toClear)
 
 
 if __name__ == "__main__":
