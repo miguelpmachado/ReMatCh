@@ -1,5 +1,5 @@
 import os
-import numpy
+import csv
 
 
 def mergeResults(workdir):
@@ -14,7 +14,8 @@ def mergeResults(workdir):
 		print os.path.join(workdir, sampleName, sampleName+'_mappingCheck.tab')
 		mappingFilePath = os.path.join(workdir, sampleName, 'rematch_results', sampleName+'_mappingCheck.tab')
 		if os.path.isfile(mappingFilePath):
-			sampledict[sampleName] = {}
-			mappingCheckFile = numpy.loadtxt(mappingFilePath, dtype={'formats': (numpy.object, numpy.float, numpy.float, numpy.float, numpy.object, numpy.object, numpy.object, numpy.float, numpy.float)}, comments='#', delimiter='\t', converters=None, skiprows=0, usecols=None, unpack=False, ndmin=0)
-			print mappingCheckFile.shape
-			print mappingCheckFile[1][:]
+			with open(mappingFilePath, 'rb') as csvfile:
+				mappingreader = csv.reader(csvfile, delimiter='\t', quotechar='#')
+				sampledict[sampleName] = {}
+				for j in mappingreader:
+					print j
