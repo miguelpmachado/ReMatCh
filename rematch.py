@@ -35,12 +35,15 @@ def main():
 	parser.add_argument('-allplat', nargs='?', type=bool, help='Use all platforms', required=False, default = False)
 	parser.add_argument('-xtraSeq', nargs='?', type=int, help='For trimming extra sequence lenght 5\' and 3\' ', required=False, default = 0)
 	parser.add_argument('-bowtieBuild', nargs='?', type=bool, help='Run build bowtie', required=False, default = False)
+	parser.add_argument('-clean', nargs='?', type=bool, help='Clean intermediate files', required=False, default = False)
 
 	args = parser.parse_args()
 
 	runReMaCh(args)
 
 def runReMaCh(args):
+
+	toClear = []
 
 	if not os.path.isdir(args.t):
 		os.mkdir(args.t)
@@ -100,7 +103,7 @@ def runReMaCh(args):
 
 				print "\n######\ndownloading and bowtieying\n######\n"
 				logFile.write("\n######\ndownloading and bowtieying\n######\n")
-				samFilePath, singOrPaired, numFilesDownloaded = downloadAndBowtie(args.r, run_id, args.t, buildBowtie, args.picard, args.threads, logFile)
+				samFilePath, singOrPaired, numFilesDownloaded = downloadAndBowtie(args.r, run_id, args.t, buildBowtie, args.picard, args.threads, logFile, toClear)
 				print "\n######\ndownloaded and bowtied\n######\n"
 				logFile.write("\n######\ndownloaded and bowtied\n######\n")
 				
@@ -110,15 +113,15 @@ def runReMaCh(args):
 
 				if not samFilePath==False:
 				
-					sortedPath = convertToBAM(samFilePath)
+					sortedPath = convertToBAM(samFilePath, toClear)
 
-					rawCoverage(sortedPath)
+					rawCoverage(sortedPath, toClear)
 					print "\n######\nChecking coverage\n######\n"
 					logFile.write("\n######\nChecking coverage\n######\n")
-					sequenceNames, sequenceMedObject = checkCoverage(sortedPath, args.cov,args.xtraSeq, logFile)
+					sequenceNames, sequenceMedObject = checkCoverage(sortedPath, args.cov,args.xtraSeq, logFile, toClear)
 					print "\n######\nChecked coverage goint to perform allele call\n######\n"
 					logFile.write("\n######\nChecked coverage goint to perform allele call\n######\n")
-					alleleCalling(sortedPath, args.r, sequenceNames, args.gatk, run_id, args.qual, args.cov, args.mul, sequenceMedObject,args.xtraSeq, logFile)
+					alleleCalling(sortedPath, args.r, sequenceNames, args.gatk, run_id, args.qual, args.cov, args.mul, sequenceMedObject,args.xtraSeq, logFile, toClear)
 					print "\n######\nallele called everything\n######\n"	
 					logFile.write("\n######\nallele called everything\n######\n")
 					

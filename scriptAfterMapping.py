@@ -15,24 +15,26 @@ from rematch_utils import filter_vcf
 from rematch_utils import createCheckFile
 
 
-def convertToBAM(samPath):
+def convertToBAM(samPath, toClear):
 
 	filename, samfile_extension = os.path.splitext(samPath)
 
         os.system("samtools view -buh -o " + filename +'_temp.bam' + " " + samPath)
-        #os.system("rm " + samPath)
+        os.system("rm " + samPath)
         os.system("samtools sort " + filename + "_temp.bam " + filename)
-        #os.system("rm "+ filename +'_temp.bam')
+        os.system("rm "+ filename +'_temp.bam')
         os.system("samtools index " + filename +'.bam')
+        toClear.append(filename +'.bam*')
 
 	return (filename +'')
 
 
-def rawCoverage(bamSortedPath):
+def rawCoverage(bamSortedPath, toClear):
 	os.system("bedtools genomecov -d -ibam " + bamSortedPath + ".bam > " + bamSortedPath+".tab")
+	toClear.append(bamSortedPath+".tab")
 
 
-def checkCoverage(outputPath, coverageThreshold,extraSeq, logFile):
+def checkCoverage(outputPath, coverageThreshold,extraSeq, logFile, toClear):
 
 	sequenceMedObject = {}
 	#sequenceAndIndex = {}
@@ -64,13 +66,11 @@ def checkCoverage(outputPath, coverageThreshold,extraSeq, logFile):
 				if countlines == 1:
 					prevName = line[0]
 
-			print prevName, countSequences
 
 		sequenceNames.append(prevName)
 		sequenceMedObject[prevName] = [prevName, numpy.average(arrayOfcoverageValues), numpy.std(arrayOfcoverageValues), arrayOfcoverageValues, False, False, False,arrayOfpositionValues]
 		countSequences += 1
 
-		print prevName, countSequences
 
         for sequence in sequenceMedObject:
                 countLowCoverage = 0
@@ -104,7 +104,7 @@ def checkCoverage(outputPath, coverageThreshold,extraSeq, logFile):
 
 
     		
-def alleleCalling(bamSortedPath, referencePath, sequenceNames, gatkPath, sampleID, qualityThreshold, coverageThreshold, multipleAlleles, sequenceMedObject,extraSeq, logFile):
+def alleleCalling(bamSortedPath, referencePath, sequenceNames, gatkPath, sampleID, qualityThreshold, coverageThreshold, multipleAlleles, sequenceMedObject,extraSeq, logFile, toClear):
 
 	ploidytempFile = bamSortedPath+'_temp_ploi.tab'
 	sequencesFile = bamSortedPath + '_sequences.fasta'
@@ -113,17 +113,20 @@ def alleleCalling(bamSortedPath, referencePath, sequenceNames, gatkPath, sampleI
 	with open(ploidytempFile, 'w') as tempFile:
 		tempFile.write(sampleID + '\t' + str(1))
 
-	os.system("samtools mpileup --no-BAQ --fasta-ref " + referencePath + " --uncompressed -t DP,DPR,DV " + bamSortedPath + ".bam | bcftools call --multiallelic-caller --variants-only --samples-file " + ploidytempFile + " --output-type v --output " + bamSortedPath + ".vcf")
-	
 	print "running bcf"
 	logFile.write("running bcf" + '\n')
+
+	os.system("samtools mpileup --no-BAQ --fasta-ref " + referencePath + " --uncompressed -t DP,DPR,DV " + bamSortedPath + ".bam | bcftools call --multiallelic-caller --variants-only --samples-file " + ploidytempFile + " --output-type v --output " + bamSortedPath + ".vcf")
+	toClear.append(referencePath+'.fai')
+	toClear.append(bamSortedPath + ".vcf")
+
 	
-	os.system("bcftools filter --SnpGap 3 --IndelGap 10 --include 'QUAL>=" + str(qualityThreshold) + " && FORMAT/DV>=" + str(coverageThreshold) + " && (FORMAT/DV)/(FORMAT/DP)>=" + str(multipleAlleles) + "' --output-type v --output " + bamSortedPath + "_filtered.vcf " + bamSortedPath + ".vcf")
-	os.system("bcftools filter --SnpGap 3 --IndelGap 10 --include 'TYPE=\"snp\" && QUAL>=" + str(qualityThreshold) + " && FORMAT/DV>=" + str(coverageThreshold) + " && (FORMAT/DV)/(FORMAT/DP)>=" + str(multipleAlleles) + "' --output-type v --output " + bamSortedPath + "_filtered_without_indels.vcf " + bamSortedPath + ".vcf")
+	#os.system("bcftools filter --SnpGap 3 --IndelGap 10 --include 'QUAL>=" + str(qualityThreshold) + " && FORMAT/DV>=" + str(coverageThreshold) + " && (FORMAT/DV)/(FORMAT/DP)>=" + str(multipleAlleles) + "' --output-type v --output " + bamSortedPath + "_filtered.vcf " + bamSortedPath + ".vcf")
+	#os.system("bcftools filter --SnpGap 3 --IndelGap 10 --include 'TYPE=\"snp\" && QUAL>=" + str(qualityThreshold) + " && FORMAT/DV>=" + str(coverageThreshold) + " && (FORMAT/DV)/(FORMAT/DP)>=" + str(multipleAlleles) + "' --output-type v --output " + bamSortedPath + "_filtered_without_indels.vcf " + bamSortedPath + ".vcf")
 	
 
-	filter_vcf(bamSortedPath + "_filtered.vcf", extraSeq, sequenceMedObject)
-	filter_vcf(bamSortedPath + "_filtered_without_indels.vcf", extraSeq, sequenceMedObject)
+	#filter_vcf(bamSortedPath + "_filtered.vcf", extraSeq, sequenceMedObject)
+	#filter_vcf(bamSortedPath + "_filtered_without_indels.vcf", extraSeq, sequenceMedObject)
 
 
 	with open(bamSortedPath + ".vcf", 'r') as vcfFile:
@@ -158,15 +161,16 @@ def alleleCalling(bamSortedPath, referencePath, sequenceNames, gatkPath, sampleI
 	print "running gatk"
 	logFile.write("running gatk" + '\n')
 	
-	os.system("java -jar " + gatkPath + " -T FastaAlternateReferenceMaker -R "+ referencePath +" -o "+ filteredsequencesFile +" -V "+ bamSortedPath + "_filtered.vcf 2> "+sequencesFile+"Log_gatk.txt")
-	os.system("java -jar " + gatkPath + " -T FastaAlternateReferenceMaker -R "+ referencePath +" -o "+ bamSortedPath + "_sequences_filtered_without_indels.fasta -V "+ bamSortedPath + "_filtered_without_indels.vcf 2>> "+sequencesFile+"Log_gatk.txt")
+	#os.system("java -jar " + gatkPath + " -T FastaAlternateReferenceMaker -R "+ referencePath +" -o "+ filteredsequencesFile +" -V "+ bamSortedPath + "_filtered.vcf 2> "+sequencesFile+"Log_gatk.txt")
+	#os.system("java -jar " + gatkPath + " -T FastaAlternateReferenceMaker -R "+ referencePath +" -o "+ bamSortedPath + "_sequences_filtered_without_indels.fasta -V "+ bamSortedPath + "_filtered_without_indels.vcf 2>> "+sequencesFile+"Log_gatk.txt")
 	os.system("java -jar " + gatkPath + " -T FastaAlternateReferenceMaker -R "+ referencePath +" -o "+ sequencesFile +" -V "+ bamSortedPath + ".vcf 2>> "+sequencesFile+"Log_gatk.txt")
+	toClear.append(sequencesFile+"Log_gatk.txt")
 
 	os.system("rm " + ploidytempFile)
 
 	
-	changeFastaHeadersAndTrimm(filteredsequencesFile, extraSeq,referencePath)
-	changeFastaHeadersAndTrimm(bamSortedPath + "_sequences_filtered_without_indels.fasta", extraSeq,referencePath)
+	#changeFastaHeadersAndTrimm(filteredsequencesFile, extraSeq,referencePath)
+	#changeFastaHeadersAndTrimm(bamSortedPath + "_sequences_filtered_without_indels.fasta", extraSeq,referencePath)
 	changeFastaHeadersAndTrimm(sequencesFile, 0,referencePath)
 
 

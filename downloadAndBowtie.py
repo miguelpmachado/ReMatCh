@@ -103,14 +103,15 @@ def download_ERR(ERR_id,target_dir, logFile):
 
 
 
-def downloadAndBowtie(referencePath, run_id, target_dir, buildBowtie, picardJarPath, threads, logFile):
+def downloadAndBowtie(referencePath, run_id, target_dir, buildBowtie, picardJarPath, threads, logFile, toClear):
 
 	if buildBowtie == True:
 		print "run picard"
 		logFile.write("run picard" + '\n')
 		picardFileName, extension = os.path.splitext(referencePath)
 		os.system(picardJarPath +" CreateSequenceDictionary R= " + referencePath + " O= " + picardFileName + ".dict 2> "+picardFileName+"_picard_out.txt")
-
+		toClear.append(picardFileName+"_picard_out.txt")
+		toClear.append(picardFileName + ".dict")
 
 
 	bowtieBuildFileName, extension = os.path.splitext(referencePath)
@@ -121,9 +122,11 @@ def downloadAndBowtie(referencePath, run_id, target_dir, buildBowtie, picardJarP
 	if buildBowtie == True:
 		print "run bowtie"
 		logFile.write("run bowtie" + '\n')
-		bowtiBuildeLog=bowtieBuildFileName +"_bowtiBuildeLog.txt"
+		bowtiBuildeLog=bowtieBuildFileName +"_bowtiBuildLog.txt"
 		myoutput = open(bowtiBuildeLog, 'w')
 		subprocess.call(["bowtie2-build", referencePath, bowtieBuildFileName],stdout=myoutput,stderr=myoutput)
+		toClear.append(bowtieBuildFileName + ".*.bt2")
+		toClear.append(bowtiBuildeLog)
 	
 	#download ERR
 
@@ -170,6 +173,8 @@ def downloadAndBowtie(referencePath, run_id, target_dir, buildBowtie, picardJarP
 		myoutput = open(bowtieLog, 'w')
 		args = shlex.split(command_line)
 		p = subprocess.call(args,stdout=myoutput,stderr=myoutput)
+		toClear.append(os.path.join(resultsFolder, run_id+".bowtie_metrics.txt"))
+		toClear.append(os.path.join(resultsFolder, run_id+".bowtie_error.txt"))
 
 
 	elif len(FilesDowned)==2:
@@ -180,7 +185,8 @@ def downloadAndBowtie(referencePath, run_id, target_dir, buildBowtie, picardJarP
 		args = shlex.split(command_line)
 		p = subprocess.call(args,stdout=myoutput,stderr=myoutput)
 		pairedOrSingle="Paired_end"	
-
+		toClear.append(os.path.join(resultsFolder, run_id+".bowtie_metrics.txt"))
+		toClear.append(os.path.join(resultsFolder, run_id+".bowtie_error.txt"))
 
 	
 	else:
