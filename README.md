@@ -83,23 +83,15 @@ be used in the analysis.
 
 ***sample_mappingCheck.tab*** information:
 
-**Sequence** - Target sequence name.
-
-**Duplication** - Sequence nucleotide frequency with more than 1.25x mean coverage depth.
-
-**Indel** - Sequence nucleotide frequency with less than 0.1x mean coverage depth.
-
-**Coverage** - Sequence nucleotide frequency with less than minimum coverage required for base calling (0 - all nucleotide present; 1 - sequence absent).
-
-**LowSNPsQualityScore** - Presence of SNPs with low mapping quality score (< -qual).
-
-**SNPCoverage** - Presence of SNPs with low coverage depth (< -cov).
-
-**SNPMultipleAlleles** - Presence of SNPs with multiple alleles.
-
-**meanSequenceCoverage** - Mean coverage depth of the entire sequence.
-
-**meanTrimmedSequenceCoverage** - Mean coverage depth of the sequence without the trimmed ends.
+- **Sequence** - Target sequence name.
+- **Duplication** - Sequence nucleotide frequency with more than 1.25x mean coverage depth.
+- **Indel** - Sequence nucleotide frequency with less than 0.1x mean coverage depth.
+- **Coverage** - Sequence nucleotide frequency with less than minimum coverage required for base calling (0 - all nucleotide present; 1 - sequence absent).
+- **LowSNPsQualityScore** - Presence of SNPs with low mapping quality score (< -qual).
+- **SNPCoverage** - Presence of SNPs with low coverage depth (< -cov).
+- **SNPMultipleAlleles** - Presence of SNPs with multiple alleles.
+- **meanSequenceCoverage** - Mean coverage depth of the entire sequence.
+- **meanTrimmedSequenceCoverage** - Mean coverage depth of the sequence without the trimmed ends.
 
 **ReMatCh** *--mergeResults* also outputs a tabular file with gene presence/absence information for samples existing in the *--workdir*, with the name *mergedResults.tab*.
 
@@ -123,10 +115,8 @@ Python Module: NumPy http://www.numpy.org/ - Matrix manipulation.
 
 ##Authors
 
-Miguel Machado (https://github.com/miguelpmachado)
-
-Bruno Gonçalves (https://github.com/bfrgoncalves)
-
-Mickael Silva (https://github.com/mickaelsilva)
+- Miguel Machado (https://github.com/miguelpmachado)
+- Bruno Gonçalves (https://github.com/bfrgoncalves)
+- Mickael Silva (https://github.com/mickaelsilva)
 
 > Written with [StackEdit](https://stackedit.io/).
