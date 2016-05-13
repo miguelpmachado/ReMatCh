@@ -14,6 +14,6 @@ def mergeResults(workdir):
 		print os.path.join(workdir, sampleName, sampleName+'_mappingCheck.tab')
 		if os.path.isfile(os.path.join(workdir, sampleName, 'rematch_results', sampleName+'_mappingCheck.tab')):
 			sampledict[sampleName] = {}
-			mappingCheckFile = numpy.loadtxt(coveragefile, comments='#', delimiter='\t', converters=None, skiprows=0, usecols=None, unpack=False, ndmin=0)
+			mappingCheckFile = np.loadtxt(coveragefile, comments='#', delimiter='\t', converters=None, skiprows=0, usecols=None, unpack=False, ndmin=0)
 			print mappingCheckFile.shape
 			print mappingCheckFile[1][:]
