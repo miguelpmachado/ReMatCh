@@ -4,6 +4,7 @@ import csv
 
 def mergeResults(workdir):
 
+	sequenceCoverage = 0.8
 	#sampleList = os.listdir(workdir)
 	dirs = [d for d in os.listdir(workdir) if os.path.isdir(os.path.join(workdir, d))]
 	sampledict = {}
@@ -19,8 +20,37 @@ def mergeResults(workdir):
 				sampledict[sampleName] = {}
 				for line in mappingreader:
 					if not line[0].startswith("#"):
-						sampledict[sampleName][line[0]] = line[1:]
+						if 1 - float(line[3]) >= sequenceCoverage:
+							if line[6] == False:
+								sampledict[sampleName][line[0]] = line[8]
+							else:
+								sampledict[sampleName][line[0]] = 'Mul.Allele'
+						else:
+							sampledict[sampleName][line[0]] = 'Absent'
 
-				print sampledict
+	with open(os.path.join(workdir,'mergedResults.tab'),'w') as results:
+		firstLine = True
+		header = 'Samples\t'
+
+		for x in sampledict:
+			if firstLine:
+				for l in sampledict[x]:
+					header += sampledict[x][l] + '\t'
+				results.write(header + '\n')
+				firstLine = False
+
+			row = x + '\t'
+			for k in sampledict[x]:
+				row += sampledict[x][k] + '\t'
+			results.write(row + '\n')
+						
+
+
+
+
+
+
+	
+
 
 
