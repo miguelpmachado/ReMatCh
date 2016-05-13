@@ -111,7 +111,9 @@ Python Module: NumPy http://www.numpy.org/ - Matrix manipulation.
 ##Authors
 
 Miguel Machado (https://github.com/miguelpmachado)
+
 Bruno Gonçalves (https://github.com/bfrgoncalves)
+
 Mickael Silva (https://github.com/mickaelsilva)
 
 > Written with [StackEdit](https://stackedit.io/).
