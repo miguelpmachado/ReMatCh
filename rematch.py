@@ -29,7 +29,7 @@ def main():
 	requiredNamed.add_argument('-l', nargs=1, metavar=('/path/to/idenfifiersList.txt'), type=str, help='Path to a list with ids to run. IDs can be ENA run accession numbers for download or direcory names where fastqs are stored in --workdir. Run accession numbers retrieved from ENA using -tax will be stored here.' , required=True)
 	parser.add_argument('-cov', '--min-coverage', nargs='?', metavar=('N'), type=int, help='Minimum coverage depth required for base calling and SNP calling.', default = 10, required=False)
 	parser.add_argument('-qual', '--min-quality', nargs='?', metavar=('N'), type=int, help='Minimum mapping quality for SNP calling', default = 10, required=False)
-	parser.add_argument('-mul', nargs='?', metavar=('0.0 - 1.0'), type=float, help='Minimum read mapping frequency to be considered as ', default = 0.75, required=False)
+	parser.add_argument('-mul', '--multiple', nargs='?', metavar=('0.0 - 1.0'), type=float, help='Minimum read mapping frequency to be considered as ', default = 0.75, required=False)
 	parser.add_argument('-threads', nargs='?', metavar=('N'), type=int, help='Number of threads used to run bowtie2', required=False, default= 1)
 	parser.add_argument('-tax', nargs='?', metavar=('Streptococcus pneumoniae'), type=str, help='Name taxon to download sequences. Results will be stored in /path/to/idenfifiersList.txt', required=False)
 	parser.add_argument('-xtraSeq', nargs='?', type=int, help='For trimming extra sequence lenght 5\' and 3\' ', required=False, default = 0)
