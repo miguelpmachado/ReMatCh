@@ -19,24 +19,24 @@ from rematch_utils import removeFromArray
 
 def main():
 
-	parser = argparse.ArgumentParser(description="This program performs a download and read mapping of a given RUN_ID against a reference sequence and returns a report based on coverage.")
-
+	parser = argparse.ArgumentParser(prog='rematch.py', description="ReMatCh is an application which combines a set of bioinformatic tools for reads mapping against a reference, finds the allelic variants and produces a consensus sequence. It also allows direct sample download from ENA database to be used in the analysis.", formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+	requiredNamed = parser.add_argument_group('required arguments')
 	#parser.add_argument('-s', nargs='?', type=str, help="sam file path", required=True)
-	parser.add_argument('-r', nargs='?', type=str, help='Path for the reference sequence', required=True)
-	parser.add_argument('-t', nargs='?', type=str, help='Output directory path', required=True)
-	parser.add_argument('-gatk', nargs='?', type=str, help='Path for the Genome Analysis Toolkit jar file', required=True)
-	parser.add_argument('-picard', nargs='?', type=str, help='Path for the Picard jar file', required=True)
-	parser.add_argument('-cov', nargs='?', type=int, help='Minimum coverage', required=True)
-	parser.add_argument('-qual', nargs='?', type=float, help='Minimum mapping quality', required=True)
-	parser.add_argument('-mul', nargs='?', type=float, help='Multiple alleles', required=True)
-	parser.add_argument('-threads', nargs='?', type=int, help='Number of threads', required=False, default= 1)
-	parser.add_argument('-rmFastq', nargs='?', type=bool, help='Remove fastq files after the analysis', required=False, default = False)
-	parser.add_argument('-l', nargs='?', type=str, help='Path to a list with ids of the sequencing run', required=True)
-	parser.add_argument('-tax', nargs='?', type=str, help='Name taxon to download sequences', required=False)
-	parser.add_argument('-allplat', nargs='?', type=bool, help='Use all platforms', required=False, default = False)
+	requiredNamed.add_argument('-r', nargs=1, type=str, metavar=('/path/reference.fasta'), help='Path for the reference sequence', required=True)
+	requiredNamed.add_argument('-d', '--workdir', nargs=1, type=str, metavar=('/path/to/workdir'), help='Working directory. Downloaded files will be stored here, but it can also already contain folders with fastq files. Results will be stored here.', required=True)
+	requiredNamed.add_argument('-gatk', nargs=1, type=str, metavar=('/path/to/gatk.jar'), help='Path for the Genome Analysis Toolkit jar file', required=True)
+	requiredNamed.add_argument('-picard', nargs=1, metavar=('/path/to/picard'), type=str, help='Path for Picard', required=True)
+	requiredNamed.add_argument('-l', nargs=1, metavar=('/path/to/idenfifiersList.txt'), type=str, help='Path to a list with ids to run. IDs can be ENA run accession numbers for download or direcory names where fastqs are stored in --workdir. Run accession numbers retrieved from ENA using -tax will be stored here.' , required=True)
+	parser.add_argument('-cov', '--min-coverage', nargs='?', metavar=('N'), type=int, help='Minimum coverage depth required for base calling and SNP calling.', default = 10, required=False)
+	parser.add_argument('-qual', '--min-quality', nargs='?', metavar=('N'), type=int, help='Minimum mapping quality for SNP calling', default = 10, required=False)
+	parser.add_argument('-mul', nargs='?', metavar=('0.0 - 1.0'), type=float, help='Minimum read mapping frequency to be considered as ', default = 0.75, required=False)
+	parser.add_argument('-threads', nargs='?', metavar=('N'), type=int, help='Number of threads used to run bowtie2', required=False, default= 1)
+	parser.add_argument('-tax', nargs='?', metavar=('Streptococcus pneumoniae'), type=str, help='Name taxon to download sequences. Results will be stored in /path/to/idenfifiersList.txt', required=False)
 	parser.add_argument('-xtraSeq', nargs='?', type=int, help='For trimming extra sequence lenght 5\' and 3\' ', required=False, default = 0)
 	parser.add_argument('-bowtieBuild', help='Run build bowtie', action='store_true')
-	parser.add_argument('-clean', help='Clean intermediate files', action='store_true')
+	parser.add_argument('-clean', help='Clean intermediate files produced by the application (.bam, .vcf, index files, coverage file)', action='store_true')
+	parser.add_argument('-rmFastq', help='Remove fastq files after the analysis', action='store_true')
+	parser.add_argument('-allplat', help='Use all platforms. By default, only Illumina runs are used', action='store_true')
 
 	args = parser.parse_args()
 
@@ -53,7 +53,7 @@ def runReMaCh(args):
 	if args.tax:
 		GetSequencesFromTaxon(args.tax,args.l,True)
 	
-	if args.allplat == False:
+	if not args.allplat:
 		platform="Illumina"
 	else:
 		platform=''
@@ -134,7 +134,7 @@ def runReMaCh(args):
 					for files in filesToRemove:
 						gzSizes += float(os.path.getsize(files))
 
-					if args.rmFastq == True:
+					if args.rmFastq:
 						for i in filesToRemove:
 							os.remove(i)
 
