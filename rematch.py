@@ -48,7 +48,7 @@ def main():
 	args = parser.parse_args()
 
 	if args.mergeResults:
-		print 'Running only mergeResults with --mergeResults ' + str(args.mergeResults[0]) + ' and --sequenceCoverage '+ str(args.sequenceCoverage[0])
+		print 'Running only mergeResults with --mergeResults ' + str(args.mergeResults[0]) + ' and --sequenceCoverage '+ str(args.sequenceCoverage)
 		mergeResults(args.mergeResults[0], args.sequenceCoverage[0])
 	else:
 		if not args.r or not args.workdir or not args.gatk or not args.picard or not args.l:
