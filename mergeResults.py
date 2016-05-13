@@ -14,4 +14,3 @@ def mergeResults(workdir):
 			mappingCheckFile = numpy.loadtxt(coveragefile, comments='#', delimiter='\t', converters=None, skiprows=0, usecols=None, unpack=False, ndmin=0)
 			print mappingCheckFile.shape
 			print mappingCheckFile[1][:]
-			
