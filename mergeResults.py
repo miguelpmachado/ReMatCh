@@ -14,8 +14,8 @@ def mergeResults(workdir):
 		print os.path.join(workdir, sampleName, sampleName+'_mappingCheck.tab')
 		mappingFilePath = os.path.join(workdir, sampleName, 'rematch_results', sampleName+'_mappingCheck.tab')
 		if os.path.isfile(mappingFilePath):
-			with open(mappingFilePath, 'rb') as csvfile:
-				mappingreader = csv.reader(csvfile, delimiter='\t', quotechar='#')
+			with open(mappingFilePath, 'r') as csvfile:
+				mappingreader = csv.reader(csvfile, delimiter='\t')
 				sampledict[sampleName] = {}
 				for j in mappingreader:
 					print j
