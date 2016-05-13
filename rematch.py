@@ -46,7 +46,6 @@ def main():
 	mergedResults.add_argument('--sequenceCoverage', nargs=1, metavar=('0.0 - 1.0'), type=float, help='Minimum sequence length to consider the gene to be present. This is a relative measure. To be used with --mergeResults', default=0.8, required=False)
 
 	args = parser.parse_args()
-	print len(args)
 
 	if args.mergeResults:
 		print 'Running only mergeResults with --mergeResults ' + args.mergeResults[0] + ' and --sequenceCoverage '+ args.sequenceCoverage[0]
