@@ -21,7 +21,7 @@ def mergeResults(workdir):
 				for line in mappingreader:
 					if not line[0].startswith("#"):
 						if 1 - float(line[3]) >= sequenceCoverage:
-							if line[6] == False:
+							if line[6] == 'False':
 								sampledict[sampleName][line[0]] = line[8]
 							else:
 								sampledict[sampleName][line[0]] = 'Mul.Allele'
@@ -35,7 +35,7 @@ def mergeResults(workdir):
 		for x in sampledict:
 			if firstLine:
 				for l in sampledict[x]:
-					header += sampledict[x][l] + '\t'
+					header += l + '\t'
 				results.write(header + '\n')
 				firstLine = False
 
