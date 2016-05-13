@@ -12,8 +12,9 @@ def mergeResults(workdir):
 	for i in dirs:
 		sampleName = os.path.basename(i)
 		print os.path.join(workdir, sampleName, sampleName+'_mappingCheck.tab')
-		if os.path.isfile(os.path.join(workdir, sampleName, 'rematch_results', sampleName+'_mappingCheck.tab')):
+		mappingFilePath = os.path.join(workdir, sampleName, 'rematch_results', sampleName+'_mappingCheck.tab')
+		if os.path.isfile(mappingFilePath):
 			sampledict[sampleName] = {}
-			mappingCheckFile = np.loadtxt(coveragefile, comments='#', delimiter='\t', converters=None, skiprows=0, usecols=None, unpack=False, ndmin=0)
+			mappingCheckFile = np.loadtxt(mappingFilePath, comments='#', delimiter='\t', converters=None, skiprows=0, usecols=None, unpack=False, ndmin=0)
 			print mappingCheckFile.shape
 			print mappingCheckFile[1][:]
