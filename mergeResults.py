@@ -30,15 +30,17 @@ def mergeResults(workdir, sequenceCoverage):
 
 		if os.path.isfile(consensusFilePath): #parse consensus sequences
 			with open(consensusFilePath, 'r') as consensusFile:
+				countSequences = -1
 				for line in consensusFile:
 					if '>' in line:
 						nameseq = line[1:]
 						if nameseq not in consensusdict:
 							consensusdict[nameseq] = []
-							consensusdict[nameseq].append(('>' + sampleName + '_' + nameseq, False))
+							consensusdict[nameseq].append(['>' + sampleName + '_' + nameseq, False])
+							countSequences+=1
 						prevNameSeq = nameseq
 					else:
-						consensusdict[prevNameSeq][0][1] = line 
+						consensusdict[prevNameSeq][countSequences][1] = line 
 
 
 	
