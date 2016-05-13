@@ -2,9 +2,8 @@ import os
 import csv
 
 
-def mergeResults(workdir):
+def mergeResults(workdir, sequenceCoverage):
 
-	sequenceCoverage = 0.8
 	#sampleList = os.listdir(workdir)
 	dirs = [d for d in os.listdir(workdir) if os.path.isdir(os.path.join(workdir, d))]
 	sampledict = {}

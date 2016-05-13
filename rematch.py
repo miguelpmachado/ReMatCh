@@ -40,12 +40,14 @@ def main():
 	parser.add_argument('-allplat', help='Use all platforms. By default, only Illumina runs are used', action='store_true')
 
 	#Merge results
-	parser.add_argument('--mergeResults', nargs=1, metavar=('/path/to/workdir'), type=str, help='Merge all rematch results available at --workdir. Option to be used alone.', required=False)
+	parser.add_argument('--mergeResults', nargs=1, metavar=('/path/to/workdir'), type=str, help='Merge all rematch results available at --workdir. Option to be used alone or with --sequenceCoverage.', required=False)
+	parser.add_argument('--sequenceCoverage', nargs=1, metavar=('0.0 - 1.0'), type=float, help='Minimum sequence length to consider the gene to be present. This is a relative measure. To be used with --mergeResults', default=0.8, required=False)
 
 	args = parser.parse_args()
+	print len(args)
 
 	if args.mergeResults:
-		mergeResults(args.mergeResults[0])
+		mergeResults(args.mergeResults[0], args.sequenceCoverage[0])
 	else:
 		if not args.r or not args.workdir or not args.gatk or not args.picard or not args.l:
 			parser.error('You must pass all the required arguments. For more information type -h')
