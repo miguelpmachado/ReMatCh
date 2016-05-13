@@ -7,11 +7,14 @@ def mergeResults(workdir, sequenceCoverage):
 	#sampleList = os.listdir(workdir)
 	dirs = [d for d in os.listdir(workdir) if os.path.isdir(os.path.join(workdir, d))]
 	sampledict = {}
+	consensusdict = {}
+	prevNameSeq = ''
 
 	for i in dirs:
 		sampleName = os.path.basename(i)
 		mappingFilePath = os.path.join(workdir, sampleName, 'rematch_results', sampleName+'_mappingCheck.tab')
-		if os.path.isfile(mappingFilePath):
+		consensusFilePath = os.path.join(workdir, sampleName, 'rematch_results', sampleName+'_sequences.fasta')
+		if os.path.isfile(mappingFilePath): #parse mappingCheck file
 			with open(mappingFilePath, 'r') as csvfile:
 				mappingreader = csv.reader(csvfile, delimiter='\t')
 				sampledict[sampleName] = {}
@@ -25,6 +28,20 @@ def mergeResults(workdir, sequenceCoverage):
 						else:
 							sampledict[sampleName][line[0]] = 'Absent'
 
+		if os.path.isfile(consensusFilePath): #parse consensus sequences
+			with open(consensusFilePath, 'r') as consensusFile:
+				for line in consensusFile:
+					if '>' in line:
+						nameseq = line[1:]
+						if nameseq not in consensusdict:
+							consensusdict[nameseq] = []
+							consensusdict[nameseq].append(('>' + sampleName + '_' + nameseq, False))
+						prevNameSeq = nameseq
+					else:
+						consensusdict[prevNameSeq][0][1] = line 
+
+
+	
 	with open(os.path.join(workdir,'mergedResults.tab'),'w') as results:
 		firstLine = True
 		header = 'Samples\t'
@@ -40,6 +57,18 @@ def mergeResults(workdir, sequenceCoverage):
 			for k in sampledict[x]:
 				row += sampledict[x][k] + '\t'
 			results.write(row + '\n')
+
+	if not os.path.exists(os.path.join(workdir, 'consensus_sequences')):
+		os.makedirs(os.path.join(workdir, 'consensus_sequences'))
+
+	
+	for x in consensusdict:
+		with open(os.path.join(workdir, 'consensus_sequences', x + '_merged_sequences.fasta'),'w') as sequenceResults:
+			for z in consensusdict[x]:
+				sequenceResults.write('>' + consensusdict[x][z][0] + '\n')
+				sequenceResults.write(consensusdict[x][z][1] + '\n')
+
+	
 						
 
 
