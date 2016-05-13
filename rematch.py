@@ -46,9 +46,9 @@ def runReMaCh(args):
 
 	toClear = []
 
-	if not os.path.isdir(args.t):
-		os.mkdir(args.t)
-		print str(args.t) + ' directory created!'
+	if not os.path.isdir(args.d):
+		os.mkdir(args.d)
+		print str(args.d) + ' directory created!'
 	
 	if args.tax:
 		GetSequencesFromTaxon(args.tax,args.l,True)
@@ -58,8 +58,8 @@ def runReMaCh(args):
 	else:
 		platform=''
 	
-	ids_with_problems = open(os.path.join(args.t,'ids_with_problems.txt'), 'w')
-	logFile = open(os.path.join(args.t,'log_file.txt'), 'a')
+	ids_with_problems = open(os.path.join(args.d,'ids_with_problems.txt'), 'w')
+	logFile = open(os.path.join(args.d,'log_file.txt'), 'a')
 
 	with open(args.l, 'r') as run_ids:
 
@@ -104,7 +104,7 @@ def runReMaCh(args):
 
 				print "\n######\ndownloading and bowtieying\n######\n"
 				logFile.write("\n######\ndownloading and bowtieying\n######\n")
-				samFilePath, singOrPaired, numFilesDownloaded = downloadAndBowtie(args.r, run_id, args.t, buildBowtie, args.picard, args.threads, logFile, toClear)
+				samFilePath, singOrPaired, numFilesDownloaded = downloadAndBowtie(args.r, run_id, args.d, buildBowtie, args.picard, args.threads, logFile, toClear)
 				print "\n######\ndownloaded and bowtied\n######\n"
 				logFile.write("\n######\ndownloaded and bowtied\n######\n")
 				
@@ -129,7 +129,7 @@ def runReMaCh(args):
 					
 					gzSizes = 0
 
-					filesToRemove = glob.glob(os.path.join(args.t, run_id) + '/*.fastq.gz')
+					filesToRemove = glob.glob(os.path.join(args.d, run_id) + '/*.fastq.gz')
 
 					for files in filesToRemove:
 						gzSizes += float(os.path.getsize(files))
@@ -140,7 +140,7 @@ def runReMaCh(args):
 
 					run_time = str(datetime.now() - startTime)
 
-					with open(os.path.join(args.t, run_id, run_id + '_runtime.txt'), 'w') as runTimeFile:
+					with open(os.path.join(args.d, run_id, run_id + '_runtime.txt'), 'w') as runTimeFile:
 						runTimeFile.write("#runTime\tfileSize\tlibraryLayout\n")
 						runTimeFile.write(str(run_time) + '\t' + str(gzSizes) +"\t"+singOrPaired+ '\n')
 				else:
