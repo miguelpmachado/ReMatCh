@@ -16,17 +16,18 @@ from scriptAfterMapping import rawCoverage
 from scriptAfterMapping import alleleCalling
 from SeqFromWebTaxon import GetSequencesFromTaxon
 from rematch_utils import removeFromArray
+from mergeResults import mergeResults
 
 def main():
 
 	parser = argparse.ArgumentParser(prog='rematch.py', description="ReMatCh is an application which combines a set of bioinformatic tools for reads mapping against a reference, finds the allelic variants and produces a consensus sequence. It also allows direct sample download from ENA database to be used in the analysis.", formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 	requiredNamed = parser.add_argument_group('required arguments')
 	#parser.add_argument('-s', nargs='?', type=str, help="sam file path", required=True)
-	requiredNamed.add_argument('-r', nargs="?", type=str, metavar=('/path/reference.fasta'), help='Path for the reference sequence', required=True)
-	requiredNamed.add_argument('-d', '--workdir', nargs="?", type=str, metavar=('/path/to/workdir'), help='Working directory. Downloaded files will be stored here, but it can also already contain folders with fastq files. Results will be stored here.', required=True)
-	requiredNamed.add_argument('-gatk', nargs="?", type=str, metavar=('/path/to/gatk.jar'), help='Path for the Genome Analysis Toolkit jar file', required=True)
-	requiredNamed.add_argument('-picard', nargs="?", metavar=('/path/to/picard'), type=str, help='Path for Picard', required=True)
-	requiredNamed.add_argument('-l', nargs="?", metavar=('/path/to/idenfifiersList.txt'), type=str, help='Path to a list with ids to run. IDs can be ENA run accession numbers for download or direcory names where fastqs are stored in --workdir. Run accession numbers retrieved from ENA using -tax will be stored here.' , required=True)
+	requiredNamed.add_argument('-r', nargs="?", type=str, metavar=('/path/reference.fasta'), help='Path for the reference sequence', required=False)
+	requiredNamed.add_argument('-d', '--workdir', nargs="?", type=str, metavar=('/path/to/workdir'), help='Working directory. Downloaded files will be stored here, but it can also already contain folders with fastq files. Results will be stored here.', required=False)
+	requiredNamed.add_argument('-gatk', nargs="?", type=str, metavar=('/path/to/gatk.jar'), help='Path for the Genome Analysis Toolkit jar file', required=False)
+	requiredNamed.add_argument('-picard', nargs="?", metavar=('/path/to/picard'), type=str, help='Path for Picard', required=False)
+	requiredNamed.add_argument('-l', nargs="?", metavar=('/path/to/idenfifiersList.txt'), type=str, help='Path to a list with ids to run. IDs can be ENA run accession numbers for download or direcory names where fastqs are stored in --workdir. Run accession numbers retrieved from ENA using -tax will be stored here.' , required=False)
 	parser.add_argument('-cov', '--minCoverage', nargs='?', metavar=('N'), type=int, help='Minimum coverage depth required for base calling and SNP calling.', default = 10, required=False)
 	parser.add_argument('-qual', '--minQuality', nargs='?', metavar=('N'), type=int, help='Minimum mapping quality for SNP calling', default = 10, required=False)
 	parser.add_argument('-mul', '--multipleAlleles', nargs='?', metavar=('0.0 - 1.0'), type=float, help='Minimum reads frequency (confidence) of dominant nucleotide to consider absence of multiple alleles at a given SNP position.', default = 0.75, required=False)
@@ -38,9 +39,20 @@ def main():
 	parser.add_argument('-rmFastq', help='Remove fastq files after the analysis', action='store_true')
 	parser.add_argument('-allplat', help='Use all platforms. By default, only Illumina runs are used', action='store_true')
 
+	#Merge results
+	parser.add_argument('--mergeResults', nargs=1, metavar=('/path/to/workdir'), type=str, help='Merge all rematch results available at --workdir. Option to be used alone.', required=False)
+
 	args = parser.parse_args()
 
-	runReMaCh(args)
+	if args.mergeResults:
+		mergeResults(args.mergeResults)
+	else:
+		if not args.r or not args.workdir or not args.gatk or not args.picard or not args.l:
+			parser.error('You must pass all the required arguments. For more information type -h')
+		else:
+			runReMaCh(args)
+
+
 
 def runReMaCh(args):
 
