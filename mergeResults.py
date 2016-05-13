@@ -40,7 +40,7 @@ def mergeResults(workdir, sequenceCoverage):
 							countSequences+=1
 						prevNameSeq = nameseq
 					else:
-						print countSequences
+						print countSequences, prevNameSeq
 						consensusdict[prevNameSeq][countSequences][1] = line 
 						print consensusdict[prevNameSeq][countSequences]
 
@@ -69,8 +69,8 @@ def mergeResults(workdir, sequenceCoverage):
 	for x in consensusdict:
 		with open(os.path.join(workdir, 'consensus_sequences', x + '_merged_sequences.fasta'),'w') as sequenceResults:
 			for z in consensusdict[x]:
-				sequenceResults.write('>' + consensusdict[x][z][0] + '\n')
-				sequenceResults.write(consensusdict[x][z][1] + '\n')
+				sequenceResults.write(consensusdict[x][z][0])
+				sequenceResults.write(consensusdict[x][z][1])
 
 	
 						
