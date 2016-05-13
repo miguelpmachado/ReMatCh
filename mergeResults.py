@@ -71,8 +71,8 @@ def mergeResults(workdir, sequenceCoverage):
 	for x in consensusdict:
 		with open(os.path.join(workdir, 'consensus_sequences', x + '_merged_sequences.fasta'),'w') as sequenceResults:
 			for z in consensusdict[x]:
-				sequenceResults.write(consensusdict[x][z][0])
-				sequenceResults.write(consensusdict[x][z][1])
+				sequenceResults.write(z[0])
+				sequenceResults.write(z[1])
 
 	
 						
