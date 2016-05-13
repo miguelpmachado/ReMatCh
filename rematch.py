@@ -42,7 +42,7 @@ def main():
 
 	#Merge results
 	mergedResults = parser.add_argument_group('merge results arguments. To be used after ReMatCh run')
-	mergedResults.add_argument('--mergeResults', nargs=1, metavar=('/path/to/workdir'), type=str, help='Merge all rematch results available at --workdir. Option to be used alone or with --sequenceCoverage.', required=False)
+	mergedResults.add_argument('--mergeResults', nargs=1, metavar=('/path/to/workdir'), type=str, help='Merge all ReMatCh results available at --workdir. Option to be used alone or with --sequenceCoverage.', required=False)
 	mergedResults.add_argument('--sequenceCoverage', nargs=1, metavar=('0.0 - 1.0'), type=float, help='Minimum sequence length to consider the gene to be present. This is a relative measure. To be used with --mergeResults', default=0.8, required=False)
 
 	args = parser.parse_args()
