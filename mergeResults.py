@@ -17,5 +17,10 @@ def mergeResults(workdir):
 			with open(mappingFilePath, 'r') as csvfile:
 				mappingreader = csv.reader(csvfile, delimiter='\t')
 				sampledict[sampleName] = {}
-				for j in mappingreader:
-					print j
+				for line in mappingreader:
+					if not line[0].startswith("#"):
+						sampledict[sampleName][line[0]] = line[1,:]
+
+				print sampledict
+
+
