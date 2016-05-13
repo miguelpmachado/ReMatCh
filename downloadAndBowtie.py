@@ -174,7 +174,7 @@ def downloadAndBowtie(referencePath, run_id, target_dir, buildBowtie, picardJarP
 		args = shlex.split(command_line)
 		p = subprocess.call(args,stdout=myoutput,stderr=myoutput)
 		toClear.append(os.path.join(resultsFolder, run_id+".bowtie_metrics.txt"))
-		toClear.append(os.path.join(resultsFolder, run_id+".bowtie_error.txt"))
+		toClear.append(os.path.join(resultsFolder, run_id+"_bowtie_error.txt"))
 
 
 	elif len(FilesDowned)==2:
