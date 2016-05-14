@@ -15,8 +15,8 @@ def mergeResults(workdir, sequenceCoverage):
 
 	for i in dirs:
 		countdirs+=1
-		time.sleep(1)
-		print "\rChecking " + str(countdirs) + " of " + str(len(dirs)) + " folders...",
+		sys.stdout.write("\rChecking " + str(countdirs) + " of " + str(len(dirs)) + " folders...")
+		sys.stdout.flush()
 		sampleName = os.path.basename(i)
 		mappingFilePath = os.path.join(workdir, sampleName, 'rematch_results', sampleName+'_mappingCheck.tab')
 		consensusFilePath = os.path.join(workdir, sampleName, 'rematch_results', sampleName+'_sequences.fasta')
