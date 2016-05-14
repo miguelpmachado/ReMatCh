@@ -15,6 +15,7 @@ def mergeResults(workdir, sequenceCoverage):
 
 	for i in dirs:
 		countdirs+=1
+		time.sleep(1)
 		sys.stdout.write("\rChecking " + str(countdirs) + " of " + str(len(dirs)) + " folders...")
 		sys.stdout.flush()
 		sampleName = os.path.basename(i)
@@ -51,7 +52,7 @@ def mergeResults(workdir, sequenceCoverage):
 						#print consensusdict
 						consensusdict[prevNameSeq][countSequences][1] = line 
 						#print consensusdict[prevNameSeq][countSequences]
-	print "Writing results..."
+	print "\nWriting results..."
 	
 	if not os.path.exists(os.path.join(workdir, 'merged_results')):
 		os.makedirs(os.path.join(workdir, 'merged_results'))
