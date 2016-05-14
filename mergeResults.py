@@ -15,7 +15,7 @@ def mergeResults(workdir, sequenceCoverage):
 
 	for i in dirs:
 		countdirs+=1
-		time.sleep(1)
+		time.sleep(0.1)
 		sys.stdout.write("\rChecking " + str(countdirs) + " of " + str(len(dirs)) + " folders...")
 		sys.stdout.flush()
 		sampleName = os.path.basename(i)
