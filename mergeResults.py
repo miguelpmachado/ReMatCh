@@ -1,5 +1,7 @@
 import os
 import csv
+import sys
+import time
 
 
 def mergeResults(workdir, sequenceCoverage):
@@ -9,8 +11,12 @@ def mergeResults(workdir, sequenceCoverage):
 	sampledict = {}
 	consensusdict = {}
 	prevNameSeq = ''
+	countdirs = 0
 
 	for i in dirs:
+		countdirs+=1
+		time.sleep(1)
+		sys.stdout.write("Checking " + countdirs + "of " + len(dirs) + " folders...")
 		sampleName = os.path.basename(i)
 		mappingFilePath = os.path.join(workdir, sampleName, 'rematch_results', sampleName+'_mappingCheck.tab')
 		consensusFilePath = os.path.join(workdir, sampleName, 'rematch_results', sampleName+'_sequences.fasta')
@@ -45,10 +51,13 @@ def mergeResults(workdir, sequenceCoverage):
 						#print consensusdict
 						consensusdict[prevNameSeq][countSequences][1] = line 
 						#print consensusdict[prevNameSeq][countSequences]
+		sys.stdout.flush()
 
+	if not os.path.exists(os.path.join(workdir, 'merged_results')):
+		os.makedirs(os.path.join(workdir, 'merged_results'))
 
 	
-	with open(os.path.join(workdir,'mergedResults.tab'),'w') as results:
+	with open(os.path.join(workdir, 'merged_results', 'mergedResults.tab'),'w') as results:
 		firstLine = True
 		header = 'Samples\t'
 
@@ -64,12 +73,12 @@ def mergeResults(workdir, sequenceCoverage):
 				row += sampledict[x][k] + '\t'
 			results.write(row + '\n')
 
-	if not os.path.exists(os.path.join(workdir, 'consensus_sequences')):
-		os.makedirs(os.path.join(workdir, 'consensus_sequences'))
+	if not os.path.exists(os.path.join(workdir, 'merged_results', 'consensus_sequences')):
+		os.makedirs(os.path.join(workdir, 'merged_results', 'consensus_sequences'))
 
 	
 	for x in consensusdict:
-		with open(os.path.join(workdir, 'consensus_sequences', x.strip('\n').strip(' ') + '_merged_sequences.fasta'),'w') as sequenceResults:
+		with open(os.path.join(workdir, 'merged_results', 'consensus_sequences', x.strip('\n').strip(' ') + '_merged_sequences.fasta'),'w') as sequenceResults:
 			for z in consensusdict[x]:
 				sequenceResults.write(z[0].strip('\n').strip(' ') + '\n')
 				sequenceResults.write(z[1].strip('\n').strip(' ') + '\n')
