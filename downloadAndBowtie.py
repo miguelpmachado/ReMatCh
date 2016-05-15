@@ -111,7 +111,7 @@ def downloadAndBowtie(referencePath, run_id, target_dir, buildBowtie, picardJarP
 		picardFileName, extension = os.path.splitext(referencePath)
 		os.system(picardJarPath +" CreateSequenceDictionary R= " + referencePath + " O= " + picardFileName + ".dict 2> "+picardFileName+"_picard_out.txt")
 		toClear.append(picardFileName+"_picard_out.txt")
-		toClear.append(picardFileName + ".dict")
+		#toClear.append(picardFileName + ".dict")
 
 
 	bowtieBuildFileName, extension = os.path.splitext(referencePath)
@@ -125,8 +125,8 @@ def downloadAndBowtie(referencePath, run_id, target_dir, buildBowtie, picardJarP
 		bowtiBuildeLog=bowtieBuildFileName +"_bowtiBuildLog.txt"
 		myoutput = open(bowtiBuildeLog, 'w')
 		subprocess.call(["bowtie2-build", referencePath, bowtieBuildFileName],stdout=myoutput,stderr=myoutput)
-		toClear.append(bowtieBuildFileName + ".*.bt2")
-		toClear.append(bowtiBuildeLog)
+		#toClear.append(bowtieBuildFileName + ".*.bt2")
+		#toClear.append(bowtiBuildeLog)
 	
 	#download ERR
 

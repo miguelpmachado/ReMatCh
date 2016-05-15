@@ -117,7 +117,7 @@ def alleleCalling(bamSortedPath, referencePath, sequenceNames, gatkPath, sampleI
 	logFile.write("running bcf" + '\n')
 
 	os.system("samtools mpileup --no-BAQ --fasta-ref " + referencePath + " --uncompressed -t DP,DPR,DV " + bamSortedPath + ".bam | bcftools call --multiallelic-caller --variants-only --samples-file " + ploidytempFile + " --output-type v --output " + bamSortedPath + ".vcf")
-	toClear.append(referencePath+'.fai')
+	#toClear.append(referencePath+'.fai')
 	toClear.append(bamSortedPath + ".vcf")
 	toClear.append(bamSortedPath + ".vcf.idx")
 
