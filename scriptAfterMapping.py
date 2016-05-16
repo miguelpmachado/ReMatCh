@@ -124,7 +124,7 @@ def alleleCalling(bamSortedPath, referencePath, sequenceNames, gatkPath, sampleI
 	#os.system("bcftools filter --SnpGap 3 --IndelGap 10 --include 'QUAL>=" + str(qualityThreshold) + " && FORMAT/DV>=" + str(coverageThreshold) + " && (FORMAT/DV)/(FORMAT/DP)>=" + str(multipleAlleles) + "' --output-type v --output " + bamSortedPath + "_filtered.vcf " + bamSortedPath + ".vcf")
 	#os.system("bcftools filter --SnpGap 3 --IndelGap 10 --include 'TYPE=\"snp\" && QUAL>=" + str(qualityThreshold) + " && FORMAT/DV>=" + str(coverageThreshold) + " && (FORMAT/DV)/(FORMAT/DP)>=" + str(multipleAlleles) + "' --output-type v --output " + bamSortedPath + "_filtered_without_indels.vcf " + bamSortedPath + ".vcf")
 	
-
+	filter_vcf(bamSortedPath + ".vcf", extraSeq, sequenceMedObject)
 	#filter_vcf(bamSortedPath + "_filtered.vcf", extraSeq, sequenceMedObject)
 	#filter_vcf(bamSortedPath + "_filtered_without_indels.vcf", extraSeq, sequenceMedObject)
 
@@ -135,26 +135,26 @@ def alleleCalling(bamSortedPath, referencePath, sequenceNames, gatkPath, sampleI
 			if not line[0].startswith("#"):
 				quality = line[5]
 
-				if int(line[1]) > extraSeq and int(line[1]) <= len(sequenceMedObject[line[0]][3]) - extraSeq:
+				#if int(line[1]) > extraSeq and int(line[1]) <= len(sequenceMedObject[line[0]][3]) - extraSeq:
 
-					if quality < float(qualityThreshold):
-						sequenceMedObject[line[0]][4] = True
-					
-					qualityCoverage = float(line[9].split(':')[2])
-					
-					if qualityCoverage < float(coverageThreshold):
-						sequenceMedObject[line[0]][5] = True
+				if quality < float(qualityThreshold):
+					sequenceMedObject[line[0]][4] = True
 				
-					coverageByAllele = line[9].split(':')[3].split(',')
-					alternativeAlleles = line[4].split(',')
+				qualityCoverage = float(line[9].split(':')[2])
+				
+				if qualityCoverage < float(coverageThreshold):
+					sequenceMedObject[line[0]][5] = True
+			
+				coverageByAllele = line[9].split(':')[3].split(',')
+				alternativeAlleles = line[4].split(',')
 
-					coverageByAllele = [ int(x) for x in coverageByAllele ]
+				coverageByAllele = [ int(x) for x in coverageByAllele ]
 
-					dominantSNP = coverageByAllele.index(max(coverageByAllele))
-					coverageAllele = coverageByAllele[dominantSNP]
+				dominantSNP = coverageByAllele.index(max(coverageByAllele))
+				coverageAllele = coverageByAllele[dominantSNP]
 
-					if coverageAllele/qualityCoverage < float(multipleAlleles):
-						sequenceMedObject[line[0]][6] = True
+				if coverageAllele/qualityCoverage < float(multipleAlleles):
+					sequenceMedObject[line[0]][6] = True
 
 
 
@@ -171,7 +171,7 @@ def alleleCalling(bamSortedPath, referencePath, sequenceNames, gatkPath, sampleI
 	
 	#changeFastaHeadersAndTrimm(filteredsequencesFile, extraSeq,referencePath)
 	#changeFastaHeadersAndTrimm(bamSortedPath + "_sequences_filtered_without_indels.fasta", extraSeq,referencePath)
-	changeFastaHeadersAndTrimm(sequencesFile, 0,referencePath)
+	changeFastaHeadersAndTrimm(sequencesFile, extraSeq,referencePath)
 
 
 	createCheckFile(bamSortedPath, sequenceMedObject)
