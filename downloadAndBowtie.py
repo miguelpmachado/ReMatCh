@@ -106,8 +106,8 @@ def download_ERR(ERR_id,target_dir, logFile):
 def downloadAndBowtie(referencePath, run_id, target_dir, buildBowtie, picardJarPath, threads, logFile, toClear):
 
 	if buildBowtie == True:
-		print "run picard"
-		logFile.write("run picard" + '\n')
+		print "Running picard"
+		logFile.write("Running picard" + '\n')
 		picardFileName, extension = os.path.splitext(referencePath)
 		os.system(picardJarPath +" CreateSequenceDictionary R= " + referencePath + " O= " + picardFileName + ".dict 2> "+picardFileName+"_picard_out.txt")
 		toClear.append(picardFileName+"_picard_out.txt")
@@ -118,11 +118,9 @@ def downloadAndBowtie(referencePath, run_id, target_dir, buildBowtie, picardJarP
 	bowtieBuildFileName, extension = os.path.splitext(referencePath)
 
 
-	print "run bowtie"
-	logFile.write("run bowtie" + '\n')
 	if buildBowtie == True:
-		print "run bowtie"
-		logFile.write("run bowtie" + '\n')
+		print "Running bowtie..."
+		logFile.write("Running bowtie..." + '\n')
 		bowtiBuildeLog=bowtieBuildFileName +"_bowtiBuildLog.txt"
 		myoutput = open(bowtiBuildeLog, 'w')
 		subprocess.call(["bowtie2-build", referencePath, bowtieBuildFileName],stdout=myoutput,stderr=myoutput)
@@ -138,7 +136,7 @@ def downloadAndBowtie(referencePath, run_id, target_dir, buildBowtie, picardJarP
 	if numberFilesDowned < 1:
 		download_ERR(run_id, target_dir, logFile)
 	else:
-		print 'File '+ run_id+' already exists...' 
+		#print 'File '+ run_id+' already exists...' 
 		logFile.write('File '+ run_id+' already exists...' + '\n')
 
 
@@ -191,8 +189,8 @@ def downloadAndBowtie(referencePath, run_id, target_dir, buildBowtie, picardJarP
 	
 	else:
 		
-		print "0 or more than 2 fastq files"
-		logFile.write("0 or more than 2 fastq files" + '\n')
+		print "0 or more than 2 fastQ files exist. Aborting...\n"
+		logFile.write("0 or more than 2 fastQ files exist. Aborting..." + '\n')
 		os.rmdir(dir_with_gz)
 		return False, False, numberFilesDowned
 

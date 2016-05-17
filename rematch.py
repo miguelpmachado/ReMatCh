@@ -117,12 +117,10 @@ def runReMaCh(args):
 
 				run_id = run_id.strip()
 
-
-				print "\n######\ndownloading and bowtieying\n######\n"
-				logFile.write("\n######\ndownloading and bowtieying\n######\n")
+				print "\nChecking Run ID: " + str(run_id)
 				samFilePath, singOrPaired, numFilesDownloaded = downloadAndBowtie(args.r, run_id, args.workdir, buildBowtie, args.picard, args.threads, logFile, toClear)
-				print "\n######\ndownloaded and bowtied\n######\n"
-				logFile.write("\n######\ndownloaded and bowtied\n######\n")
+				#print "\n######\ndownloaded and bowtied\n######\n"
+				#logFile.write("\n######\ndownloaded and bowtied\n######\n")
 				
 				if numFilesDownloaded == 0:
 					ids_with_problems.write(run_id + '\n')
@@ -133,14 +131,14 @@ def runReMaCh(args):
 					sortedPath = convertToBAM(samFilePath, toClear)
 
 					rawCoverage(sortedPath, toClear)
-					print "\n######\nChecking coverage\n######\n"
-					logFile.write("\n######\nChecking coverage\n######\n")
+					print "\nChecking coverage..."
+					logFile.write("\nChecking coverage...")
 					sequenceNames, sequenceMedObject = checkCoverage(sortedPath, args.minCoverage,args.xtraSeq, logFile, toClear)
-					print "\n######\nChecked coverage goint to perform allele call\n######\n"
-					logFile.write("\n######\nChecked coverage goint to perform allele call\n######\n")
+					print "\nPerforming Allele Call..."
+					logFile.write("\nPerforming Allele Call...")
 					alleleCalling(sortedPath, args.r, sequenceNames, args.gatk, run_id, args.minQuality, args.minCoverage, args.multipleAlleles, sequenceMedObject,args.xtraSeq, logFile, toClear)
-					print "\n######\nallele called everything\n######\n"	
-					logFile.write("\n######\nallele called everything\n######\n")
+					print str(run_id) + " DONE" 
+					logFile.write(str(run_id) + " DONE")
 					
 					
 					gzSizes = 0
@@ -160,8 +158,8 @@ def runReMaCh(args):
 						runTimeFile.write("#runTime\tfileSize\tlibraryLayout\n")
 						runTimeFile.write(str(run_time) + '\t' + str(gzSizes) +"\t"+singOrPaired+ '\n')
 				else:
-					print run_id+" not downloaded sucessfully"
-					logFile.write(run_id+" not downloaded sucessfully" + '\n')
+					print "An error has ocurried: "+run_id+" fastQs do not exist."
+					logFile.write("An error has ocurried: "+run_id+" fastQs do not exist.")
 					pass
 
 		ids_with_problems.close()
