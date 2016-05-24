@@ -16,8 +16,10 @@ from scriptAfterMapping import rawCoverage
 from scriptAfterMapping import alleleCalling
 from SeqFromWebTaxon import GetSequencesFromTaxon
 from rematch_utils import removeFromArray
+from rematch_utils import checkPrograms
 from mergeResults import mergeResults
 from rematch_utils import Logger
+
 
 def main():
 
