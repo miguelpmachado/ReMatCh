@@ -42,8 +42,8 @@ def download(dirs2,target_dir2,ref2,success2,f2,link2):
 	# subprocess.call(['mkdir', target_dir2+"/"+ref2]) # mpmachado #
 	
 	#get fasta file for each read file name
-	numFilesInDir = len(dirs2)
-	insucess2=0
+	#numFilesInDir = len(dirs2)
+	insucess=0
 
 	'''if numFilesInDir > 2:
 		print "more than 2 files"
@@ -66,10 +66,9 @@ def download(dirs2,target_dir2,ref2,success2,f2,link2):
 			success2+=1		
 		except Exception as e:
 			print e
-			insucess2+=1
+			insucess+=1
 
-	print 'download:' + str(success2)+ ','+ str(insucess2)
-	return success2,insucess2
+	return success2,insucess
 
 def download_ERR(ERR_id,target_dir):
 	
@@ -107,11 +106,9 @@ def download_ERR(ERR_id,target_dir):
 			print "Bad ID: " + ref
 			#logFile.write("Bad ID: " + ref + '\n')
 		else:
-			print 'except2:' + str(success)+ ','+ str(insucess)
 			success,insucess=download(dirs,target_dir,ref,success,f,link)	
 			
-	else:
-		print 'done:' + str(success)+ ','+ str(insucess)	
+	else:	
 		success,insucess=download(dirs,target_dir,ref,success,f,link)
 	
 	f.quit()	
@@ -215,6 +212,7 @@ def downloadAndBowtie(referencePath, run_id, target_dir, buildBowtie, picardJarP
 				filesToUse.append(i)
 
 		downloadedFiles = filesToUse
+		print 'Files used: ' + str(downloadedFiles)
 	
 	
 
