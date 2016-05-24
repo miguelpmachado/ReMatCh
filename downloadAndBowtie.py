@@ -209,7 +209,8 @@ def downloadAndBowtie(referencePath, run_id, target_dir, buildBowtie, picardJarP
 		for i in downloadedFiles:
 			if '_1.f' in i or '_2.f' in i:
 				filesToUse.append(i)
-
+			else:
+				os.system('rm ' + os.path.join(dir_with_gz, i))
 		downloadedFiles = filesToUse
 		print 'Files used: ' + str(downloadedFiles)
 	
