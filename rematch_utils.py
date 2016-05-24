@@ -112,6 +112,7 @@ def checkPrograms():
 			else:
 				check_version = [stdout, '--version']
 
+			print check_version
 			proc = subprocess.Popen(check_version, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 			stdout,stderr = proc.communicate()
 			print 'STDOUT:'
