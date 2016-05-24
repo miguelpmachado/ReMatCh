@@ -22,16 +22,25 @@
 #  
 #  
 
-import shlex, subprocess,ftplib
+import shlex, subprocess, ftplib
 import os, os.path, glob
 
 from os import listdir
 from os.path import isfile, join
+from threading import Timer ## mpmachado ##
+
+def runTimeoutLimit(command_fragmented_in_list, timeout_sec): ## mpmachado ##
+	proc = subprocess.Popen(command_fragmented_in_list, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+	timer = Timer(timeout_sec, proc.kill)
+	timer.start()
+	stdout,stderr = proc.communicate()
+	timer.cancel()
+	return proc.returncode, stdout.decode("utf-8"), stderr.decode("utf-8")
 
 def download(dirs2,target_dir2,ref2,success2,f2,link2, logFile):
 	#new folder for each reference with reference id name
-	subprocess.call(['mkdir', target_dir2+"/"+ref2])
-				
+	# subprocess.call(['mkdir', target_dir2+"/"+ref2]) # mpmachado #
+	
 	#get fasta file for each read file name
 	numFilesInDir = len(dirs2)
 
@@ -58,10 +67,10 @@ def download(dirs2,target_dir2,ref2,success2,f2,link2, logFile):
 
 def download_ERR(ERR_id,target_dir, logFile):
 	
-	if not os.path.isdir(target_dir):
-		os.makedirs(target_dir)
+	# if not os.path.isdir(target_dir): # mpmachado #
+		# os.makedirs(target_dir) # mpmachado #
 	
-	f=ftplib.FTP('ftp.sra.ebi.ac.uk')
+	f=ftplib.FTP('ftp.sra.ebi.ac.uk', timeout=3600) # mpmachado #
 	f.login()
 	#for each reference id get the read files
 	ref=ERR_id
@@ -101,9 +110,40 @@ def download_ERR(ERR_id,target_dir, logFile):
 	print "Successfully downloaded %s files and %s ID references were wrong" % (success,failed)	
 	logFile.write("Successfully downloaded %s files and %s ID references were wrong\n" % (success,failed))
 
+def downloadAspera(run_id, outdir, asperaKey): ## mpmachado ##
+	aspera_run = False
+	aspera_command = ['ascp', '-QT', '-l', '300m', '-i', asperaKey, str('era-fasp@fasp.sra.ebi.ac.uk:/vol1/fastq/' + run_id[0:6] + '/' + run_id), outdir]
+	aspera, std_out, std_err = runTimeoutLimit(aspera_command, 3600)
+	if aspera == 0:
+		aspera_run = True
+	else:
+		print "Connecting using the following command didn't work:"
+		print ' '.join(aspera_command)
+		aspera_command[6] = str('era-fasp@fasp.sra.ebi.ac.uk:/vol1/fastq/' + run_id[0:6] + '/00' + run_id[-1] + '/' + run_id)
+		print 'Trying: ' + ' '.join(aspera_command)
+		aspera, std_out, std_err = runTimeoutLimit(aspera_command, 3600)
+		if aspera == 0:
+			aspera_run = True
+		else:
+			print "Download using Aspera didn't work" + "\n"
+	return aspera_run
+
+# Search Fastq files (that were downloaded or already provided by the user)
+def searchDownloadedFiles(directory): ## mpmachado ##
+	filesExtensions = ['fastq.gz', 'fq.gz']
+	downloadedFiles = []
+	for extension in filesExtensions:
+		downloadedFiles = glob.glob1(directory, str('*.' + extension))
+		if len(downloadedFiles) == 0:
+			downloadedFiles = []
+		else:
+			break
+	return downloadedFiles
 
 
-def downloadAndBowtie(referencePath, run_id, target_dir, buildBowtie, picardJarPath, threads, logFile, toClear):
+def downloadAndBowtie(referencePath, run_id, target_dir, buildBowtie, picardJarPath, threads, logFile, toClear, asperaKey): # mpmachado #
+
+	bowtieBuildFileName, extension = os.path.splitext(referencePath) # mpmachado #
 
 	if buildBowtie == True:
 		print "Running picard"
@@ -113,12 +153,8 @@ def downloadAndBowtie(referencePath, run_id, target_dir, buildBowtie, picardJarP
 		toClear.append(picardFileName+"_picard_out.txt")
 		toClear.append(picardFileName + ".dict")
 		toClear.append(referencePath+'.fai')
-
-
-	bowtieBuildFileName, extension = os.path.splitext(referencePath)
-
-
-	if buildBowtie == True:
+		
+	# if buildBowtie == True: # mpmachado #
 		print "Running bowtie..."
 		logFile.write("Running bowtie..." + '\n')
 		bowtiBuildeLog=bowtieBuildFileName +"_bowtiBuildLog.txt"
@@ -127,45 +163,47 @@ def downloadAndBowtie(referencePath, run_id, target_dir, buildBowtie, picardJarP
 		toClear.append(bowtieBuildFileName + ".*.bt2")
 		toClear.append(bowtiBuildeLog)
 	
-	#download ERR
-
+	if not os.path.isdir(target_dir): # mpmachado #
+		os.makedirs(target_dir) # mpmachado #
 	dir_with_gz = os.path.join(target_dir,run_id)
-
-	numberFilesDowned= len(glob.glob1(dir_with_gz, "*.fastq.gz")) 
-
-	if numberFilesDowned < 1:
-		download_ERR(run_id, target_dir, logFile)
+	if not os.path.isdir(dir_with_gz): # mpmachado #
+		os.makedirs(dir_with_gz) # mpmachado #
+	
+	#download ERR
+	
+	# numberFilesDowned= len(glob.glob1(dir_with_gz, "*.fastq.gz")) # mpmachado #
+	downloadedFiles = searchDownloadedFiles(dir_with_gz) # mpmachado #
+	if len(downloadedFiles) < 1: # mpmachado #
+		if asperaKey != None: ## mpmachado ##
+			aspera_run = downloadAspera(run_id, target_dir, asperaKey[0]) ## mpmachado ##
+			if aspera_run == False:
+				print 'Trying download using FTP' + "\n" ## mpmachado ##
+				download_ERR(run_id, target_dir, logFile) ## mpmachado ##
+		else: ## mpmachado ##
+			download_ERR(run_id, target_dir, logFile) # mpmachado #
 	else:
-		#print 'File '+ run_id+' already exists...' 
+		print 'File '+ run_id+' already exists...' 
 		logFile.write('File '+ run_id+' already exists...' + '\n')
-
-
 	
-	#download_ERR(run_id, target_dir)
+	downloadedFiles = searchDownloadedFiles(dir_with_gz) # mpmachado #
 
-	FilesDowned = glob.glob1(dir_with_gz, "*.fastq.gz")
-
-
-
-
-	#print len(glob.glob1(dir_with_gz, "*.fastq.gz")) 
-	
 	resultsFolder = os.path.join(dir_with_gz, 'rematch_results')
 	
 	if not os.path.exists(resultsFolder):
 		os.makedirs(resultsFolder)
 	
 	bowtie_output_file=os.path.join(resultsFolder, run_id + ".sam")
-	
 	bowtieLog = os.path.join(resultsFolder, run_id + "_bowtie_error.txt")
 	
 	pairedOrSingle="Single_end"	
 
+	print downloadedFiles
+
 	
-	if len(FilesDowned)==1:
+	if len(downloadedFiles)==1:
 
 
-		command_line ="bowtie2 -k 2 --quiet --no-unal -x "+bowtieBuildFileName+" -U "+dir_with_gz+"/"+FilesDowned[0] + " --rg-id ENA --rg SM:"+run_id+" --sensitive-local --threads "+ str(threads) +" --met-file "+ os.path.join(resultsFolder, run_id+".bowtie_metrics.txt") + " -S "+bowtie_output_file+" "
+		command_line ="bowtie2 -k 2 --quiet --no-unal -x "+bowtieBuildFileName+" -U "+dir_with_gz+"/"+downloadedFiles[0] + " --rg-id ENA --rg SM:"+run_id+" --sensitive-local --threads "+ str(threads) +" --met-file "+ os.path.join(resultsFolder, run_id+".bowtie_metrics.txt") + " -S "+bowtie_output_file+" "
 
 
 		myoutput = open(bowtieLog, 'w')
@@ -175,9 +213,9 @@ def downloadAndBowtie(referencePath, run_id, target_dir, buildBowtie, picardJarP
 		toClear.append(os.path.join(resultsFolder, run_id+"_bowtie_error.txt"))
 
 
-	elif len(FilesDowned)==2:
+	elif len(downloadedFiles)==2:
 
-		command_line ="bowtie2 -k 2 --quiet --no-unal -x "+bowtieBuildFileName+" -1 "+dir_with_gz+"/"+FilesDowned[0]+ " -2 "+dir_with_gz+"/"+FilesDowned[1] + " --rg-id ENA --rg SM:"+run_id+" --sensitive-local --threads "+ str(threads) +" --met-file "+ os.path.join(resultsFolder, run_id+".bowtie_metrics.txt") + " -S "+bowtie_output_file+" "
+		command_line ="bowtie2 -k 2 --quiet --no-unal -x "+bowtieBuildFileName+" -1 "+dir_with_gz+"/"+downloadedFiles[0]+ " -2 "+dir_with_gz+"/"+downloadedFiles[1] + " --rg-id ENA --rg SM:"+run_id+" --sensitive-local --threads "+ str(threads) +" --met-file "+ os.path.join(resultsFolder, run_id+".bowtie_metrics.txt") + " -S "+bowtie_output_file+" "
 		
 		myoutput = open(bowtieLog, 'w')
 		args = shlex.split(command_line)
@@ -191,10 +229,10 @@ def downloadAndBowtie(referencePath, run_id, target_dir, buildBowtie, picardJarP
 		
 		print "0 or more than 2 fastQ files exist. Aborting...\n"
 		logFile.write("0 or more than 2 fastQ files exist. Aborting..." + '\n')
-		os.rmdir(dir_with_gz)
-		return False, False, numberFilesDowned
+		os.system('rm -r ' + dir_with_gz)
+		return False, False, len(downloadedFiles) # mpmachado #
 
 	
-	return bowtie_output_file, pairedOrSingle, numberFilesDowned
+	return bowtie_output_file, pairedOrSingle, len(downloadedFiles) # mpmachado #
 
 
