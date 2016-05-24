@@ -45,11 +45,11 @@ def download(dirs2,target_dir2,ref2,success2,f2,link2):
 	numFilesInDir = len(dirs2)
 	insucess2=0
 
-	if numFilesInDir > 2:
+	'''if numFilesInDir > 2:
 		print "more than 2 files"
 		#logFile.write("more than 2 files" + '\n')
-		return success2
-
+		return success2 
+	'''
 	for item in dirs2:
 					
 		try:
