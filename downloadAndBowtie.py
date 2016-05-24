@@ -87,6 +87,7 @@ def download_ERR(ERR_id,target_dir):
 		firstid=ref[0:6]
 		#get the read files name from the reference id
 		link='/vol1/fastq/'+firstid+"/"+ref
+		print link
 		f.cwd(link)
 		dirs=f.nlst();
 				
@@ -95,6 +96,7 @@ def download_ERR(ERR_id,target_dir):
 			firstid=ref[0:6]
 			#get the read files name from the reference id
 			link='/vol1/fastq/'+firstid+"/00"+ref[-1]+"/"+ref
+			print link
 			f.cwd(link)
 			dirs=f.nlst();
 					
