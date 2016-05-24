@@ -183,6 +183,7 @@ def downloadAndBowtie(referencePath, run_id, target_dir, buildBowtie, picardJarP
 	
 	#download ERR
 	aspera_run = False
+	ftp_down_insuc = 0
 	
 	# numberFilesDowned= len(glob.glob1(dir_with_gz, "*.fastq.gz")) # mpmachado #
 	downloadedFiles = searchDownloadedFiles(dir_with_gz) # mpmachado #
@@ -195,7 +196,7 @@ def downloadAndBowtie(referencePath, run_id, target_dir, buildBowtie, picardJarP
 				
 				
 		else: ## mpmachado ##
-			download_ERR(run_id, dir_with_gz) # mpmachado #
+			ftp_down_insuc=download_ERR(run_id, dir_with_gz) # mpmachado #
 	else:
 		print 'File '+ run_id+' already exists...' 
 		#logFile.write('File '+ run_id+' already exists...' + '\n')
