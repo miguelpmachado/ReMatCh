@@ -81,6 +81,7 @@ def download_ERR(ERR_id,target_dir):
 	ref=ERR_id
 	failed=0
 	success=0
+	insucess=0
 
 	try:
 				
@@ -109,8 +110,7 @@ def download_ERR(ERR_id,target_dir):
 		else:
 			success,insucess=download(dirs,target_dir,ref,success,f,link)	
 			
-	else:
-				
+	else:	
 		success,insucess=download(dirs,target_dir,ref,success,f,link)
 	
 	f.quit()	
