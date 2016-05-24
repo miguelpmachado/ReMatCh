@@ -31,9 +31,9 @@ def mergeResults(workdir, sequenceCoverage):
 							if line[6] == 'False':
 								sampledict[sampleName][line[0]] = line[8]
 							else:
-								sampledict[sampleName][line[0]] = 'Mul.Allele'
+								sampledict[sampleName][line[0]] = 'Mul_Allele (' + line[8] + ')'
 						else:
-							sampledict[sampleName][line[0]] = 'Absent'
+							sampledict[sampleName][line[0]] = 'Absent (' + line[8] + ')'
 
 		if os.path.isfile(consensusFilePath): #parse consensus sequences
 			with open(consensusFilePath, 'r') as consensusFile:

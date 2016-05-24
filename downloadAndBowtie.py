@@ -37,7 +37,7 @@ def runTimeoutLimit(command_fragmented_in_list, timeout_sec): ## mpmachado ##
 	timer.cancel()
 	return proc.returncode, stdout.decode("utf-8"), stderr.decode("utf-8")
 
-def download(dirs2,target_dir2,ref2,success2,f2,link2, logFile):
+def download(dirs2,target_dir2,ref2,success2,f2,link2):
 	#new folder for each reference with reference id name
 	# subprocess.call(['mkdir', target_dir2+"/"+ref2]) # mpmachado #
 	
@@ -46,26 +46,26 @@ def download(dirs2,target_dir2,ref2,success2,f2,link2, logFile):
 
 	if numFilesInDir > 2:
 		print "more than 2 files"
-		logFile.write("more than 2 files" + '\n')
+		#logFile.write("more than 2 files" + '\n')
 		return success2
 
 	for item in dirs2:
 					
 		f2.cwd(link2)
-		final_target_dir=target_dir2+"/"+ref2 +"/"+ item
+		final_target_dir=target_dir2+"/"+ item
 		file = open(final_target_dir, 'wb')
 		print "Downloading: %s" % item
-		logFile.write("Downloading: %s\n" % item)
+		#logFile.write("Downloading: %s\n" % item)
 
 		f2.retrbinary('RETR %s' % item, file.write)
 		file.close()
 		print "Downloaded %s" % item
-		logFile.write("Downloaded %s\n" % item)
+		#logFile.write("Downloaded %s\n" % item)
 		success2+=1		
 
 	return success2
 
-def download_ERR(ERR_id,target_dir, logFile):
+def download_ERR(ERR_id,target_dir):
 	
 	# if not os.path.isdir(target_dir): # mpmachado #
 		# os.makedirs(target_dir) # mpmachado #
@@ -98,17 +98,17 @@ def download_ERR(ERR_id,target_dir, logFile):
 		except Exception, e:
 			failed +=1
 			print "Bad ID: " + ref
-			logFile.write("Bad ID: " + ref + '\n')
+			#logFile.write("Bad ID: " + ref + '\n')
 		else:
-			success=download(dirs,target_dir,ref,success,f,link, logFile)	
+			success=download(dirs,target_dir,ref,success,f,link)	
 			
 	else:
 				
-		success=download(dirs,target_dir,ref,success,f,link, logFile)
+		success=download(dirs,target_dir,ref,success,f,link)
 	
 	f.quit()	
 	print "Successfully downloaded %s files and %s ID references were wrong" % (success,failed)	
-	logFile.write("Successfully downloaded %s files and %s ID references were wrong\n" % (success,failed))
+	#logFile.write("Successfully downloaded %s files and %s ID references were wrong\n" % (success,failed))
 
 def downloadAspera(run_id, outdir, asperaKey): ## mpmachado ##
 	aspera_run = False
@@ -141,13 +141,13 @@ def searchDownloadedFiles(directory): ## mpmachado ##
 	return downloadedFiles
 
 
-def downloadAndBowtie(referencePath, run_id, target_dir, buildBowtie, picardJarPath, threads, logFile, toClear, asperaKey): # mpmachado #
+def downloadAndBowtie(referencePath, run_id, target_dir, buildBowtie, picardJarPath, threads, toClear, asperaKey): # mpmachado #
 
 	bowtieBuildFileName, extension = os.path.splitext(referencePath) # mpmachado #
 
 	if buildBowtie == True:
 		print "Running picard"
-		logFile.write("Running picard" + '\n')
+		#logFile.write("Running picard" + '\n')
 		picardFileName, extension = os.path.splitext(referencePath)
 		os.system(picardJarPath +" CreateSequenceDictionary R= " + referencePath + " O= " + picardFileName + ".dict 2> "+picardFileName+"_picard_out.txt")
 		toClear.append(picardFileName+"_picard_out.txt")
@@ -156,7 +156,7 @@ def downloadAndBowtie(referencePath, run_id, target_dir, buildBowtie, picardJarP
 		
 	# if buildBowtie == True: # mpmachado #
 		print "Running bowtie..."
-		logFile.write("Running bowtie..." + '\n')
+		#logFile.write("Running bowtie..." + '\n')
 		bowtiBuildeLog=bowtieBuildFileName +"_bowtiBuildLog.txt"
 		myoutput = open(bowtiBuildeLog, 'w')
 		subprocess.call(["bowtie2-build", referencePath, bowtieBuildFileName],stdout=myoutput,stderr=myoutput)
@@ -165,7 +165,11 @@ def downloadAndBowtie(referencePath, run_id, target_dir, buildBowtie, picardJarP
 	
 	if not os.path.isdir(target_dir): # mpmachado #
 		os.makedirs(target_dir) # mpmachado #
-	dir_with_gz = os.path.join(target_dir,run_id)
+	dir_sample = os.path.join(target_dir,run_id)
+	if not os.path.isdir(dir_sample): # mpmachado #
+		os.makedirs(dir_sample) # mpmachado #
+
+	dir_with_gz = os.path.join(target_dir,run_id, 'fastq')
 	if not os.path.isdir(dir_with_gz): # mpmachado #
 		os.makedirs(dir_with_gz) # mpmachado #
 	
@@ -175,19 +179,29 @@ def downloadAndBowtie(referencePath, run_id, target_dir, buildBowtie, picardJarP
 	downloadedFiles = searchDownloadedFiles(dir_with_gz) # mpmachado #
 	if len(downloadedFiles) < 1: # mpmachado #
 		if asperaKey != None: ## mpmachado ##
-			aspera_run = downloadAspera(run_id, target_dir, asperaKey[0]) ## mpmachado ##
+			aspera_run = downloadAspera(run_id, dir_with_gz, asperaKey[0]) ## mpmachado ##
 			if aspera_run == False:
 				print 'Trying download using FTP' + "\n" ## mpmachado ##
-				download_ERR(run_id, target_dir, logFile) ## mpmachado ##
+				download_ERR(run_id, dir_with_gz) ## mpmachado ##
 		else: ## mpmachado ##
-			download_ERR(run_id, target_dir, logFile) # mpmachado #
+			download_ERR(run_id, dir_with_gz) # mpmachado #
 	else:
 		print 'File '+ run_id+' already exists...' 
-		logFile.write('File '+ run_id+' already exists...' + '\n')
+		#logFile.write('File '+ run_id+' already exists...' + '\n')
 	
 	downloadedFiles = searchDownloadedFiles(dir_with_gz) # mpmachado #
 
-	resultsFolder = os.path.join(dir_with_gz, 'rematch_results')
+	if len(downloadedFiles) > 2:
+		filesToUse = []
+		for i in downloadedFiles:
+			if '_1.f' in i or '_2.f' in i:
+				filesToUse.append(i)
+
+		downloadedFiles = filesToUse
+
+	
+
+	resultsFolder = os.path.join(dir_sample, 'rematch_results')
 	
 	if not os.path.exists(resultsFolder):
 		os.makedirs(resultsFolder)
@@ -196,8 +210,6 @@ def downloadAndBowtie(referencePath, run_id, target_dir, buildBowtie, picardJarP
 	bowtieLog = os.path.join(resultsFolder, run_id + "_bowtie_error.txt")
 	
 	pairedOrSingle="Single_end"	
-
-	print downloadedFiles
 
 	
 	if len(downloadedFiles)==1:
@@ -227,12 +239,12 @@ def downloadAndBowtie(referencePath, run_id, target_dir, buildBowtie, picardJarP
 	
 	else:
 		
-		print "0 or more than 2 fastQ files exist. Aborting...\n"
-		logFile.write("0 or more than 2 fastQ files exist. Aborting..." + '\n')
+		print "0 fastq files found. Aborting...\n"
+		#logFile.write("0 fastq files found. Aborting..." + '\n')
 		os.system('rm -r ' + dir_with_gz)
-		return False, False, len(downloadedFiles) # mpmachado #
+		return False, False, downloadedFiles # mpmachado #
 
 	
-	return bowtie_output_file, pairedOrSingle, len(downloadedFiles) # mpmachado #
+	return bowtie_output_file, pairedOrSingle, downloadedFiles # mpmachado #
 
 

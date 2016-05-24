@@ -17,6 +17,7 @@ from scriptAfterMapping import alleleCalling
 from SeqFromWebTaxon import GetSequencesFromTaxon
 from rematch_utils import removeFromArray
 from mergeResults import mergeResults
+from rematch_utils import Logger
 
 def main():
 
@@ -25,7 +26,7 @@ def main():
 	
 	#parser.add_argument('-s', nargs='?', type=str, help="sam file path", required=True)
 	requiredNamed.add_argument('-r', nargs="?", type=str, metavar=('/path/reference.fasta'), help='Path for the reference sequence', required=False)
-	requiredNamed.add_argument('-d', '--workdir', nargs="?", type=str, metavar=('/path/to/workdir'), help='Working directory. Downloaded files will be stored here, but it can also already contain folders with fastq files. Results will be stored here.', required=False)
+	requiredNamed.add_argument('-d', '--workdir', nargs="?", type=str, metavar=('/path/to/workdir'), help='Working directory. Downloaded files will be stored here under sampleID/fastq/, but it can also already contain folders with fastq files. Results will be stored here.', required=False)
 	requiredNamed.add_argument('-gatk', nargs="?", type=str, metavar=('/path/to/gatk.jar'), help='Path for the Genome Analysis Toolkit jar file', required=False)
 	requiredNamed.add_argument('-picard', nargs="?", metavar=('/path/to/picard'), type=str, help='Path for Picard', required=False)
 	requiredNamed.add_argument('-l', nargs="?", metavar=('/path/to/idenfifiersList.txt'), type=str, help='Path to a list with ids to run. IDs can be ENA run accession numbers for download or directory names where fastqs are stored in --workdir. Run accession numbers retrieved from ENA using -tax will be stored here.' , required=False)
@@ -63,6 +64,8 @@ def runReMaCh(args):
 
 	toClear = []
 
+	sys.stdout = Logger(args.workdir)
+
 	if not os.path.isdir(args.workdir):
 		os.mkdir(args.workdir)
 		print str(args.workdir) + ' directory created!'
@@ -76,7 +79,7 @@ def runReMaCh(args):
 		platform=''
 	
 	ids_with_problems = open(os.path.join(args.workdir,'ids_with_problems.txt'), 'w')
-	logFile = open(os.path.join(args.workdir,'log_file.txt'), 'a')
+	#logFile = open(os.path.join(args.workdir,'log_file.txt'), 'a')
 
 	with open(args.l, 'r') as run_ids:
 
@@ -119,11 +122,11 @@ def runReMaCh(args):
 				run_id = run_id.strip()
 
 				print "\nChecking Run ID: " + str(run_id)
-				samFilePath, singOrPaired, numFilesDownloaded = downloadAndBowtie(args.r, run_id, args.workdir, buildBowtie, args.picard, args.threads, logFile, toClear, args.asperaKey) # mpmachado #
+				samFilePath, singOrPaired, filesDownloaded = downloadAndBowtie(args.r, run_id, args.workdir, buildBowtie, args.picard, args.threads, toClear, args.asperaKey) # mpmachado #
 				#print "\n######\ndownloaded and bowtied\n######\n"
 				#logFile.write("\n######\ndownloaded and bowtied\n######\n")
 				
-				if numFilesDownloaded == 0:
+				if len(filesDownloaded) == 0:
 					ids_with_problems.write(run_id + '\n')
 					pass
 
@@ -133,25 +136,24 @@ def runReMaCh(args):
 
 					rawCoverage(sortedPath, toClear)
 					print "\nChecking coverage..."
-					logFile.write("\nChecking coverage...")
-					sequenceNames, sequenceMedObject = checkCoverage(sortedPath, args.minCoverage,args.xtraSeq, logFile, toClear)
+					#logFile.write("\nChecking coverage...")
+					sequenceNames, sequenceMedObject = checkCoverage(sortedPath, args.minCoverage,args.xtraSeq, toClear)
 					print "\nPerforming Allele Call..."
-					logFile.write("\nPerforming Allele Call...")
-					alleleCalling(sortedPath, args.r, sequenceNames, args.gatk, run_id, args.minQuality, args.minCoverage, args.multipleAlleles, sequenceMedObject,args.xtraSeq, logFile, toClear)
+					#logFile.write("\nPerforming Allele Call...")
+					alleleCalling(sortedPath, args.r, sequenceNames, args.gatk, run_id, args.minQuality, args.minCoverage, args.multipleAlleles, sequenceMedObject,args.xtraSeq, toClear)
 					print str(run_id) + " DONE" 
-					logFile.write(str(run_id) + " DONE")
+					#logFile.write(str(run_id) + " DONE")
 					
 					
 					gzSizes = 0
 
-					filesToRemove = glob.glob(os.path.join(args.workdir, run_id) + '/*.fastq.gz')
+					#filesToRemove = glob.glob(os.path.join(args.workdir, run_id, 'downloads'))
 
-					for files in filesToRemove:
-						gzSizes += float(os.path.getsize(files))
+					for files in filesDownloaded:
+						gzSizes += float(os.path.getsize(os.path.join(args.workdir, run_id, 'fastq',files)))
 
 					if args.rmFastq:
-						for i in filesToRemove:
-							os.remove(i)
+						os.system('rm -r ' + os.path.join(args.workdir, run_id, 'fastq'))
 
 					run_time = str(datetime.now() - startTime)
 
@@ -160,7 +162,7 @@ def runReMaCh(args):
 						runTimeFile.write(str(run_time) + '\t' + str(gzSizes) +"\t"+singOrPaired+ '\n')
 				else:
 					print "An error has ocurried: "+run_id+" fastQs do not exist."
-					logFile.write("An error has ocurried: "+run_id+" fastQs do not exist.")
+					#logFile.write("An error has ocurried: "+run_id+" fastQs do not exist.")
 					pass
 
 		ids_with_problems.close()

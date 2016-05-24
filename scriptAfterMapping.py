@@ -34,7 +34,7 @@ def rawCoverage(bamSortedPath, toClear):
 	toClear.append(bamSortedPath+".tab")
 
 
-def checkCoverage(outputPath, coverageThreshold,extraSeq, logFile, toClear):
+def checkCoverage(outputPath, coverageThreshold,extraSeq, toClear):
 
 	sequenceMedObject = {}
 	#sequenceAndIndex = {}
@@ -104,7 +104,7 @@ def checkCoverage(outputPath, coverageThreshold,extraSeq, logFile, toClear):
 
 
     		
-def alleleCalling(bamSortedPath, referencePath, sequenceNames, gatkPath, sampleID, qualityThreshold, coverageThreshold, multipleAlleles, sequenceMedObject,extraSeq, logFile, toClear):
+def alleleCalling(bamSortedPath, referencePath, sequenceNames, gatkPath, sampleID, qualityThreshold, coverageThreshold, multipleAlleles, sequenceMedObject,extraSeq, toClear):
 
 	ploidytempFile = bamSortedPath+'_temp_ploi.tab'
 	sequencesFile = bamSortedPath + '_sequences.fasta'
@@ -114,7 +114,7 @@ def alleleCalling(bamSortedPath, referencePath, sequenceNames, gatkPath, sampleI
 		tempFile.write(sampleID + '\t' + str(1))
 
 	print "running bcf"
-	logFile.write("running bcf" + '\n')
+	#logFile.write("running bcf" + '\n')
 
 	os.system("samtools mpileup --no-BAQ --fasta-ref " + referencePath + " --uncompressed -t DP,DPR,DV " + bamSortedPath + ".bam | bcftools call --multiallelic-caller --variants-only --samples-file " + ploidytempFile + " --output-type v --output " + bamSortedPath + ".vcf")
 	toClear.append(bamSortedPath + ".vcf")
@@ -159,7 +159,7 @@ def alleleCalling(bamSortedPath, referencePath, sequenceNames, gatkPath, sampleI
 
 
 	print "running gatk"
-	logFile.write("running gatk" + '\n')
+	#logFile.write("running gatk" + '\n')
 	
 	#os.system("java -jar " + gatkPath + " -T FastaAlternateReferenceMaker -R "+ referencePath +" -o "+ filteredsequencesFile +" -V "+ bamSortedPath + "_filtered.vcf 2> "+sequencesFile+"Log_gatk.txt")
 	#os.system("java -jar " + gatkPath + " -T FastaAlternateReferenceMaker -R "+ referencePath +" -o "+ bamSortedPath + "_sequences_filtered_without_indels.fasta -V "+ bamSortedPath + "_filtered_without_indels.vcf 2>> "+sequencesFile+"Log_gatk.txt")
