@@ -152,7 +152,7 @@ def downloadAndBowtie(referencePath, run_id, target_dir, buildBowtie, picardJarP
 	bowtieBuildFileName, extension = os.path.splitext(referencePath) # mpmachado #
 
 	if buildBowtie == True:
-		print "Running picard"
+		print "Indexing Reference file..."
 		#logFile.write("Running picard" + '\n')
 		picardFileName, extension = os.path.splitext(referencePath)
 		os.system(picardJarPath +" CreateSequenceDictionary R= " + referencePath + " O= " + picardFileName + ".dict 2> "+picardFileName+"_picard_out.txt")
@@ -161,7 +161,6 @@ def downloadAndBowtie(referencePath, run_id, target_dir, buildBowtie, picardJarP
 		toClear.append(referencePath+'.fai')
 		
 	# if buildBowtie == True: # mpmachado #
-		print "Running bowtie..."
 		#logFile.write("Running bowtie..." + '\n')
 		bowtiBuildeLog=bowtieBuildFileName +"_bowtiBuildLog.txt"
 		myoutput = open(bowtiBuildeLog, 'w')
@@ -226,7 +225,7 @@ def downloadAndBowtie(referencePath, run_id, target_dir, buildBowtie, picardJarP
 	
 	pairedOrSingle="Single_end"	
 
-	
+	print "Running bowtie..."
 	if len(downloadedFiles)==1:
 
 
