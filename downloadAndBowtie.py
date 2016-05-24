@@ -182,7 +182,7 @@ def downloadAndBowtie(referencePath, run_id, target_dir, buildBowtie, picardJarP
 		os.makedirs(dir_with_gz) # mpmachado #
 	
 	#download ERR
-	aspera_run == False
+	aspera_run = False
 	
 	# numberFilesDowned= len(glob.glob1(dir_with_gz, "*.fastq.gz")) # mpmachado #
 	downloadedFiles = searchDownloadedFiles(dir_with_gz) # mpmachado #
