@@ -93,3 +93,37 @@ def changeFastaHeadersAndTrimm(FastasequencesFile,TrimmExtraSeq,referencePath):
 def removeFromArray(toClear):
 	for i in toClear:
 		os.system('rm ' + i)
+
+def checkPrograms():
+
+	which_program = ['which', '']
+	programs = {'bedtools':['>=','2.22'], 'java':['>=', '1.8'], 'samtools':['=', '1.2'], 'bcftools':['=', '1.2'],'bowtie2':['>=','2.2.6']}
+	#java -version
+
+	for program in programs:
+		which_program[1] = program
+		proc = subprocess.Popen(which_program, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+	    stdout,stderr = proc.communicate()
+	    if proc.returncode != 0:
+	    	sys.exit(program + ' not found in PATH.')
+	    else:
+	    	if program =='java':
+	    		check_version = [stdout, '-version']
+	    	else:
+	    		check_version = [stdout, '--version']
+
+	    	proc = subprocess.Popen(check_version, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+	    	stdout,stderr = proc.communicate()
+	    	print 'STDOUT:'
+	    	print stdout
+	    	print 'STDERR:'
+	    	print stderr
+
+
+
+
+
+
+
+
+
