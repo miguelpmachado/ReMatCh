@@ -43,7 +43,7 @@ def download(dirs2,target_dir2,ref2,success2,f2,link2):
 	
 	#get fasta file for each read file name
 	numFilesInDir = len(dirs2)
-	insucess=0
+	insucess2=0
 
 	if numFilesInDir > 2:
 		print "more than 2 files"
@@ -66,9 +66,9 @@ def download(dirs2,target_dir2,ref2,success2,f2,link2):
 			success2+=1		
 		except Exception as e:
 			print e
-			insucess+=1
+			insucess2+=1
 
-	return success2,insucess
+	return success2,insucess2
 
 def download_ERR(ERR_id,target_dir):
 	
@@ -88,7 +88,6 @@ def download_ERR(ERR_id,target_dir):
 		firstid=ref[0:6]
 		#get the read files name from the reference id
 		link='/vol1/fastq/'+firstid+"/"+ref
-		print link
 		f.cwd(link)
 		dirs=f.nlst();
 				
@@ -97,7 +96,6 @@ def download_ERR(ERR_id,target_dir):
 			firstid=ref[0:6]
 			#get the read files name from the reference id
 			link='/vol1/fastq/'+firstid+"/00"+ref[-1]+"/"+ref
-			print link
 			f.cwd(link)
 			dirs=f.nlst();
 					
