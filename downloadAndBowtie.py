@@ -43,6 +43,7 @@ def download(dirs2,target_dir2,ref2,success2,f2,link2):
 	
 	#get fasta file for each read file name
 	numFilesInDir = len(dirs2)
+	insucess=0
 
 	if numFilesInDir > 2:
 		print "more than 2 files"
@@ -51,19 +52,23 @@ def download(dirs2,target_dir2,ref2,success2,f2,link2):
 
 	for item in dirs2:
 					
-		f2.cwd(link2)
-		final_target_dir=target_dir2+"/"+ item
-		file = open(final_target_dir, 'wb')
-		print "Downloading: %s" % item
-		#logFile.write("Downloading: %s\n" % item)
+		try:
+			f2.cwd(link2)
+			final_target_dir=target_dir2+"/"+ item
+			file = open(final_target_dir, 'wb')
+			print "Downloading: %s" % item
+			#logFile.write("Downloading: %s\n" % item)
 
-		f2.retrbinary('RETR %s' % item, file.write)
-		file.close()
-		print "Downloaded %s" % item
-		#logFile.write("Downloaded %s\n" % item)
-		success2+=1		
+			f2.retrbinary('RETR %s' % item, file.write)
+			file.close()
+			print "Downloaded %s" % item
+			#logFile.write("Downloaded %s\n" % item)
+			success2+=1		
+		except Exception as e:
+			print e
+			insucess+=1
 
-	return success2
+	return success2,insucess
 
 def download_ERR(ERR_id,target_dir):
 	
@@ -100,15 +105,16 @@ def download_ERR(ERR_id,target_dir):
 			print "Bad ID: " + ref
 			#logFile.write("Bad ID: " + ref + '\n')
 		else:
-			success=download(dirs,target_dir,ref,success,f,link)	
+			success,insucess=download(dirs,target_dir,ref,success,f,link)	
 			
 	else:
 				
-		success=download(dirs,target_dir,ref,success,f,link)
+		success,insucess=download(dirs,target_dir,ref,success,f,link)
 	
 	f.quit()	
 	print "Successfully downloaded %s files and %s ID references were wrong" % (success,failed)	
 	#logFile.write("Successfully downloaded %s files and %s ID references were wrong\n" % (success,failed))
+	return insucess
 
 def downloadAspera(run_id, outdir, asperaKey): ## mpmachado ##
 	aspera_run = False
@@ -174,6 +180,7 @@ def downloadAndBowtie(referencePath, run_id, target_dir, buildBowtie, picardJarP
 		os.makedirs(dir_with_gz) # mpmachado #
 	
 	#download ERR
+	aspera_run == False
 	
 	# numberFilesDowned= len(glob.glob1(dir_with_gz, "*.fastq.gz")) # mpmachado #
 	downloadedFiles = searchDownloadedFiles(dir_with_gz) # mpmachado #
@@ -182,7 +189,9 @@ def downloadAndBowtie(referencePath, run_id, target_dir, buildBowtie, picardJarP
 			aspera_run = downloadAspera(run_id, dir_with_gz, asperaKey[0]) ## mpmachado ##
 			if aspera_run == False:
 				print 'Trying download using FTP' + "\n" ## mpmachado ##
-				download_ERR(run_id, dir_with_gz) ## mpmachado ##
+				ftp_down_insuc=download_ERR(run_id, dir_with_gz) ## mpmachado ##
+				
+				
 		else: ## mpmachado ##
 			download_ERR(run_id, dir_with_gz) # mpmachado #
 	else:
@@ -190,7 +199,11 @@ def downloadAndBowtie(referencePath, run_id, target_dir, buildBowtie, picardJarP
 		#logFile.write('File '+ run_id+' already exists...' + '\n')
 	
 	downloadedFiles = searchDownloadedFiles(dir_with_gz) # mpmachado #
-
+	
+	if ftp_down_insuc>0 and aspera_run == False:
+		return False, False, downloadedFiles # mpmachado #
+		
+	
 	if len(downloadedFiles) > 2:
 		filesToUse = []
 		for i in downloadedFiles:
@@ -198,7 +211,7 @@ def downloadAndBowtie(referencePath, run_id, target_dir, buildBowtie, picardJarP
 				filesToUse.append(i)
 
 		downloadedFiles = filesToUse
-
+	
 	
 
 	resultsFolder = os.path.join(dir_sample, 'rematch_results')
