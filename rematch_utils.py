@@ -103,21 +103,21 @@ def checkPrograms():
 	for program in programs:
 		which_program[1] = program
 		proc = subprocess.Popen(which_program, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-	    stdout,stderr = proc.communicate()
-	    if proc.returncode != 0:
-	    	sys.exit(program + ' not found in PATH.')
-	    else:
-	    	if program =='java':
-	    		check_version = [stdout, '-version']
-	    	else:
-	    		check_version = [stdout, '--version']
+		stdout,stderr = proc.communicate()
+		if proc.returncode != 0:
+			sys.exit(program + ' not found in PATH.')
+		else:
+			if program =='java':
+				check_version = [stdout, '-version']
+			else:
+				check_version = [stdout, '--version']
 
-	    	proc = subprocess.Popen(check_version, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-	    	stdout,stderr = proc.communicate()
-	    	print 'STDOUT:'
-	    	print stdout
-	    	print 'STDERR:'
-	    	print stderr
+			proc = subprocess.Popen(check_version, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+			stdout,stderr = proc.communicate()
+			print 'STDOUT:'
+			print stdout
+			print 'STDERR:'
+			print stderr
 
 
 
