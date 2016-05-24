@@ -68,6 +68,7 @@ def download(dirs2,target_dir2,ref2,success2,f2,link2):
 			print e
 			insucess2+=1
 
+	print 'download:' + str(success2,insucess2)
 	return success2,insucess2
 
 def download_ERR(ERR_id,target_dir):
@@ -106,9 +107,11 @@ def download_ERR(ERR_id,target_dir):
 			print "Bad ID: " + ref
 			#logFile.write("Bad ID: " + ref + '\n')
 		else:
+			print 'except2:' + str(success,insucess)
 			success,insucess=download(dirs,target_dir,ref,success,f,link)	
 			
-	else:	
+	else:
+		print 'done:' + str(success,insucess)	
 		success,insucess=download(dirs,target_dir,ref,success,f,link)
 	
 	f.quit()	
