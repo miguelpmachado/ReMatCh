@@ -56,6 +56,7 @@ def main():
 		if not args.r or not args.workdir or not args.gatk or not args.picard or not args.l:
 			parser.error('You must pass all the required arguments. For more information type -h')
 		else:
+			checkPrograms()
 			runReMaCh(args)
 
 
