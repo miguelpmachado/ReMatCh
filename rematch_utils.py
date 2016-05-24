@@ -108,9 +108,9 @@ def checkPrograms():
 			sys.exit(program + ' not found in PATH.')
 		else:
 			if program =='java':
-				check_version = [stdout, '-version']
+				check_version = [stdout.strip('\n'), '-version']
 			else:
-				check_version = [stdout, '--version']
+				check_version = [stdout.strip('\n'), '--version']
 
 			print check_version
 			proc = subprocess.Popen(check_version, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
