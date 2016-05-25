@@ -99,7 +99,7 @@ def checkPrograms(args):
 	print 'Checking dependencies...'
 	which_program = ['which', '']
 	programs = {'bedtools':['>=','2.22'], 'java':['>=', '1.8'], 'samtools':['=', '1.2'], 'bcftools':['=', '1.2'],'bowtie2':['>=','2.2.6'], 'ascp':['=', '3.6.2']}
-
+	listMissings = []
 	for program in programs:
 		if program =='ascp' and not args.asperaKey:
 			print 'No aspera key defined, using ftp'
@@ -108,7 +108,8 @@ def checkPrograms(args):
 		proc = subprocess.Popen(which_program, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 		stdout,stderr = proc.communicate()
 		if proc.returncode != 0:
-			sys.exit(program + ' not found in PATH.')
+			listMissings.append(program + ' not found in PATH.')
+			#sys.exit(program + ' not found in PATH.')
 		else:
 			if program =='java':
 				check_version = [stdout.strip('\n'), '-version']
@@ -129,11 +130,15 @@ def checkPrograms(args):
 			print version_line
 			if programs[program][0] == '>=':
 				if float('.'.join(version_line.split('.')[1:2])) < float('.'.join(programs[program][1].split('.')[1:2])):
-					sys.exit('ReMatCh requires ' + program + ' with version ' + programs[program][1] + ' or above.')
+					listMissings.append('ReMatCh requires ' + program + ' with version ' + programs[program][1] + ' or above.')
+					#sys.exit('ReMatCh requires ' + program + ' with version ' + programs[program][1] + ' or above.')
 			else:
 				if version_line != programs[program][1]:
-					sys.exit('ReMatCh requires ' + program + ' with version ' + programs[program][1] + '.')
+					listMissings.append('ReMatCh requires ' + program + ' with version ' + programs[program][1] + '.')
+					#sys.exit('ReMatCh requires ' + program + ' with version ' + programs[program][1] + '.')
 
+	if len(listMissings) > 0:
+		sys.exit('\n'.join(listMissings))
 
 
 
