@@ -165,17 +165,17 @@ def downloadAndBowtie(referencePath, run_id, target_dir, buildBowtie, picardJarP
 		#logFile.write("Running picard" + '\n')
 		picardFileName, extension = os.path.splitext(referencePath)
 		os.system('java -jar ' + picardJarPath +" CreateSequenceDictionary R= " + referencePath + " O= " + picardFileName + ".dict 2> "+picardFileName+"_picard_out.txt")
-		toClear.append(picardFileName+"_picard_out.txt")
-		toClear.append(picardFileName + ".dict")
-		toClear.append(referencePath+'.fai')
+		#toClear.append(picardFileName+"_picard_out.txt")
+		#toClear.append(picardFileName + ".dict")
+		#toClear.append(referencePath+'.fai')
 		
 	# if buildBowtie == True: # mpmachado #
 		#logFile.write("Running bowtie..." + '\n')
 		bowtiBuildeLog=bowtieBuildFileName +"_bowtiBuildLog.txt"
 		myoutput = open(bowtiBuildeLog, 'w')
 		subprocess.call(["bowtie2-build", referencePath, bowtieBuildFileName],stdout=myoutput,stderr=myoutput)
-		toClear.append(bowtieBuildFileName + ".*.bt2")
-		toClear.append(bowtiBuildeLog)
+		#toClear.append(bowtieBuildFileName + ".*.bt2")
+		#toClear.append(bowtiBuildeLog)
 	
 	if not os.path.isdir(target_dir): # mpmachado #
 		os.makedirs(target_dir) # mpmachado #

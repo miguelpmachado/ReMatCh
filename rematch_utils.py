@@ -140,6 +140,15 @@ def checkPrograms(args):
 		sys.exit('\nErrors:\n'+'\n'.join(listMissings) + '\n\nInstall all dependencies and try again.')
 
 
+def removeIndexes(referencePath):
+
+	referenceFileName, extension = os.path.splitext(referencePath)
+
+	os.remove(referenceFileName+"_picard_out.txt")
+	os.remove(referenceFileName + ".dict")
+	os.remove(referencePath+'.fai')
+	os.remove(referenceFileName + ".*.bt2")
+	os.remove(referenceFileName+"_bowtiBuildLog.txt")
 
 
 

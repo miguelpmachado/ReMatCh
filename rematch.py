@@ -19,6 +19,7 @@ from rematch_utils import removeFromArray
 from rematch_utils import checkPrograms
 from mergeResults import mergeResults
 from rematch_utils import Logger
+from rematch_utils import removeIndexes
 
 
 def main():
@@ -80,7 +81,7 @@ def runReMaCh(args):
 		platform=''
 	
 	sys.stdout = Logger(args.workdir)
-	
+
 	ids_with_problems = open(os.path.join(args.workdir,'ids_with_problems.txt'), 'w')
 	#logFile = open(os.path.join(args.workdir,'log_file.txt'), 'a')
 
@@ -90,6 +91,7 @@ def runReMaCh(args):
 		buildBowtie = True
 		firstLine = True
 		for run_id in run_ids:
+			toClear = []
 			run=False
 			if args.tax and firstLine == True:
 				firstLine = False
@@ -167,11 +169,15 @@ def runReMaCh(args):
 					print "An error has ocurried: "+run_id+" fastQs do not exist."
 					#logFile.write("An error has ocurried: "+run_id+" fastQs do not exist.")
 					pass
-
+			
+			if args.clean:
+				removeFromArray(toClear)
+		
 		ids_with_problems.close()
 
-	if args.clean:
-		removeFromArray(toClear)
+		if args.clean:
+			removeIndexes(args.r)
+
 
 
 
