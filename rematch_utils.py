@@ -113,6 +113,7 @@ def checkPrograms():
 				check_version = [stdout.strip('\n'), '--version']
 
 			print program + ' found at: ' + check_version[0]
+			print check_version
 			proc = subprocess.Popen(check_version, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 			stdout,stderr = proc.communicate() 
 			print stdout
