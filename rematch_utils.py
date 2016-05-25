@@ -94,13 +94,16 @@ def removeFromArray(toClear):
 	for i in toClear:
 		os.system('rm ' + i)
 
-def checkPrograms():
+def checkPrograms(args):
 
 	print 'Checking dependencies...'
 	which_program = ['which', '']
-	programs = {'bedtools':['>=','2.22'], 'java':['>=', '1.8'], 'samtools':['=', '1.2'], 'bcftools':['=', '1.2'],'bowtie2':['>=','2.2.6']}
+	programs = {'bedtools':['>=','2.22'], 'java':['>=', '1.8'], 'samtools':['=', '1.2'], 'bcftools':['=', '1.2'],'bowtie2':['>=','2.2.6'], 'ascp':['=', '3.6.2']}
 
 	for program in programs:
+		if program =='ascp' and not args.asperaKey:
+			print 'No aspera key defined, using ftp'
+			continue
 		which_program[1] = program
 		proc = subprocess.Popen(which_program, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 		stdout,stderr = proc.communicate()
