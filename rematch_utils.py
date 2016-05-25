@@ -118,7 +118,7 @@ def checkPrograms():
 			version_line=stdout.split('\n')[0].split(' ')[-1]
 			if 'v' in version_line:
 				version_line=version_line.split('v')[1]
-			else if 'V' in version_line:
+			elif 'V' in version_line:
 				version_line=version_line.split('V')[1]
 			if programs[program][0] == '>=':
 				if float(version_line) < float(programs[program][1]):
