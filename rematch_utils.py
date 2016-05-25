@@ -118,6 +118,8 @@ def checkPrograms():
 			stdout,stderr = proc.communicate() 
 			print stdout
 			print stderr
+			if program =='java':
+				stdout = stderr
 			version_line=stdout.split('\n')[0].split(' ')[-1]
 			print version_line
 			version_line=version_line.replace('"', '')
