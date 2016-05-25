@@ -116,6 +116,7 @@ def checkPrograms():
 			proc = subprocess.Popen(check_version, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 			stdout,stderr = proc.communicate() 
 			version_line=stdout.split('\n')[0].split(' ')[-1]
+			version_line=version_line.replace('"', '')
 			if 'v' in version_line:
 				version_line=version_line.split('v')[1]
 			elif 'V' in version_line:
