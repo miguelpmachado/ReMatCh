@@ -137,7 +137,7 @@ def checkPrograms(args):
 					#sys.exit('ReMatCh requires ' + program + ' with version ' + programs[program][1] + '.')
 
 	if len(listMissings) > 0:
-		sys.exit('\n'.join(listMissings))
+		sys.exit('\nWarnings:\n'+'\n'.join(listMissings))
 
 
 
