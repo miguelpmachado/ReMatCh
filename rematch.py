@@ -67,8 +67,6 @@ def runReMaCh(args):
 
 	toClear = []
 
-	sys.stdout = Logger(args.workdir)
-
 	if not os.path.isdir(args.workdir):
 		os.mkdir(args.workdir)
 		print str(args.workdir) + ' directory created!'
@@ -80,6 +78,8 @@ def runReMaCh(args):
 		platform="Illumina"
 	else:
 		platform=''
+	
+	sys.stdout = Logger(args.workdir)
 	
 	ids_with_problems = open(os.path.join(args.workdir,'ids_with_problems.txt'), 'w')
 	#logFile = open(os.path.join(args.workdir,'log_file.txt'), 'a')
