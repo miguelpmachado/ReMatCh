@@ -121,10 +121,10 @@ def checkPrograms():
 			elif 'V' in version_line:
 				version_line=version_line.split('V')[1]
 			if programs[program][0] == '>=':
-				if float(version_line) < float(programs[program][1]):
+				if float(version_line.split('.')[1:2]) < float(programs[program][1].split('.')[1:2]):
 					sys.exit('ReMatCh requires ' + program + ' with version ' + programs[program][1] + ' or above.')
 			else:
-				if float(version_line) != float(programs[program][1]):
+				if version_line != programs[program][1]:
 					sys.exit('ReMatCh requires ' + program + ' with version ' + programs[program][1] + '.')
 
 
