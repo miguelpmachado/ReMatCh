@@ -112,15 +112,20 @@ def checkPrograms():
 			else:
 				check_version = [stdout.strip('\n'), '--version']
 
-			print check_version
+			print program + 'found at: ' + check_version[0]
 			proc = subprocess.Popen(check_version, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 			stdout,stderr = proc.communicate() 
 			version_line=stdout.split('\n')[0].split(' ')[-1]
-			print version_line
-			print 'STDOUT:'
-			print stdout
-			print 'STDERR:'
-			print stderr
+			if 'v' in version_line:
+				version_line=version_line.split('v')[1]
+			else if 'V' in version_line:
+				version_line=version_line.split('V')[1]
+			if programs[program][0] == '>=':
+				if float(version_line) < float(programs[program][1]):
+					sys.exit('ReMatCh requires ' + program + ' with version ' + programs[program][1] + ' or above.')
+			else:
+				if float(version_line) != float(programs[program][1]):
+					sys.exit('ReMatCh requires ' + program + ' with version ' + programs[program][1] + '.')
 
 
 
