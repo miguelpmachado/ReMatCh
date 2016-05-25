@@ -96,7 +96,7 @@ def removeFromArray(toClear):
 
 def checkPrograms(args):
 
-	print 'Checking dependencies...'
+	print '\nChecking dependencies...'
 	which_program = ['which', '']
 	programs = {'bedtools':['>=','2.22'], 'java':['>=', '1.8'], 'samtools':['=', '1.2'], 'bcftools':['=', '1.2'],'bowtie2':['>=','2.2.6'], 'ascp':['=', '3.6.2']}
 	listMissings = []

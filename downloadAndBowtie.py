@@ -24,6 +24,7 @@
 
 import shlex, subprocess, ftplib
 import os, os.path, glob
+import shutil
 
 from os import listdir
 from os.path import isfile, join
@@ -111,7 +112,11 @@ def download_ERR(ERR_id,target_dir):
 	else:	
 		success,insucess=download(dirs,target_dir,ref,success,f,link)
 	
-	f.quit()	
+	try:
+		f.quit()
+	except Exception, e:
+		print e
+		print 'Insucess: ' + str(insucess)
 	print "Successfully downloaded %s files and %s ID references were wrong" % (success,failed)	
 	#logFile.write("Successfully downloaded %s files and %s ID references were wrong\n" % (success,failed))
 	return insucess
@@ -122,6 +127,7 @@ def downloadAspera(run_id, outdir, asperaKey): ## mpmachado ##
 	aspera, std_out, std_err = runTimeoutLimit(aspera_command, 3600)
 	if aspera == 0:
 		aspera_run = True
+		print ' '.join(aspera_command)
 	else:
 		print "Connecting using the following command didn't work:"
 		print ' '.join(aspera_command)
@@ -132,17 +138,20 @@ def downloadAspera(run_id, outdir, asperaKey): ## mpmachado ##
 			aspera_run = True
 		else:
 			print "Download using Aspera didn't work" + "\n"
+			return aspera_run
+	
+	files = glob.glob1(os.path.join(outdir, run_id), '*')
+	for file in files:
+		shutil.move(os.path.join(outdir, run_id, file), outdir)
+	shutil.rmtree(os.path.join(outdir, run_id))
 	return aspera_run
 
 # Search Fastq files (that were downloaded or already provided by the user)
 def searchDownloadedFiles(directory): ## mpmachado ##
 	filesExtensions = ['fastq.gz', 'fq.gz']
-	downloadedFiles = []
 	for extension in filesExtensions:
 		downloadedFiles = glob.glob1(directory, str('*.' + extension))
-		if len(downloadedFiles) == 0:
-			downloadedFiles = []
-		else:
+		if len(downloadedFiles) > 0:
 			break
 	return downloadedFiles
 
@@ -155,7 +164,7 @@ def downloadAndBowtie(referencePath, run_id, target_dir, buildBowtie, picardJarP
 		print "Indexing Reference file..."
 		#logFile.write("Running picard" + '\n')
 		picardFileName, extension = os.path.splitext(referencePath)
-		os.system(picardJarPath +" CreateSequenceDictionary R= " + referencePath + " O= " + picardFileName + ".dict 2> "+picardFileName+"_picard_out.txt")
+		os.system('java -jar ' + picardJarPath +" CreateSequenceDictionary R= " + referencePath + " O= " + picardFileName + ".dict 2> "+picardFileName+"_picard_out.txt")
 		toClear.append(picardFileName+"_picard_out.txt")
 		toClear.append(picardFileName + ".dict")
 		toClear.append(referencePath+'.fai')
@@ -185,6 +194,7 @@ def downloadAndBowtie(referencePath, run_id, target_dir, buildBowtie, picardJarP
 	# numberFilesDowned= len(glob.glob1(dir_with_gz, "*.fastq.gz")) # mpmachado #
 	downloadedFiles = searchDownloadedFiles(dir_with_gz) # mpmachado #
 	if len(downloadedFiles) < 1: # mpmachado #
+		print 'Trying download...'
 		if asperaKey != None: ## mpmachado ##
 			aspera_run = downloadAspera(run_id, dir_with_gz, asperaKey[0]) ## mpmachado ##
 			if aspera_run == False:
@@ -200,7 +210,8 @@ def downloadAndBowtie(referencePath, run_id, target_dir, buildBowtie, picardJarP
 	
 	downloadedFiles = searchDownloadedFiles(dir_with_gz) # mpmachado #
 	
-	if ftp_down_insuc>0 and aspera_run == False:
+	if ftp_down_insuc > 0 and aspera_run == False:
+		os.system('rm -r ' + dir_with_gz)
 		return False, False, downloadedFiles # mpmachado #
 		
 	
