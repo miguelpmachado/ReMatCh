@@ -96,9 +96,9 @@ def removeFromArray(toClear):
 
 def checkPrograms():
 
+	print 'Checking dependencies...'
 	which_program = ['which', '']
 	programs = {'bedtools':['>=','2.22'], 'java':['>=', '1.8'], 'samtools':['=', '1.2'], 'bcftools':['=', '1.2'],'bowtie2':['>=','2.2.6']}
-	#java -version
 
 	for program in programs:
 		which_program[1] = program
@@ -112,7 +112,7 @@ def checkPrograms():
 			else:
 				check_version = [stdout.strip('\n'), '--version']
 
-			print program + 'found at: ' + check_version[0]
+			print program + ' found at: ' + check_version[0]
 			proc = subprocess.Popen(check_version, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 			stdout,stderr = proc.communicate() 
 			version_line=stdout.split('\n')[0].split(' ')[-1]
@@ -121,7 +121,6 @@ def checkPrograms():
 			elif 'V' in version_line:
 				version_line=version_line.split('V')[1]
 			if programs[program][0] == '>=':
-				print version_line.split('.')[0:2]
 				if float('.'.join(version_line.split('.')[1:2])) < float('.'.join(programs[program][1].split('.')[1:2])):
 					sys.exit('ReMatCh requires ' + program + ' with version ' + programs[program][1] + ' or above.')
 			else:
