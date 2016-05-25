@@ -114,7 +114,9 @@ def checkPrograms():
 
 			print check_version
 			proc = subprocess.Popen(check_version, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-			stdout,stderr = proc.communicate()
+			stdout,stderr = proc.communicate() 
+			version_line=stdout.split('\n')[0].split(' ')[-1]
+			print version_line
 			print 'STDOUT:'
 			print stdout
 			print 'STDERR:'
