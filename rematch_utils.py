@@ -98,7 +98,7 @@ def checkPrograms():
 
 	print 'Checking dependencies...'
 	which_program = ['which', '']
-	programs = {'bedtools':['>=','2.22'], 'java':['>=', '1.8'], 'samtools':['=', '1.2'], 'bcftools':['=', '1.2'],'bowtie2':['>=','2.2.6']}
+	programs = {'bedtools':['>=','2.22'], 'java':['>=', '1.7'], 'samtools':['=', '1.2'], 'bcftools':['=', '1.2'],'bowtie2':['>=','2.2.6']}
 
 	for program in programs:
 		which_program[1] = program
