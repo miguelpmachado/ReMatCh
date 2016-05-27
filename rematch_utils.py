@@ -133,6 +133,9 @@ def checkPrograms(args):
 			if programs[program][0] == '>=':
 				program_found_version = version_line.split('.')
 				program_version_required = programs[program][1].split('.')
+				print program
+				print '.'.join(program_found_version[0:1])
+				print '.'.join(program_version_required[0:1])
 				if float('.'.join(program_found_version[0:1])) < float('.'.join(program_version_required[0:1])):
 					listMissings.append('ReMatCh requires ' + program + ' with version ' + programs[program][1] + ' or above.')
 				elif float('.'.join(program_found_version[0:1])) == float('.'.join(program_version_required[0:1])):
