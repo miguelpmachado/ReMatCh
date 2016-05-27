@@ -98,7 +98,7 @@ def checkPrograms(args):
 
 	print '\nChecking dependencies...'
 	which_program = ['which', '']
-	programs = {'bedtools':['>=','2.22'], 'java':['>=', '1.8'], 'samtools':['=', '1.2'], 'bcftools':['=', '1.2'],'bowtie2':['>=','2.2.6'], 'ascp':['>=', '3.6.2']}
+	programs = {'bedtools':['>=','2.22'], 'java':['>=', '1.8'], 'samtools':['=', '1.2'], 'bcftools':['=', '1.2'],'bowtie2':['>=','2.2.6'], 'ascp':['>=', '3.6.1']}
 	listMissings = []
 	for program in programs:
 		if program =='ascp' and not args.asperaKey:
