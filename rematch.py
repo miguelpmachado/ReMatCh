@@ -162,7 +162,7 @@ def runReMaCh(args):
 						runTimeFile.write("#runTime\tfileSize\tlibraryLayout\n")
 						runTimeFile.write(str(run_time) + '\t' + str(gzSizes) +"\t"+singOrPaired+ '\n')
 				else:
-					ids_with_problems.write(run_id)
+					ids_with_problems.write(run_id + "\n")
 					ids_with_problems.flush()
 					print run_id + ' - An error has occurred.'
 			
