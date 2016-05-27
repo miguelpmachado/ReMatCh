@@ -126,7 +126,7 @@ def runReMaCh(args):
 
 				run_id = run_id.strip()
 
-				print "\nChecking Run ID: " + str(run_id)
+				print "\nRunning ID: " + str(run_id)
 				samFilePath, singOrPaired, filesDownloaded = downloadAndBowtie(args.r, run_id, args.workdir, buildBowtie, args.picard, args.threads, toClear, args.asperaKey) # mpmachado #
 				#print "\n######\ndownloaded and bowtied\n######\n"
 				#logFile.write("\n######\ndownloaded and bowtied\n######\n")
