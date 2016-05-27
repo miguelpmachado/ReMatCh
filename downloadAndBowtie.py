@@ -214,6 +214,7 @@ def downloadAndBowtie(referencePath, run_id, target_dir, buildBowtie, picardJarP
 		proc = subprocess.Popen(bowtie_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 		stdout, stderr = proc.communicate()
 		if proc.returncode != 0:
+			print 'Bowtie2 fails'
 			print stdout.decode("utf-8"), stderr.decode("utf-8")
 			return False, False, downloadedFiles
 	elif len(downloadedFiles)==2:
@@ -221,6 +222,7 @@ def downloadAndBowtie(referencePath, run_id, target_dir, buildBowtie, picardJarP
 		proc = subprocess.Popen(bowtie_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 		stdout, stderr = proc.communicate()
 		if proc.returncode != 0:
+			print 'Bowtie2 fails'
 			print stdout.decode("utf-8"), stderr.decode("utf-8")
 			return False, False, downloadedFiles
 	else:
