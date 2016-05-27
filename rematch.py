@@ -164,7 +164,7 @@ def runReMaCh(args):
 				else:
 					ids_with_problems.write(run_id)
 					ids_with_problems.flush()
-					print 'An error has occurred: ' + str(len(filesDownloaded)) + 'fastq files were downloaded.'
+					print run_id + ' - An error has occurred.'
 			
 			if args.clean:
 				removeFromArray(toClear)
