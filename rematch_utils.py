@@ -136,7 +136,7 @@ def checkPrograms(args):
 					if len(program_version_required) == 3:
 						if len(program_found_version) == 2:
 							program_found_version.append(0)
-						if program_found_version[2] < program_version_required[2]
+						if program_found_version[2] < program_version_required[2]:
 							listMissings.append('ReMatCh requires ' + program + ' with version ' + programs[program][1] + ' or above.')
 			else:
 				if version_line != programs[program][1]:
