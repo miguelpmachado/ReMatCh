@@ -131,10 +131,6 @@ def runReMaCh(args):
 				#print "\n######\ndownloaded and bowtied\n######\n"
 				#logFile.write("\n######\ndownloaded and bowtied\n######\n")
 				
-				if len(filesDownloaded) == 0:
-					ids_with_problems.write(run_id + '\n')
-					pass
-
 				if not samFilePath==False:
 				
 					sortedPath = convertToBAM(samFilePath, toClear)
@@ -166,9 +162,9 @@ def runReMaCh(args):
 						runTimeFile.write("#runTime\tfileSize\tlibraryLayout\n")
 						runTimeFile.write(str(run_time) + '\t' + str(gzSizes) +"\t"+singOrPaired+ '\n')
 				else:
-					print "An error has ocurried: "+run_id+" fastQs do not exist."
-					#logFile.write("An error has ocurried: "+run_id+" fastQs do not exist.")
-					pass
+					ids_with_problems.write(run_id)
+					ids_with_problems.flush()
+					print 'An error has occurred: ' + str(len(filesDownloaded)) + 'fastq files were downloaded.'
 			
 			if args.clean:
 				removeFromArray(toClear)
