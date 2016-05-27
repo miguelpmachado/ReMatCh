@@ -128,13 +128,19 @@ def checkPrograms(args):
 			elif 'V' in version_line:
 				version_line=version_line.split('V')[1]
 			if programs[program][0] == '>=':
-				if float('.'.join(version_line.split('.')[1:2])) < float('.'.join(programs[program][1].split('.')[1:2])):
+				program_found_version = version_line.split('.')
+				program_version_required = programs[program][1].split('.')
+				if float('.'.join(program_found_version[0:1])) < float('.'.join(program_version_required[0:1])):
 					listMissings.append('ReMatCh requires ' + program + ' with version ' + programs[program][1] + ' or above.')
-					#sys.exit('ReMatCh requires ' + program + ' with version ' + programs[program][1] + ' or above.')
+				elif float('.'.join(program_found_version[0:1])) == float('.'.join(program_version_required[0:1])):
+					if len(program_version_required) == 3:
+						if len(program_found_version) == 2:
+							program_found_version.append(0)
+						if program_found_version[2] < program_version_required[2]
+							listMissings.append('ReMatCh requires ' + program + ' with version ' + programs[program][1] + ' or above.')
 			else:
 				if version_line != programs[program][1]:
 					listMissings.append('ReMatCh requires ' + program + ' with version ' + programs[program][1] + '.')
-					#sys.exit('ReMatCh requires ' + program + ' with version ' + programs[program][1] + '.')
 
 	if len(listMissings) > 0:
 		sys.exit('\nErrors:\n'+'\n'.join(listMissings) + '\n\nInstall all dependencies and try again.')
