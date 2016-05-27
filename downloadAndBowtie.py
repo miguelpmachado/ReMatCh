@@ -207,7 +207,8 @@ def downloadAndBowtie(referencePath, run_id, target_dir, buildBowtie, picardJarP
 
 	print "Running bowtie..."
 	
-	bowtie_command = ['bowtie2', '-k', str(2), '--quiet', '--no-unal', '-x', bowtieBuildFileName, str('-U ' + os.path.join(dir_with_gz, downloadedFiles[0])), str('--rg-id ENA --rg SM:' + run_id), '--sensitive-local', '--threads', str(threads), '--met-file', os.path.join(resultsFolder, str(run_id + '.bowtie_metrics.txt')), '-S', bowtie_output_file]
+	print ' '.join('bowtie2', '-k', '2', '--quiet', '--no-unal', '-x', bowtieBuildFileName, str('-U ' + os.path.join(dir_with_gz, downloadedFiles[0])), str('--rg-id ENA --rg SM:' + run_id), '--sensitive-local', '--threads', str(threads), '--met-file', os.path.join(resultsFolder, str(run_id + '.bowtie_metrics.txt')), '-S', bowtie_output_file)
+	bowtie_command = ['bowtie2', '-k', '2', '--quiet', '--no-unal', '-x', bowtieBuildFileName, str('-U ' + os.path.join(dir_with_gz, downloadedFiles[0])), str('--rg-id ENA --rg SM:' + run_id), '--sensitive-local', '--threads', str(threads), '--met-file', os.path.join(resultsFolder, str(run_id + '.bowtie_metrics.txt')), '-S', bowtie_output_file]
 	
 	if len(downloadedFiles)==1:
 		proc = subprocess.Popen(bowtie_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
