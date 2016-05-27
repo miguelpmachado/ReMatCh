@@ -152,7 +152,8 @@ def removeIndexes(referencePath):
 
 	os.remove(referenceFileName+"_picard_out.txt")
 	os.remove(referenceFileName + ".dict")
-	os.remove(referencePath+'.fai')
+	if os.path.isfile(referencePath+'.fai'):
+		os.remove(referencePath+'.fai')
 	os.system('rm ' + referenceFileName + ".*.bt2")
 	os.remove(referenceFileName+"_bowtiBuildLog.txt")
 
