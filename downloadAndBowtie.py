@@ -202,6 +202,7 @@ def downloadAndBowtie(referencePath, run_id, target_dir, buildBowtie, picardJarP
 		os.makedirs(resultsFolder)
 	
 	bowtie_output_file=os.path.join(resultsFolder, str(run_id + '.sam'))
+	bowtieLog = os.path.join(resultsFolder, run_id + "_bowtie_error.txt")
 	
 	pairedOrSingle="Single_end"	
 
@@ -213,28 +214,25 @@ def downloadAndBowtie(referencePath, run_id, target_dir, buildBowtie, picardJarP
 	
 	if len(downloadedFiles)==1:
 		bowtie_command[7] = str('-U ' + os.path.join(dir_with_gz, downloadedFiles[0]))
-		print ' '.join(bowtie_command)
-		# os.system(' '.join(bowtie_command))
-		proc = subprocess.Popen(bowtie_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
-		stdout, stderr = proc.communicate()
-		if proc.returncode != 0:
-			print 'Bowtie2 fails'
-			print stdout.decode("utf-8"), stderr.decode("utf-8")
+		myoutput = open(bowtieLog, 'w')
+		proc = subprocess.call(bowtie_command, stdout=myoutput, stderr=myoutput)
+		myoutput.close()
+		if proc != 0:
+			print 'Bowtie2 fails! Find Bowtie2 log file at' + bowtieLog
 			return False, False, downloadedFiles
 	elif len(downloadedFiles)==2:
 		bowtie_command[7] = str('-1 ' + os.path.join(dir_with_gz, downloadedFiles[0]) + ' -2 ' + os.path.join(dir_with_gz, downloadedFiles[1]))
-		print ' '.join(bowtie_command)
-		# os.system(' '.join(bowtie_command))
-		proc = subprocess.Popen(bowtie_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
-		stdout, stderr = proc.communicate()
-		if proc.returncode != 0:
-			print 'Bowtie2 fails'
-			print stdout.decode("utf-8"), stderr.decode("utf-8")
+		myoutput = open(bowtieLog, 'w')
+		proc = subprocess.call(bowtie_command, stdout=myoutput, stderr=myoutput)
+		myoutput.close()
+		if proc != 0:
+			print 'Bowtie2 fails! Find Bowtie2 log file at' + bowtieLog
 			return False, False, downloadedFiles
 	else:
 		print "0 fastq files found. Aborting..."
 		os.system('rm -r ' + dir_with_gz)
 		return False, False, downloadedFiles
 
+	toClear.append(os.path.join(resultsFolder, run_id+"_bowtie_error.txt"))
 	toClear.append(os.path.join(resultsFolder, run_id+".bowtie_metrics.txt"))
 	return bowtie_output_file, pairedOrSingle, downloadedFiles
