@@ -59,6 +59,9 @@ def main():
 		if not args.r or not args.workdir or not args.gatk or not args.picard or not args.l:
 			parser.error('You must pass all the required arguments. For more information type -h')
 		else:
+			if not os.path.isdir(args.workdir):
+				os.mkdir(args.workdir)
+				print str(args.workdir) + ' directory created!'
 			sys.stdout = Logger(args.workdir)
 			checkPrograms(args)
 			runReMaCh(args)
@@ -69,10 +72,6 @@ def runReMaCh(args):
 
 	toClear = []
 
-	if not os.path.isdir(args.workdir):
-		os.mkdir(args.workdir)
-		print str(args.workdir) + ' directory created!'
-	
 	if args.tax:
 		GetSequencesFromTaxon(args.tax,args.l,True)
 	
