@@ -59,6 +59,7 @@ def main():
 		if not args.r or not args.workdir or not args.gatk or not args.picard or not args.l:
 			parser.error('You must pass all the required arguments. For more information type -h')
 		else:
+			sys.stdout = Logger(args.workdir)
 			checkPrograms(args)
 			runReMaCh(args)
 
@@ -80,9 +81,8 @@ def runReMaCh(args):
 	else:
 		platform=''
 	
-	sys.stdout = Logger(args.workdir)
-
 	ids_with_problems = open(os.path.join(args.workdir,'ids_with_problems.txt'), 'w')
+	ids_no_problems = open(os.path.join(args.workdir,'ids_no_problems.txt'), 'w')
 	#logFile = open(os.path.join(args.workdir,'log_file.txt'), 'a')
 
 	with open(args.l, 'r') as run_ids:
@@ -155,6 +155,9 @@ def runReMaCh(args):
 
 					if args.rmFastq:
 						os.system('rm -r ' + os.path.join(args.workdir, run_id, 'fastq'))
+					
+					ids_no_problems.write(run_id + "\n")
+					ids_no_problems.flush()
 
 					run_time = str(datetime.now() - startTime)
 
@@ -164,12 +167,18 @@ def runReMaCh(args):
 				else:
 					ids_with_problems.write(run_id + "\n")
 					ids_with_problems.flush()
+					if args.rmFastq:
+						try:
+							shutil.rmtree(os.path.join(args.workdir, run_id, 'fastq'))
+						except Exception as e:
+							print e
 					print run_id + ' - An error has occurred.'
 			
 			if args.clean:
 				removeFromArray(toClear)
 		
 		ids_with_problems.close()
+		ids_no_problems.close()
 
 		if args.clean:
 			removeIndexes(args.r)
