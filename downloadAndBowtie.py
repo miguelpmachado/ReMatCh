@@ -214,19 +214,21 @@ def downloadAndBowtie(referencePath, run_id, target_dir, buildBowtie, picardJarP
 	
 	if len(downloadedFiles)==1:
 		bowtie_command[7] = str('-U ' + os.path.join(dir_with_gz, downloadedFiles[0]))
+		print ' '.join(bowtie_command)
 		myoutput = open(bowtieLog, 'w')
 		proc = subprocess.call(bowtie_command, stdout=myoutput, stderr=myoutput)
 		myoutput.close()
 		if proc != 0:
-			print 'Bowtie2 fails! Find Bowtie2 log file at' + bowtieLog
+			print 'Bowtie2 fails! Find Bowtie2 log file at ' + bowtieLog
 			return False, False, downloadedFiles
 	elif len(downloadedFiles)==2:
 		bowtie_command[7] = str('-1 ' + os.path.join(dir_with_gz, downloadedFiles[0]) + ' -2 ' + os.path.join(dir_with_gz, downloadedFiles[1]))
+		print ' '.join(bowtie_command)
 		myoutput = open(bowtieLog, 'w')
 		proc = subprocess.call(bowtie_command, stdout=myoutput, stderr=myoutput)
 		myoutput.close()
 		if proc != 0:
-			print 'Bowtie2 fails! Find Bowtie2 log file at' + bowtieLog
+			print 'Bowtie2 fails! Find Bowtie2 log file at ' + bowtieLog
 			return False, False, downloadedFiles
 	else:
 		print "0 fastq files found. Aborting..."
