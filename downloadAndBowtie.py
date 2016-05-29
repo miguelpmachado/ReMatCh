@@ -86,7 +86,7 @@ def download_ERR(ERR_id,target_dir):
 					
 					
 						
-		except Exception, e:
+		except Exception as e:
 			failed +=1
 			print "Bad ID: " + ref
 		else:
@@ -97,7 +97,7 @@ def download_ERR(ERR_id,target_dir):
 	
 	try:
 		f.quit()
-	except Exception, e:
+	except Exception as e:
 		print e
 		print 'Insucess: ' + str(insucess)
 	print "Downloaded %s files successfully, %s fail and %s ID references were wrong" % (success,insucess,failed)
@@ -201,7 +201,7 @@ def downloadAndBowtie(referencePath, run_id, target_dir, buildBowtie, picardJarP
 	if not os.path.exists(resultsFolder):
 		os.makedirs(resultsFolder)
 	
-	bowtie_output_file=os.path.join(resultsFolder, run_id + ".sam")
+	bowtie_output_file=os.path.join(resultsFolder, str(run_id + '.sam'))
 	
 	pairedOrSingle="Single_end"	
 
@@ -209,8 +209,11 @@ def downloadAndBowtie(referencePath, run_id, target_dir, buildBowtie, picardJarP
 	
 	bowtie_command = ['bowtie2', '-k', '2', '--quiet', '--no-unal', '-x', bowtieBuildFileName, str(''), str('--rg-id ENA --rg SM:' + run_id), '--sensitive-local', '--threads', str(threads), '--met-file', os.path.join(resultsFolder, str(run_id + '.bowtie_metrics.txt')), '-S', bowtie_output_file]
 	
+	print os.listdir(dir_with_gz)
+	
 	if len(downloadedFiles)==1:
 		bowtie_command[7] = str('-U ' + os.path.join(dir_with_gz, downloadedFiles[0]))
+		print ' '.join(bowtie_command)
 		proc = subprocess.Popen(bowtie_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 		stdout, stderr = proc.communicate()
 		if proc.returncode != 0:
@@ -219,6 +222,7 @@ def downloadAndBowtie(referencePath, run_id, target_dir, buildBowtie, picardJarP
 			return False, False, downloadedFiles
 	elif len(downloadedFiles)==2:
 		bowtie_command[7] = str('-1 ' + os.path.join(dir_with_gz, downloadedFiles[0]) + ' -2 ' + os.path.join(dir_with_gz, downloadedFiles[1]))
+		print ' '.join(bowtie_command)
 		proc = subprocess.Popen(bowtie_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 		stdout, stderr = proc.communicate()
 		if proc.returncode != 0:
