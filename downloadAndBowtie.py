@@ -212,7 +212,7 @@ def downloadAndBowtie(referencePath, run_id, target_dir, buildBowtie, picardJarP
 	
 	if len(downloadedFiles)==1:
 		bowtie_command[7] = str('-U ' + os.path.join(dir_with_gz, downloadedFiles[0]))
-		bowtie_command_splitted = shlex.split(bowtie_command)
+		bowtie_command_splitted = shlex.split(' '.join(bowtie_command))
 		'''
 		print ' '.join(bowtie_command)
 		myoutput = open(bowtieLog, 'w')
@@ -230,7 +230,7 @@ def downloadAndBowtie(referencePath, run_id, target_dir, buildBowtie, picardJarP
 			return False, False, downloadedFiles
 	elif len(downloadedFiles)==2:
 		bowtie_command[7] = str('-1 ' + os.path.join(dir_with_gz, downloadedFiles[0]) + ' -2 ' + os.path.join(dir_with_gz, downloadedFiles[1]))
-		bowtie_command_splitted = shlex.split(bowtie_command)
+		bowtie_command_splitted = shlex.split(' '.join(bowtie_command))
 		'''
 		print ' '.join(bowtie_command)
 		myoutput = open(bowtieLog, 'w')
