@@ -44,7 +44,7 @@ def GetSequencesFromTaxon(taxonname,outputfile,getmachine):
 	for child in tree:
 		taxonid=child.get('taxId')
 	if (taxonid):
-		print "Taxon ID found: "+taxonid
+		print "\n" + "Taxon ID found: "+taxonid
 		url="http://www.ebi.ac.uk/ena/data/warehouse/search?query=%22tax_tree%28"+taxonid+"%29%22&result=read_run&display=xml"
 
 		content = urllib2.urlopen(url)
@@ -90,9 +90,11 @@ def GetSequencesFromTaxon(taxonname,outputfile,getmachine):
 									
 					f.write(str(runid)+"\t"+model+"\t"+prjid+"\n")
 					sys.stderr.write("\r" + "run acession %s sequenced on %s from project %s" % (runid, model,prjid))
+					sys.stderr.flush()
 				else:
 					f.write(str(runid)+"\n")								
 					sys.stderr.write("\r" + "run acession %s" % (runid,prjid))
+					sys.stderr.flush()
 		print "\n"
 		print "\nfound %s run id's" % n
 		
