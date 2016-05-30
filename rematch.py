@@ -62,11 +62,18 @@ def main():
 			if not os.path.isdir(args.workdir):
 				os.mkdir(args.workdir)
 				print str(args.workdir) + ' directory created!'
+			
+			start_time = time.time()
+			
 			sys.stdout = Logger(args.workdir)
 			checkPrograms(args)
 			runReMaCh(args)
-
-
+			
+			end_time = time.time()
+			time_taken = end_time - start_time
+			hours, rest = divmod(time_taken,3600)
+			minutes, seconds = divmod(rest, 60)
+			print ">>> Runtime :" + str(hours) + "h:" + str(minutes) + "m:" + str(round(seconds, 2)) + "s" + "\n"
 
 def runReMaCh(args):
 
