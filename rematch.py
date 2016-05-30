@@ -8,6 +8,7 @@ import argparse
 from datetime import datetime
 import sys
 import glob
+import time
 
 from downloadAndBowtie import downloadAndBowtie
 from scriptAfterMapping import checkCoverage
@@ -32,7 +33,7 @@ def main():
 	requiredNamed.add_argument('-d', '--workdir', nargs="?", type=str, metavar=('/path/to/workdir'), help='Working directory. Downloaded files will be stored here under sampleID/fastq/, but it can also already contain folders with fastq files. Results will be stored here.', required=False)
 	requiredNamed.add_argument('-gatk', nargs="?", type=str, metavar=('/path/to/gatk.jar'), help='Path for the Genome Analysis Toolkit jar file', required=False)
 	requiredNamed.add_argument('-picard', nargs="?", metavar=('/path/to/picard'), type=str, help='Path for Picard', required=False)
-	requiredNamed.add_argument('-l', nargs="?", metavar=('/path/to/idenfifiersList.txt'), type=str, help='Path to a list with ids to run. IDs can be ENA run accession numbers for download or directory names where fastqs are stored in --workdir. Run accession numbers retrieved from ENA using -tax will be stored here.' , required=False)
+	requiredNamed.add_argument('-l', nargs="?", metavar=('/path/to/identifiersList.txt'), type=str, help='Path to a list with ids to run. IDs can be ENA run accession numbers for download or directory names where fastqs are stored in --workdir. Run accession numbers retrieved from ENA using -tax will be stored here.' , required=False)
 	parser.add_argument('-cov', '--minCoverage', nargs='?', metavar=('N'), type=int, help='Minimum coverage depth required for base calling and SNP calling.', default = 10, required=False)
 	parser.add_argument('-qual', '--minQuality', nargs='?', metavar=('N'), type=int, help='Minimum mapping quality for SNP calling', default = 10, required=False)
 	parser.add_argument('-mul', '--multipleAlleles', nargs='?', metavar=('0.0 - 1.0'), type=float, help='Minimum reads frequency (confidence) of dominant nucleotide to consider absence of multiple alleles at a given SNP position.', default = 0.75, required=False)
