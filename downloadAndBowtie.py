@@ -110,7 +110,6 @@ def downloadAspera(run_id, outdir, asperaKey):
 	aspera, std_out, std_err = runTimeoutLimit(aspera_command, 3600)
 	if aspera == 0:
 		aspera_run = True
-		print ' '.join(aspera_command)
 	else:
 		print "Connecting using the following command didn't work:"
 		print ' '.join(aspera_command)

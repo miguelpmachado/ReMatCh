@@ -68,6 +68,13 @@ def main():
 			
 			sys.stdout = Logger(args.workdir)
 			checkPrograms(args)
+			
+			# Print arguments passed and shell PATH variable
+			print '\n' + 'COMMAND:'
+			print sys.executable + ' ' + os.path.abspath(sys.argv[0]) + ' ' + ' '.join(sys.argv[1:])
+			print '\n' + 'PATH variable:'
+			print os.environ['PATH']
+			
 			runReMaCh(args)
 			
 			end_time = time.time()
