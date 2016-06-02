@@ -122,11 +122,16 @@ def runReMaCh(args):
 		for run_id in run_ids:
 			toClear = []
 			run=False
-			if args.tax and firstLine == True:
-				firstLine = False
-				continue
+			# TESTING
+			# if args.tax and firstLine == True:
+				# firstLine = False
+				# continue
+			# TESTING
 			
-			elif args.tax and platform:
+			# TESTING
+			# elif args.tax and platform:
+			elif platform:
+			# TESTING
 					run_info=run_id.split("\t")
 					run_id=run_info[0]
 					run_plat=run_info[1]
@@ -134,15 +139,17 @@ def runReMaCh(args):
 					if platform in run_plat and not "Analyzer" in run_plat:
 						run=True
 			
-			elif args.tax:
-				run_info=run_id.split("\t")
-				run_id=run_info[0]
-				run_plat=run_info[1]
+			# TESTING
+			# elif args.tax:
+				# run_info=run_id.split("\t")
+				# run_id=run_info[0]
+				# run_plat=run_info[1]
 						
-				run=True
+				# run=True
 			
-			else:
-				run=True
+			# else:
+				# run=True
+			# TESTING
 				
 			if run==True:	
 
