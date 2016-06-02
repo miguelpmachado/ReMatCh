@@ -63,8 +63,8 @@ def GetSequencesFromTaxon(taxonname,outputfile,getmachine):
 				n+=1
 				
 
+				length_line = 0
 				if getmachine is True:
-					length_line = 0
 					for child2 in child:
 						if child2.tag == 'EXPERIMENT_REF':
 							expid=child2.get('accession')
@@ -91,6 +91,8 @@ def GetSequencesFromTaxon(taxonname,outputfile,getmachine):
 									
 					f.write(str(runid)+"\t"+model+"\t"+prjid+"\n")
 					line = "run acession %s sequenced on %s from project %s" % (runid, model,prjid)
+					if length_line < len(line):
+						length_line = len(line)
 					sys.stderr.write("\r" + line + ' '*(length_line - len(line)))
 					sys.stderr.flush()
 				else:
