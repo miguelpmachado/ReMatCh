@@ -63,7 +63,7 @@ def main():
 			mergeResultsOutdir = os.path.abspath(args.mergeResultsOutdir[0])
 		
 		sys.stdout = Logger(mergeResultsOutdir)
-		# print '\n' + 'LOGFILE: ' + sys.stdout.getLogFile()
+		print '\n' + 'LOGFILE: ' + sys.stdout.getLogFile()
 		
 		# Print arguments passed
 		print '\n' + 'COMMAND:'
@@ -73,7 +73,8 @@ def main():
 	
 	else:
 		sys.stdout = Logger(args.workdir)
-		# print '\n' + 'LOGFILE: ' + sys.stdout.getLogFile()
+		print '\n' + 'LOGFILE: ' + sys.stdout.getLogFile()
+		
 		checkPrograms(args)
 		
 		# Print arguments passed and shell PATH variable
