@@ -126,16 +126,11 @@ def runReMaCh(args):
 		for run_id in run_ids:
 			toClear = []
 			run=False
-			# TESTING
-			# if args.tax and firstLine == True:
-				# firstLine = False
-				# continue
-			# TESTING
+			if args.tax and firstLine == True:
+				firstLine = False
+				continue
 			
-			# TESTING
-			# elif args.tax and platform:
-			if platform:
-			# TESTING
+			elif args.tax and platform:
 					run_info=run_id.split("\t")
 					run_id=run_info[0]
 					run_plat=run_info[1]
@@ -143,17 +138,15 @@ def runReMaCh(args):
 					if platform in run_plat and not "Analyzer" in run_plat:
 						run=True
 			
-			# TESTING
-			# elif args.tax:
-				# run_info=run_id.split("\t")
-				# run_id=run_info[0]
-				# run_plat=run_info[1]
+			elif args.tax:
+				run_info=run_id.split("\t")
+				run_id=run_info[0]
+				run_plat=run_info[1]
 						
-				# run=True
+				run=True
 			
-			# else:
-				# run=True
-			# TESTING
+			else:
+				run=True
 				
 			if run==True:	
 
@@ -167,9 +160,7 @@ def runReMaCh(args):
 				run_id = run_id.strip()
 
 				print "\nRunning ID: " + str(run_id)
-				samFilePath, singOrPaired, filesDownloaded = downloadAndBowtie(args.r, run_id, args.workdir, buildBowtie, args.picard, args.threads, toClear, args.asperaKey) # mpmachado #
-				#print "\n######\ndownloaded and bowtied\n######\n"
-				#logFile.write("\n######\ndownloaded and bowtied\n######\n")
+				samFilePath, singOrPaired, filesDownloaded = downloadAndBowtie(args.r, run_id, args.workdir, buildBowtie, args.picard, args.threads, toClear, args.asperaKey)
 				
 				if not samFilePath==False:
 				
@@ -177,18 +168,13 @@ def runReMaCh(args):
 
 					rawCoverage(sortedPath, toClear)
 					print "Checking coverage..."
-					#logFile.write("\nChecking coverage...")
 					sequenceNames, sequenceMedObject = checkCoverage(sortedPath, args.minCoverage,args.xtraSeq, toClear)
 					print "Performing Allele Call..."
-					#logFile.write("\nPerforming Allele Call...")
 					alleleCalling(sortedPath, args.r, sequenceNames, args.gatk, run_id, args.minQuality, args.minCoverage, args.multipleAlleles, sequenceMedObject,args.xtraSeq, toClear)
 					print str(run_id) + " DONE" 
-					#logFile.write(str(run_id) + " DONE")
 					
 					
 					gzSizes = 0
-
-					#filesToRemove = glob.glob(os.path.join(args.workdir, run_id, 'downloads'))
 
 					for files in filesDownloaded:
 						gzSizes += float(os.path.getsize(os.path.join(args.workdir, run_id, 'fastq',files)))
