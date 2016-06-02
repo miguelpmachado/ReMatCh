@@ -53,15 +53,35 @@ def main():
 	mergedResults.add_argument('--mergeResultsOutdir', nargs=1, metavar=('/path/to/Results/Outdir/'), type=str, help='Specify a different directory from --workdir to output the merged results (otherwise merged results will be stored in --workdir). To be used with --mergeResults', required=False, default=None)
 
 	args = parser.parse_args()
-
+	
+	start_time = time.time()
+	
 	if args.mergeResults:
 		if args.mergeResultsOutdir == None:
-			mergeResultsOutdir = args.mergeResults[0]
+			mergeResultsOutdir = os.path.abspath(args.mergeResults[0])
 		else:
-			mergeResultsOutdir = args.mergeResultsOutdir[0]
-		print 'Running mergeResults with --mergeResults ' + str(args.mergeResults[0]) + ', --sequenceCoverage '+ str(args.sequenceCoverage) + ' and --mergeResultsOutdir '+ str(args.mergeResultsOutdir)
+			mergeResultsOutdir = os.path.abspath(args.mergeResultsOutdir[0])
+		
+		sys.stdout = Logger(mergeResultsOutdir)
+		print '\n' + 'LOGFILE: ' + sys.stdout.getLogFile()
+		
+		# Print arguments passed
+		print '\n' + 'COMMAND:'
+		print sys.executable + ' ' + os.path.abspath(sys.argv[0]) + ' ' + ' '.join(sys.argv[1:])
+		
 		mergeResults(args.mergeResults[0], args.sequenceCoverage, mergeResultsOutdir)
+	
 	else:
+		sys.stdout = Logger(args.workdir)
+		print '\n' + 'LOGFILE: ' + sys.stdout.getLogFile()
+		checkPrograms(args)
+		
+		# Print arguments passed and shell PATH variable
+		print '\n' + 'COMMAND:'
+		print sys.executable + ' ' + os.path.abspath(sys.argv[0]) + ' ' + ' '.join(sys.argv[1:])
+		print '\n' + 'PATH variable:'
+		print os.environ['PATH']
+		
 		if not args.r or not args.workdir or not args.gatk or not args.picard or not args.l:
 			parser.error('You must pass all the required arguments. For more information type -h')
 		else:
@@ -69,24 +89,13 @@ def main():
 				os.mkdir(args.workdir)
 				print str(args.workdir) + ' directory created!'
 			
-			start_time = time.time()
-			
-			sys.stdout = Logger(args.workdir)
-			checkPrograms(args)
-			
-			# Print arguments passed and shell PATH variable
-			print '\n' + 'COMMAND:'
-			print sys.executable + ' ' + os.path.abspath(sys.argv[0]) + ' ' + ' '.join(sys.argv[1:])
-			print '\n' + 'PATH variable:'
-			print os.environ['PATH']
-			
 			runReMaCh(args)
 			
-			end_time = time.time()
-			time_taken = end_time - start_time
-			hours, rest = divmod(time_taken,3600)
-			minutes, seconds = divmod(rest, 60)
-			print ">>> Runtime :" + str(hours) + "h:" + str(minutes) + "m:" + str(round(seconds, 2)) + "s" + "\n"
+	end_time = time.time()
+	time_taken = end_time - start_time
+	hours, rest = divmod(time_taken,3600)
+	minutes, seconds = divmod(rest, 60)
+	print ">>> Runtime :" + str(hours) + "h:" + str(minutes) + "m:" + str(round(seconds, 2)) + "s" + "\n"
 
 def runReMaCh(args):
 

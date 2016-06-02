@@ -9,12 +9,14 @@ import csv
 import numpy
 import shlex, subprocess,ftplib
 import os.path
+import time
 
 class Logger(object):
 	def __init__(self, out_directory):
-		self.logfile = os.path.join(out_directory, "run.log")
+		time_str = time.strftime("%Y%m%d-%H%M%S")
+		self.logfile = os.path.join(out_directory, str('run.' + time_str + '.log'))
 		if os.path.isfile(self.logfile):
-			print "\nLogfile already exists! It will be overwritten..." + "\n"
+			print '\n' + 'Logfile already exists! It will be overwritten...'
 		self.terminal = sys.stdout
 		self.log = open(self.logfile, "w")
 	def write(self, message):
@@ -23,8 +25,8 @@ class Logger(object):
 		self.log.flush()
 	def flush(self):
 		pass
-
-
+	def getLogFile(self):
+		return self.logfile
 
 def createCheckFile(bamSortedPath, sequenceMedObject):
 
