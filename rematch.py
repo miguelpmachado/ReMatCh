@@ -58,7 +58,7 @@ def main():
 		if args.mergeResultsOutdir == None:
 			mergeResultsOutdir = args.mergeResults[0]
 		else:
-			mergeResultsOutdir = args.mergeResultsOutdir
+			mergeResultsOutdir = args.mergeResultsOutdir[0]
 		print 'Running mergeResults with --mergeResults ' + str(args.mergeResults[0]) + ', --sequenceCoverage '+ str(args.sequenceCoverage) + ' and --mergeResultsOutdir '+ str(args.mergeResultsOutdir)
 		mergeResults(args.mergeResults[0], args.sequenceCoverage, mergeResultsOutdir)
 	else:
