@@ -50,12 +50,17 @@ def main():
 	mergedResults = parser.add_argument_group('merge results arguments. To be used after ReMatCh run')
 	mergedResults.add_argument('--mergeResults', nargs=1, metavar=('/path/to/workdir'), type=str, help='Merge all ReMatCh results available at --workdir. Option to be used alone or with --sequenceCoverage.', required=False)
 	mergedResults.add_argument('--sequenceCoverage', nargs=1, metavar=('0.0 - 1.0'), type=float, help='Minimum sequence length to consider the gene to be present. This is a relative measure. To be used with --mergeResults', default=0.8, required=False)
+	mergedResults.add_argument('--mergeResultsOutdir', nargs=1, metavar=('/path/to/Results/Outdir/'), type=str, help='Specify a different directory from --workdir to output the merged results (otherwise merged results will be stored in --workdir). To be used with --mergeResults', required=False, default=None)
 
 	args = parser.parse_args()
 
 	if args.mergeResults:
-		print 'Running mergeResults with --mergeResults ' + str(args.mergeResults[0]) + ' and --sequenceCoverage '+ str(args.sequenceCoverage)
-		mergeResults(args.mergeResults[0], args.sequenceCoverage)
+		if args.mergeResultsOutdir == None:
+			mergeResultsOutdir = args.mergeResults[0]
+		else:
+			mergeResultsOutdir = args.mergeResultsOutdir
+		print 'Running mergeResults with --mergeResults ' + str(args.mergeResults[0]) + ', --sequenceCoverage '+ str(args.sequenceCoverage) + ' and --mergeResultsOutdir '+ str(args.mergeResultsOutdir)
+		mergeResults(args.mergeResults[0], args.sequenceCoverage, mergeResultsOutdir)
 	else:
 		if not args.r or not args.workdir or not args.gatk or not args.picard or not args.l:
 			parser.error('You must pass all the required arguments. For more information type -h')
