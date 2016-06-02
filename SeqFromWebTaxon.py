@@ -32,7 +32,7 @@ def main():
 
 def GetSequencesFromTaxon(taxonname,outputfile,getmachine, getOmicsDataType):
 
-	
+	omics_type = []
 	taxonname=urllib.quote(taxonname)
 	url="http://www.ebi.ac.uk/ena/data/view/Taxon%3A"+taxonname+"&display=xml"
 	try:
@@ -95,6 +95,8 @@ def GetSequencesFromTaxon(taxonname,outputfile,getmachine, getOmicsDataType):
 														for child6 in child5:
 															if child6.tag == 'LIBRARY_SOURCE':
 																omics = child6.text
+																if omics not in omics_type:
+																	omics_type.append(omics)
 							except:
 								model='not found'
 								omics = 'not found'
@@ -116,7 +118,7 @@ def GetSequencesFromTaxon(taxonname,outputfile,getmachine, getOmicsDataType):
 		
 	else:
 		print "taxon name does not exist"	
-	
+	print(omics_type)
 	
 if __name__ == "__main__":
 	main()
