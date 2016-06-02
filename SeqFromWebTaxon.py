@@ -69,15 +69,15 @@ def GetSequencesFromTaxon(taxonname,outputfile,getmachine):
 						if child2.tag == 'EXPERIMENT_REF':
 							expid=child2.get('accession')
 							url2="http://www.ebi.ac.uk/ena/data/view/"+expid+"&display=xml"
-							# TESTING
-							print url2
-							time.sleep(30)
-							# TESTING
 							content = urllib2.urlopen(url2)
 							xml = content.read()
 							tree2 = ET.fromstring(xml)
 							try:
 								for child3 in tree2:
+									# TESTING
+									print child3
+									time.sleep(10)
+									# TESTING
 									#print child3
 									for child4 in child3:
 										#print child4
