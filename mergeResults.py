@@ -8,6 +8,9 @@ def mergeResults(workdir, sequenceCoverage, outdir):
 
 	#sampleList = os.listdir(workdir)
 	dirs = [d for d in os.listdir(workdir) if os.path.isdir(os.path.join(workdir, d))]
+	
+	print '\n' + 'Analysing ' + str(len(dirs)) + ' samples' + '\n'
+	
 	sampledict = {}
 	consensusdict = {}
 	prevNameSeq = ''
@@ -16,8 +19,8 @@ def mergeResults(workdir, sequenceCoverage, outdir):
 	for i in dirs:
 		countdirs+=1
 		time.sleep(0.1)
-		sys.stdout.write("\rChecking " + str(countdirs) + " of " + str(len(dirs)) + " folders...")
-		sys.stdout.flush()
+		sys.stderr.write("\rChecking " + str(countdirs) + " of " + str(len(dirs)) + " folders...")
+		sys.stderr.flush()
 		sampleName = os.path.basename(i)
 		mappingFilePath = os.path.join(workdir, sampleName, 'rematch_results', sampleName+'_mappingCheck.tab')
 		consensusFilePath = os.path.join(workdir, sampleName, 'rematch_results', sampleName+'_sequences.fasta')
@@ -40,25 +43,18 @@ def mergeResults(workdir, sequenceCoverage, outdir):
 				countSequences = -1
 				for line in consensusFile:
 					line = line.splitlines()[0]
-					# if '>' in line:
 					if line.startswith('>'):
 						nameseq = line[1:]
 						prevNameSeq = nameseq
 						nameseq = nameseq.replace(' ', '_')
 						if nameseq not in consensusdict:
 							consensusdict[nameseq] = []
-							# consensusdict[nameseq].append(['>' + sampleName + '_' + nameseq, False])
 							consensusdict[nameseq].append(['>' + sampleName + '-' + prevNameSeq, ''])
 						else:
-							# consensusdict[nameseq].append(['>' + sampleName + '_' + nameseq, False])
 							consensusdict[nameseq].append(['>' + sampleName + '-' + prevNameSeq, ''])
-						# prevNameSeq = nameseq
 						countSequences=len(consensusdict[nameseq])-1
 					else:
-						#print consensusdict
-						# consensusdict[prevNameSeq][countSequences][1] = line 
 						consensusdict[nameseq][countSequences][1] = consensusdict[nameseq][countSequences][1] + line
-						#print consensusdict[prevNameSeq][countSequences]
 	print "\nWriting results..."
 	
 	if not os.path.exists(os.path.join(outdir, 'merged_results')):
@@ -86,7 +82,6 @@ def mergeResults(workdir, sequenceCoverage, outdir):
 
 	
 	for x in consensusdict:
-		# with open(os.path.join(workdir, 'merged_results', 'consensus_sequences', x.strip('\n').strip(' ') + '_merged_sequences.fasta'),'w') as sequenceResults:
 		with open(os.path.join(outdir, 'merged_results', 'consensus_sequences', x + '_merged_sequences.fasta'),'w') as sequenceResults:
 			for z in consensusdict[x]:
 				sequenceResults.write(z[0] + '\n')
