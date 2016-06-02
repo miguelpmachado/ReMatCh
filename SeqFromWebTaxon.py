@@ -102,7 +102,6 @@ def GetSequencesFromTaxon(taxonname,outputfile,getmachine):
 						length_line = len(line)
 					sys.stderr.write("\r" + line + ' '*(length_line - len(line)))
 					sys.stderr.flush()
-					length_line = len(line)
 		print "\n"
 		print "\nfound %s run id's" % n
 		
