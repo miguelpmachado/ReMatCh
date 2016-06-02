@@ -23,8 +23,8 @@ class Logger(object):
 		self.terminal.write(message)
 		self.log.write(message)
 		self.log.flush()
-	# def flush(self):
-		# pass
+	def flush(self):
+		pass
 	def getLogFile(self):
 		return self.logfile
 
