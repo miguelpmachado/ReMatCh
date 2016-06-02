@@ -68,6 +68,8 @@ def main():
 		# Print arguments passed
 		print '\n' + 'COMMAND:'
 		print sys.executable + ' ' + os.path.abspath(sys.argv[0]) + ' ' + ' '.join(sys.argv[1:])
+		print '\n' + 'DIRECTORY:'
+		print os.getcwd()
 		
 		mergeResults(args.mergeResults[0], args.sequenceCoverage, mergeResultsOutdir)
 	
@@ -80,6 +82,8 @@ def main():
 		# Print arguments passed and shell PATH variable
 		print '\n' + 'COMMAND:'
 		print sys.executable + ' ' + os.path.abspath(sys.argv[0]) + ' ' + ' '.join(sys.argv[1:])
+		print '\n' + 'DIRECTORY:'
+		print os.getcwd()
 		print '\n' + 'PATH variable:'
 		print os.environ['PATH']
 		
@@ -130,7 +134,7 @@ def runReMaCh(args):
 			
 			# TESTING
 			# elif args.tax and platform:
-			elif platform:
+			if platform:
 			# TESTING
 					run_info=run_id.split("\t")
 					run_id=run_info[0]
