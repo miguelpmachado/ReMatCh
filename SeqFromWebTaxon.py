@@ -91,13 +91,14 @@ def GetSequencesFromTaxon(taxonname,outputfile,getmachine):
 									
 					f.write(str(runid)+"\t"+model+"\t"+prjid+"\n")
 					line = "run acession %s sequenced on %s from project %s" % (runid, model,prjid)
-					sys.stderr.write("\r" + line + ' '*max((length_line - len(line)), 0))
+					sys.stderr.write("\r" + line + ' '*(length_line - len(line)))
 					sys.stderr.flush()
-					length_line = len(line)
 				else:
 					f.write(str(runid)+"\n")
 					line = "run acession %s" % (runid,prjid)
-					sys.stderr.write("\r" + line + ' '*max((length_line - len(line)), 0))
+					if length_line < len(line):
+						length_line = len(line)
+					sys.stderr.write("\r" + line + ' '*(length_line - len(line)))
 					sys.stderr.flush()
 					length_line = len(line)
 		print "\n"
