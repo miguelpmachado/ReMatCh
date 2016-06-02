@@ -23,10 +23,12 @@ class Logger(object):
 		self.terminal.write(message)
 		self.log.write(message)
 		self.log.flush()
+		self.log.getLogFile()
 	def flush(self):
 		pass
 	def getLogFile(self):
-		return self.logfile
+		print '\n' + 'LOGFILE: ' + self.logfile
+
 
 def createCheckFile(bamSortedPath, sequenceMedObject):
 
