@@ -41,10 +41,10 @@ def main():
 	parser.add_argument('-tax', nargs='?', metavar=('"Streptococcus pneumoniae"'), type=str, help='Name taxon to download sequences. Results will be stored in /path/to/idenfifiersList.txt', required=False)
 	parser.add_argument('-xtraSeq', nargs='?', type=int, help='For trimming extra sequence lenght 5\' and 3\' ', required=False, default = 0)
 	parser.add_argument('--asperaKey', nargs=1, type=str, metavar='/path/to/asperaweb_id_dsa.openssh', help='Tells ReMatCh to download run files from ENA using Aspera Connect. The path to Private-key file asperaweb_id_dsa.openssh normaly found in ~/.aspera/connect/etc/asperaweb_id_dsa.openssh needs to be provided.', required=False, default=None) ## mpmachado ##
-	parser.add_argument('-bowtieBuild', help='Run build bowtie', action='store_true')
-	parser.add_argument('-clean', help='Clean intermediate files produced by the application (.bam, .vcf, index files, coverage file)', action='store_true')
-	parser.add_argument('-rmFastq', help='Remove fastq files after the analysis', action='store_true')
-	parser.add_argument('-allplat', help='Use all platforms. By default, only Illumina runs are used', action='store_true')
+	parser.add_argument('-bowtieBuild', help='Run build bowtie', action='store_true', required=False)
+	parser.add_argument('-clean', help='Clean intermediate files produced by the application (.bam, .vcf, index files, coverage file)', action='store_true', required=False)
+	parser.add_argument('-rmFastq', help='Remove fastq files after the analysis', action='store_true', required=False)
+	parser.add_argument('-allplat', help='Use all platforms. By default, only Illumina runs are used', action='store_true', required=False)
 
 	#Merge results
 	mergedResults = parser.add_argument_group('merge results arguments. To be used after ReMatCh run')
@@ -107,7 +107,7 @@ def runReMaCh(args):
 	toClear = []
 
 	if args.tax:
-		GetSequencesFromTaxon(args.tax,args.l,True)
+		GetSequencesFromTaxon(args.tax, args.l, True, True)
 	
 	if not args.allplat:
 		platform="Illumina"

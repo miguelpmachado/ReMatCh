@@ -15,6 +15,7 @@ def main():
 	parser.add_argument('-i', nargs='?', type=str, help='taxon name', required=True)
 	parser.add_argument('-o', nargs='?', type=str, help='output file name', required=True)
 	parser.add_argument('-g', nargs='?', type=bool, help='True to include sequencing machine in the output', required=False)
+	parser.add_argument('--getOmicsDataType', help='Informs the programme to include OMICS data type (GENOMIC / TRANSCRIPTOMIC / etc) in the output', action='store_true', required=False)
 
 
 
@@ -27,8 +28,9 @@ def main():
 		getmachine = False
 	taxonname = args.i
 	outputfile = args.o
+	getOmicsDataType = args.getOmicsDataType
 
-def GetSequencesFromTaxon(taxonname,outputfile,getmachine):
+def GetSequencesFromTaxon(taxonname,outputfile,getmachine, getOmicsDataType):
 
 	
 	taxonname=urllib.quote(taxonname)
@@ -58,13 +60,14 @@ def GetSequencesFromTaxon(taxonname,outputfile,getmachine):
 			prjid=''
 			models={}
 			length_line = 0
+			omics = ''
 			for child in tree:
 				runid=child.get('accession')
 				
 				n+=1
 				
 
-				if getmachine is True:
+				if getmachine is True or getOmicsDataType:
 					for child2 in child:
 						if child2.tag == 'EXPERIMENT_REF':
 							expid=child2.get('accession')
@@ -74,10 +77,6 @@ def GetSequencesFromTaxon(taxonname,outputfile,getmachine):
 							tree2 = ET.fromstring(xml)
 							try:
 								for child3 in tree2:
-									# TESTING
-									print child3
-									time.sleep(10)
-									# TESTING
 									#print child3
 									for child4 in child3:
 										#print child4
@@ -89,12 +88,18 @@ def GetSequencesFromTaxon(taxonname,outputfile,getmachine):
 														model=child6.text
 										elif child4.tag == 'STUDY_REF':
 											prjid=child4.get('accession')
+										elif child4.tag == 'DESIGN':
+											if getOmicsDataType:
+												for child5 in child4:
+													if child5.tag == 'LIBRARY_DESCRIPTOR':
+														for child6 in child5:
+															if child6.tag == 'LIBRARY_SOURCE':
+																omics = child6.text
 							except:
 								model='not found'
-					
-									
-					f.write(str(runid)+"\t"+model+"\t"+prjid+"\n")
-					line = "run acession %s sequenced on %s from project %s" % (runid, model,prjid)
+								omics = 'not found'
+					f.write(str(runid)+"\t"+model+"\t"+prjid+"\t"+omics+"\n")
+					line = "run acession %s sequenced on %s from project %s for %s data" % (runid, model, prjid, omics)
 					if length_line < len(line):
 						length_line = len(line)
 					sys.stderr.write("\r" + line + ' '*(length_line - len(line)))
