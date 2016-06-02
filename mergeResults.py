@@ -39,18 +39,25 @@ def mergeResults(workdir, sequenceCoverage):
 			with open(consensusFilePath, 'r') as consensusFile:
 				countSequences = -1
 				for line in consensusFile:
-					if '>' in line:
+					line = line.splitlines()[0]
+					# if '>' in line:
+					if line.startswith('>'):
 						nameseq = line[1:]
+						prevNameSeq = nameseq
+						nameseq = nameseq.replace(' ', '_')
 						if nameseq not in consensusdict:
 							consensusdict[nameseq] = []
-							consensusdict[nameseq].append(['>' + sampleName + '_' + nameseq, False])
+							# consensusdict[nameseq].append(['>' + sampleName + '_' + nameseq, False])
+							consensusdict[nameseq].append(['>' + sampleName + '-' + prevNameSeq, ''])
 						else:
-							consensusdict[nameseq].append(['>' + sampleName + '_' + nameseq, False])
-						prevNameSeq = nameseq
+							# consensusdict[nameseq].append(['>' + sampleName + '_' + nameseq, False])
+							consensusdict[nameseq].append(['>' + sampleName + '-' + prevNameSeq, ''])
+						# prevNameSeq = nameseq
 						countSequences=len(consensusdict[nameseq])-1
 					else:
 						#print consensusdict
-						consensusdict[prevNameSeq][countSequences][1] = line 
+						# consensusdict[prevNameSeq][countSequences][1] = line 
+						consensusdict[nameseq][countSequences][1] = consensusdict[nameseq][countSequences][1] + line
 						#print consensusdict[prevNameSeq][countSequences]
 	print "\nWriting results..."
 	
@@ -79,20 +86,8 @@ def mergeResults(workdir, sequenceCoverage):
 
 	
 	for x in consensusdict:
-		with open(os.path.join(workdir, 'merged_results', 'consensus_sequences', x.strip('\n').strip(' ') + '_merged_sequences.fasta'),'w') as sequenceResults:
+		# with open(os.path.join(workdir, 'merged_results', 'consensus_sequences', x.strip('\n').strip(' ') + '_merged_sequences.fasta'),'w') as sequenceResults:
+		with open(os.path.join(workdir, 'merged_results', 'consensus_sequences', x + '_merged_sequences.fasta'),'w') as sequenceResults:
 			for z in consensusdict[x]:
-				sequenceResults.write(z[0].strip('\n').strip(' ') + '\n')
-				sequenceResults.write(z[1].strip('\n').strip(' ') + '\n')
-
-	
-						
-
-
-
-
-
-
-	
-
-
-
+				sequenceResults.write(z[0] + '\n')
+				sequenceResults.write(z[1] + '\n')
