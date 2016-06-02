@@ -57,13 +57,13 @@ def GetSequencesFromTaxon(taxonname,outputfile,getmachine):
 			model=''
 			prjid=''
 			models={}
+			length_line = 0
 			for child in tree:
 				runid=child.get('accession')
 				
 				n+=1
 				
 
-				length_line = 0
 				if getmachine is True:
 					for child2 in child:
 						if child2.tag == 'EXPERIMENT_REF':
