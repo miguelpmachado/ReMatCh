@@ -17,6 +17,8 @@ class Logger(object):
 		self.logfile = os.path.join(out_directory, str('run.' + time_str + '.log'))
 		if os.path.isfile(self.logfile):
 			print '\n' + 'Logfile already exists! It will be overwritten...'
+		if not os.path.isdir(out_directory):
+			os.makedirs(out_directory)
 		self.terminal = sys.stdout
 		self.log = open(self.logfile, "w")
 	def write(self, message):
