@@ -47,6 +47,7 @@ def main():
 	parser.add_argument('-clean', help='Clean intermediate files produced by the application (.bam, .vcf, index files, coverage file)', action='store_true', required=False)
 	parser.add_argument('-rmFastq', help='Remove fastq files after the analysis', action='store_true', required=False)
 	parser.add_argument('-allplat', help='Use all platforms. By default, only Illumina runs are used', action='store_true', required=False)
+	parser.add_argument('-v', '--version', action='version', version='%(prog)s v1.1')
 
 	#Merge results
 	mergedResults = parser.add_argument_group('merge results arguments. To be used after ReMatCh run')
