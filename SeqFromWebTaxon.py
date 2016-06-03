@@ -15,7 +15,7 @@ def main():
 	parser.add_argument('-i', nargs='?', type=str, help='taxon name', required=True)
 	parser.add_argument('-o', nargs='?', type=str, help='output file name', required=True)
 	parser.add_argument('-g', nargs='?', type=bool, help='True to include sequencing machine in the output', required=False)
-	parser.add_argument('--getOmicsDataType', help='Informs the programme to include OMICS data type (GENOMIC / TRANSCRIPTOMIC / etc) in the output', action='store_true', required=False)
+	parser.add_argument('--getOmicsDataType', help='Informs the programme to include OMICS data type (GENOMIC / TRANSCRIPTOMIC / SYNTHETIC) in the output', action='store_true', required=False)
 
 
 
@@ -32,7 +32,6 @@ def main():
 
 def GetSequencesFromTaxon(taxonname,outputfile,getmachine, getOmicsDataType):
 
-	omics_type = []
 	taxonname=urllib.quote(taxonname)
 	url="http://www.ebi.ac.uk/ena/data/view/Taxon%3A"+taxonname+"&display=xml"
 	try:
@@ -95,8 +94,6 @@ def GetSequencesFromTaxon(taxonname,outputfile,getmachine, getOmicsDataType):
 														for child6 in child5:
 															if child6.tag == 'LIBRARY_SOURCE':
 																omics = child6.text
-																if omics not in omics_type:
-																	omics_type.append(omics)
 							except:
 								model='not found'
 								omics = 'not found'
@@ -118,7 +115,6 @@ def GetSequencesFromTaxon(taxonname,outputfile,getmachine, getOmicsDataType):
 		
 	else:
 		print "taxon name does not exist"	
-	print(omics_type)
 	
 if __name__ == "__main__":
 	main()
