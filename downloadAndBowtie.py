@@ -142,8 +142,7 @@ def downloadAndBowtie(referencePath, run_id, target_dir, buildBowtie, picardJarP
 
 	if buildBowtie == True:
 		print "Indexing Reference file..."
-		picardFileName, extension = os.path.splitext(referencePath)
-		os.system('java -jar ' + picardJarPath +" CreateSequenceDictionary R= " + referencePath + " O= " + picardFileName + ".dict 2> "+picardFileName+"_picard_out.txt")
+		os.system('java -jar ' + picardJarPath +" CreateSequenceDictionary R= " + referencePath + " O= " + bowtieBuildFileName + ".dict 2> "+bowtieBuildFileName+"_picard_out.txt")
 
 		bowtiBuildeLog=bowtieBuildFileName +"_bowtiBuildLog.txt"
 		myoutput = open(bowtiBuildeLog, 'w')
