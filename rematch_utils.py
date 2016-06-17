@@ -58,39 +58,39 @@ def filter_vcf(pathToVcf, extraSeq, sequenceMedObject):
 
 
 def changeFastaHeadersAndTrimm(FastasequencesFile,TrimmExtraSeq,referencePath):
-	
+
 	headersArray=[]
-	
+
 	with open(referencePath, 'r') as seqFileRef:
 		for line in seqFileRef:
 			if '>' in line:
 				headersArray.append(line)
-			
+
 	with open(FastasequencesFile, 'r') as seqFile:
 		with open(FastasequencesFile+".temp", 'w') as tempFile:
 			tempStr=''
 			headercounter=0
 			for line in seqFile:
-				
+
 				if '>' in line:
-					
+
 					if TrimmExtraSeq!=0 and len(tempStr)>0:
 						tempStr=tempStr[TrimmExtraSeq:len(tempStr)-TrimmExtraSeq]
 					if headercounter>0:
 						tempFile.write(tempStr+"\n")
-						
+
 					tempStr=''
-					
+
 					tempFile.write(headersArray[headercounter])
 					headercounter+=1
-				
+
 				else:
 					tempStr+=line.replace('\n', '').replace('\r', '')
-				
+
 			if TrimmExtraSeq!=0 and len(tempStr)>0:
-				tempStr=tempStr[TrimmExtraSeq:len(tempStr)-TrimmExtraSeq]	
+				tempStr=tempStr[TrimmExtraSeq:len(tempStr)-TrimmExtraSeq]
 			tempFile.write(tempStr)
-			
+
 	os.remove(FastasequencesFile)
 	os.rename(FastasequencesFile+".temp", FastasequencesFile)
 
@@ -98,56 +98,47 @@ def removeFromArray(toClear):
 	for i in toClear:
 		os.system('rm ' + i)
 
-def checkPrograms(args):
-
-	print '\nChecking dependencies...'
+def checkPrograms(programs_version_dictionary):
+	print '\n' + 'Checking dependencies...'
+	programs = programs_version_dictionary
 	which_program = ['which', '']
-	programs = {'bedtools':['>=','2.22'], 'java':['>=', '1.8'], 'samtools':['=', '1.2'], 'bcftools':['=', '1.2'],'bowtie2':['>=','2.2.6'], 'ascp':['>=', '3.6.1']}
 	listMissings = []
 	for program in programs:
-		if program =='ascp' and not args.asperaKey:
-			print 'No aspera key defined, using ftp.'
-			continue
 		which_program[1] = program
 		proc = subprocess.Popen(which_program, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 		stdout,stderr = proc.communicate()
 		if proc.returncode != 0:
 			listMissings.append(program + ' not found in PATH.')
-			#sys.exit(program + ' not found in PATH.')
 		else:
-			if program =='java':
-				check_version = [stdout.strip('\n'), '-version']
+			if programs[program][0] == None:
+				print program + ' (impossible to determine programme version) found at: ' + stdout.splitlines()[0]
 			else:
-				check_version = [stdout.strip('\n'), '--version']
-
-			print program + ' found at: ' + check_version[0]
-			proc = subprocess.Popen(check_version, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-			stdout,stderr = proc.communicate() 
-			if program =='java':
-				stdout = stderr
-			version_line=stdout.split('\n')[0].split(' ')[-1]
-			version_line=version_line.replace('"', '')
-			if 'v' in version_line:
-				version_line=version_line.split('v')[1]
-			elif 'V' in version_line:
-				version_line=version_line.split('V')[1]
-			if programs[program][0] == '>=':
-				program_found_version = version_line.split('.')
-				program_version_required = programs[program][1].split('.')
-				if float('.'.join(program_found_version[0:2])) < float('.'.join(program_version_required[0:2])):
-					listMissings.append('ReMatCh requires ' + program + ' with version ' + programs[program][1] + ' or above.')
-				elif float('.'.join(program_found_version[0:2])) == float('.'.join(program_version_required[0:2])):
-					if len(program_version_required) == 3:
-						if len(program_found_version) == 2:
-							program_found_version.append(0)
-						if program_found_version[2] < program_version_required[2]:
-							listMissings.append('ReMatCh requires ' + program + ' with version ' + programs[program][1] + ' or above.')
-			else:
-				if version_line != programs[program][1]:
-					listMissings.append('ReMatCh requires ' + program + ' with version ' + programs[program][1] + '.')
-
+				check_version = [stdout.splitlines()[0], programs[program][0]]
+				proc = subprocess.Popen(check_version, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+				stdout,stderr = proc.communicate()
+				if stdout == '':
+					stdout = stderr
+				version_line=stdout.splitlines()[0].split(' ')[-1]
+				replace_characters = ['"', 'v', 'V', '+']
+				for i in replace_characters:
+					version_line=version_line.replace(i, '')
+				print program + ' (' + version_line + ') found at: ' + check_version[0]
+				if programs[program][1] == '>=':
+					program_found_version = version_line.split('.')
+					program_version_required = programs[program][2].split('.')
+					if float('.'.join(program_found_version[0:2])) < float('.'.join(program_version_required[0:2])):
+						listMissings.append('It is required ' + program + ' with version ' + programs[program][1] + ' ' + programs[program][2])
+					elif float('.'.join(program_found_version[0:2])) == float('.'.join(program_version_required[0:2])):
+						if len(program_version_required) == 3:
+							if len(program_found_version) == 2:
+								program_found_version.append(0)
+							if program_found_version[2] < program_version_required[2]:
+								listMissings.append('It is required ' + program + ' with version ' + programs[program][1] + ' ' + programs[program][2])
+				else:
+					if version_line != programs[program][2]:
+						listMissings.append('It is required ' + program + ' with version ' + programs[program][1] + ' ' + programs[program][2])
 	if len(listMissings) > 0:
-		sys.exit('\nErrors:\n'+'\n'.join(listMissings) + '\n\nInstall all dependencies and try again.')
+		sys.exit('\n' + 'Errors:' + '\n' + '\n'.join(listMissings))
 
 
 def removeIndexes(referencePath):
@@ -160,9 +151,3 @@ def removeIndexes(referencePath):
 		os.remove(referencePath+'.fai')
 	os.system('rm ' + referenceFileName + ".*.bt2")
 	os.remove(referenceFileName+"_bowtiBuildLog.txt")
-
-
-
-
-
-
