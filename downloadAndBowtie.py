@@ -126,18 +126,18 @@ def searchDownloadedFiles(directory):
 
 def downloadAndBowtie(referencePath, run_id, target_dir, buildBowtie, picardJarPath, threads, toClear, asperaKey):
 
-	bowtieBuildFileName, extension = os.path.splitext(referencePath.name)
+	bowtieBuildFileName, extension = os.path.splitext(referencePath)
 
 	if buildBowtie:
 		print "Indexing Reference file..."
 
 		# Picard
-		picardFileName, extension = os.path.splitext(referencePath.name)
+		picardFileName, extension = os.path.splitext(referencePath)
 		command = ['java', '-jar ', picardJarPath, ' CreateSequenceDictionary', str('R=' + referencePath), str('O=' + picardFileName + '.dict'), '2>', str(picardFileName + '_picard_out.txt')]
 		run_successfully, stdout, stderr = rematch_utils.runCommandPopenCommunicate(command, True, None)
 
 		# Bowtie build
-		command = ["bowtie2-build", referencePath.name, bowtieBuildFileName]
+		command = ["bowtie2-build", referencePath, bowtieBuildFileName]
 		run_successfully, stdout, stderr = rematch_utils.runCommandPopenCommunicate(command, False, None)
 
 	if not os.path.isdir(target_dir):

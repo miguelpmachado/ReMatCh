@@ -82,6 +82,8 @@ def runReMatCh(args, version):
 	ids_no_problems = open(os.path.join(workdir, 'ids_no_problems.txt'), 'w')
 
 	with open(args.l, 'r') as run_ids:
+		reference_file = args.reference
+		reference_file = reference_file.name
 
 		count_runs = 0
 		buildBowtie = True
@@ -130,7 +132,7 @@ def runReMatCh(args, version):
 				run_id = run_id.strip()
 
 				print "\nRunning ID: " + str(run_id)
-				samFilePath, singOrPaired, filesDownloaded = downloadAndBowtie(args.reference.name, run_id, workdir, buildBowtie, args.picard[0], args.threads, toClear, args.asperaKey[0])
+				samFilePath, singOrPaired, filesDownloaded = downloadAndBowtie(reference_file, run_id, workdir, buildBowtie, args.picard[0], args.threads, toClear, args.asperaKey[0])
 
 				if samFilePath is not False:
 
@@ -140,7 +142,7 @@ def runReMatCh(args, version):
 					print "Checking coverage..."
 					sequenceNames, sequenceMedObject = checkCoverage(sortedPath, args.minCoverage, args.xtraSeq, toClear)
 					print "Performing Allele Call..."
-					alleleCalling(sortedPath, args.reference.name, sequenceNames, args.gatk[0], run_id, args.minQuality, args.minCoverage, args.multipleAlleles, sequenceMedObject, args.xtraSeq, toClear)
+					alleleCalling(sortedPath, reference_file, sequenceNames, args.gatk[0], run_id, args.minQuality, args.minCoverage, args.multipleAlleles, sequenceMedObject, args.xtraSeq, toClear)
 					print str(run_id) + " DONE"
 
 					gzSizes = 0
@@ -176,7 +178,7 @@ def runReMatCh(args, version):
 		ids_no_problems.close()
 
 		if args.clean:
-			rematch_utils.removeIndexes(args.reference.name)
+			rematch_utils.removeIndexes(reference_file)
 
 
 if __name__ == "__main__":
