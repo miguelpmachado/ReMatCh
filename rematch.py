@@ -1,13 +1,32 @@
 #!/usr/bin/env python
 
+# -*- coding: utf-8 -*-
+
+"""
+ReMatCh
+<https://github.com/bfrgoncalves/ReMatCh>
+
+Copyright (C) 2016 Bruno Gonçalves <bfgoncalves@medicina.ulisboa.pt>
+
+Last modified: July 04, 2016
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+"""
+
 import os
 import shutil
-from os import listdir
-from os.path import isfile, join
-import argparse
 from datetime import datetime
-import sys
-import glob
 import time
 
 from downloadAndBowtie import downloadAndBowtie
@@ -16,114 +35,51 @@ from scriptAfterMapping import convertToBAM
 from scriptAfterMapping import rawCoverage
 from scriptAfterMapping import alleleCalling
 from SeqFromWebTaxon import GetSequencesFromTaxon
-from rematch_utils import removeFromArray
-from rematch_utils import checkPrograms
-from mergeResults import mergeResults
-from rematch_utils import Logger
-from rematch_utils import removeIndexes
+import rematch_utils
 
 
 def main():
-
-	parser = argparse.ArgumentParser(prog='rematch.py', description="ReMatCh is an application which combines a set of bioinformatic tools for reads mapping against a reference, finds the allelic variants and produces a consensus sequence. It also allows direct sample download from ENA database to be used in the analysis.", formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-	requiredNamed = parser.add_argument_group('required arguments')
-
-	#parser.add_argument('-s', nargs='?', type=str, help="sam file path", required=True)
-	requiredNamed.add_argument('-r', nargs="?", type=str, metavar=('/path/reference.fasta'), help='Path for the reference sequence', required=False)
-	requiredNamed.add_argument('-d', '--workdir', nargs="?", type=str, metavar=('/path/to/workdir'), help='Working directory. Downloaded files will be stored here under sampleID/fastq/, but it can also already contain folders with fastq files. Results will be stored here.', required=False)
-	requiredNamed.add_argument('-gatk', nargs="?", type=str, metavar=('/path/to/gatk.jar'), help='Path for the Genome Analysis Toolkit jar file', required=False)
-	requiredNamed.add_argument('-picard', nargs="?", metavar=('/path/to/picard'), type=str, help='Path for Picard', required=False)
-	requiredNamed.add_argument('-l', nargs="?", metavar=('/path/to/identifiersList.txt'), type=str, help='Path to a list with ids to run. IDs can be ENA run accession numbers for download or directory names where fastqs are stored in --workdir. Run accession numbers retrieved from ENA using -tax will be stored here.' , required=False)
-	parser.add_argument('-cov', '--minCoverage', nargs='?', metavar=('N'), type=int, help='Minimum coverage depth required for base calling and SNP calling.', default = 10, required=False)
-	parser.add_argument('-qual', '--minQuality', nargs='?', metavar=('N'), type=int, help='Minimum mapping quality for SNP calling', default = 10, required=False)
-	parser.add_argument('-mul', '--multipleAlleles', nargs='?', metavar=('0.0 - 1.0'), type=float, help='Minimum reads frequency (confidence) of dominant nucleotide to consider absence of multiple alleles at a given SNP position.', default = 0.75, required=False)
-	parser.add_argument('-threads', nargs='?', metavar=('N'), type=int, help='Number of threads used to run bowtie2', required=False, default= 1)
-	parser.add_argument('-tax', nargs='?', metavar=('"Streptococcus pneumoniae"'), type=str, help='Name taxon to download sequences. Results will be stored in /path/to/idenfifiersList.txt', required=False)
-	parser.add_argument('--asperaKey', nargs=1, type=str, metavar='/path/to/asperaweb_id_dsa.openssh', help='Tells ReMatCh to download run files from ENA using Aspera Connect. The path to Private-key file asperaweb_id_dsa.openssh normaly found in ~/.aspera/connect/etc/asperaweb_id_dsa.openssh needs to be provided.', required=False, default=None)
-	# AQUI
-	parser.add_argument('--getSpecificOMICSdata', nargs='?', type=int, help='For trimming extra sequence lenght 5\' and 3\' ', required=False, default = None)
-	parser.add_argument('--asperaKey', nargs=1, type=str, metavar='/path/to/asperaweb_id_dsa.openssh', help='Tells ReMatCh to download run files from ENA using Aspera Connect. The path to Private-key file asperaweb_id_dsa.openssh normaly found in ~/.aspera/connect/etc/asperaweb_id_dsa.openssh needs to be provided.', required=False, default=None)
-	parser.add_argument('-bowtieBuild', help='Run build bowtie', action='store_true', required=False)
-	parser.add_argument('-clean', help='Clean intermediate files produced by the application (.bam, .vcf, index files, coverage file)', action='store_true', required=False)
-	parser.add_argument('-rmFastq', help='Remove fastq files after the analysis', action='store_true', required=False)
-	parser.add_argument('-allplat', help='Use all platforms. By default, only Illumina runs are used', action='store_true', required=False)
-	parser.add_argument('-v', '--version', action='version', version='%(prog)s v1.1')
-
-	#Merge results
-	mergedResults = parser.add_argument_group('merge results arguments. To be used after ReMatCh run')
-	mergedResults.add_argument('--mergeResults', nargs=1, metavar=('/path/to/workdir'), type=str, help='Merge all ReMatCh results available at --workdir. Option to be used alone or with --sequenceCoverage.', required=False)
-	mergedResults.add_argument('--sequenceCoverage', nargs=1, metavar=('0.0 - 1.0'), type=float, help='Minimum sequence length to consider the gene to be present. This is a relative measure. To be used with --mergeResults', default=0.8, required=False)
-	mergedResults.add_argument('--mergeResultsOutdir', nargs=1, metavar=('/path/to/Results/Outdir/'), type=str, help='Specify a different directory from --workdir to output the merged results (otherwise merged results will be stored in --workdir). To be used with --mergeResults', required=False, default=None)
-
-	args = parser.parse_args()
-
 	start_time = time.time()
 
-	if args.mergeResults:
-		if args.mergeResultsOutdir == None:
-			mergeResultsOutdir = os.path.abspath(args.mergeResults[0])
-		else:
-			mergeResultsOutdir = os.path.abspath(args.mergeResultsOutdir[0])
+	version = '1.1'
 
-		sys.stdout = Logger(mergeResultsOutdir)
-		print '\n' + 'LOGFILE: ' + sys.stdout.getLogFile()
+	args = rematch_utils.parseArguments(version)
 
-		# Print arguments passed
-		print '\n' + 'COMMAND:'
-		print sys.executable + ' ' + os.path.abspath(sys.argv[0]) + ' ' + ' '.join(sys.argv[1:])
-		print '\n' + 'DIRECTORY:'
-		print os.getcwd()
-
-		mergeResults(args.mergeResults[0], args.sequenceCoverage, mergeResultsOutdir)
-
-	else:
-		sys.stdout = Logger(args.workdir)
-		print '\n' + 'LOGFILE: ' + sys.stdout.getLogFile()
-
-		# Check programs version
-		programs_version_dictionary = {'bedtools':['--version', '>=','2.22'], 'java':['-version', '>=', '1.8'], 'samtools':['--version', '==', '1.2'], 'bcftools':['--version', '==', '1.2'], 'bowtie2':['--version', '>=', '2.2.6']}
-		if args.asperaKey not None:
-			programs_version_dictionary['ascp'] = ['--version', '>=', '3.6.1']
-		checkPrograms(programs_version_dictionary)
-
-		# Print arguments passed and shell PATH variable
-		print '\n' + 'COMMAND:'
-		print sys.executable + ' ' + os.path.abspath(sys.argv[0]) + ' ' + ' '.join(sys.argv[1:])
-		print '\n' + 'DIRECTORY:'
-		print os.getcwd()
-		print '\n' + 'PATH variable:'
-		print os.environ['PATH']
-
-		if not args.r or not args.workdir or not args.gatk or not args.picard or not args.l:
-			parser.error('You must pass all the required arguments. For more information type -h')
-		else:
-			if not os.path.isdir(args.workdir):
-				os.mkdir(args.workdir)
-				print str(args.workdir) + ' directory created!'
-
-			runReMaCh(args)
+	args.func(args, version)
 
 	end_time = time.time()
 	time_taken = end_time - start_time
-	hours, rest = divmod(time_taken,3600)
+	hours, rest = divmod(time_taken, 3600)
 	minutes, seconds = divmod(rest, 60)
 	print ">>> Runtime :" + str(hours) + "h:" + str(minutes) + "m:" + str(round(seconds, 2)) + "s" + "\n"
 
-def runReMaCh(args):
+
+def runReMatCh(args, version):
+	workdir = args.workdir[0]
+
+	# Create working directory
+	rematch_utils.check_create_directory(workdir)
+
+	# Start logger
+	logfile = rematch_utils.start_logger(workdir)
+
+	# Get general information
+	rematch_utils.general_information(logfile, version)
+
+	rematch_utils.checkPrograms(args)
 
 	toClear = []
 
-	if args.tax:
-		GetSequencesFromTaxon(args.tax, args.l, True, True)
+	if args.tax[0]:
+		GetSequencesFromTaxon(args.tax[0], args.l, True, True)
 
 	if not args.allplat:
-		platform="Illumina"
+		platform = "Illumina"
 	else:
-		platform=''
+		platform = None
 
-	ids_with_problems = open(os.path.join(args.workdir,'ids_with_problems.txt'), 'w')
-	ids_no_problems = open(os.path.join(args.workdir,'ids_no_problems.txt'), 'w')
-	#logFile = open(os.path.join(args.workdir,'log_file.txt'), 'a')
+	ids_with_problems = open(os.path.join(workdir, 'ids_with_problems.txt'), 'w')
+	ids_no_problems = open(os.path.join(workdir, 'ids_no_problems.txt'), 'w')
 
 	with open(args.l, 'r') as run_ids:
 
@@ -132,30 +88,37 @@ def runReMaCh(args):
 		firstLine = True
 		for run_id in run_ids:
 			toClear = []
-			run=False
-			if args.tax and firstLine == True:
+			run = False
+
+			if args.tax[0] is not None and firstLine is True:
 				firstLine = False
 				continue
+			elif args.tax[0] is not None and platform is not None:
+					run_info = run_id.split("\t")
+					run_id = run_info[0]
+					run_plat = run_info[1]
 
-			elif args.tax and platform:
-					run_info=run_id.split("\t")
-					run_id=run_info[0]
-					run_plat=run_info[1]
+					if platform in run_plat and 'Analyzer' not in run_plat:
+						run = True
+			elif args.tax[0]:
+				run_info = run_id.split("\t")
+				run_id = run_info[0]
+				run_plat = run_info[1]
 
-					if platform in run_plat and not "Analyzer" in run_plat:
-						run=True
-
-			elif args.tax:
-				run_info=run_id.split("\t")
-				run_id=run_info[0]
-				run_plat=run_info[1]
-
-				run=True
-
+				run = True
 			else:
-				run=True
+				run = True
 
-			if run==True:
+			if args.tax[0] is not None and run is True:
+				if args.useOmicsDataType[0] == 'All':
+					continue
+				else:
+					run_info = run_id.split("\t")
+					omics = run_info[3]
+					if omics not in args.useOmicsDataType:
+						run = False
+
+			if run:
 
 				startTime = datetime.now()
 
@@ -167,56 +130,53 @@ def runReMaCh(args):
 				run_id = run_id.strip()
 
 				print "\nRunning ID: " + str(run_id)
-				samFilePath, singOrPaired, filesDownloaded = downloadAndBowtie(args.r, run_id, args.workdir, buildBowtie, args.picard, args.threads, toClear, args.asperaKey)
+				samFilePath, singOrPaired, filesDownloaded = downloadAndBowtie(args.reference.name, run_id, workdir, buildBowtie, args.picard[0], args.threads, toClear, args.asperaKey[0])
 
-				if not samFilePath==False:
+				if samFilePath is not False:
 
 					sortedPath = convertToBAM(samFilePath, toClear)
 
 					rawCoverage(sortedPath, toClear)
 					print "Checking coverage..."
-					sequenceNames, sequenceMedObject = checkCoverage(sortedPath, args.minCoverage,args.xtraSeq, toClear)
+					sequenceNames, sequenceMedObject = checkCoverage(sortedPath, args.minCoverage, args.xtraSeq, toClear)
 					print "Performing Allele Call..."
-					alleleCalling(sortedPath, args.r, sequenceNames, args.gatk, run_id, args.minQuality, args.minCoverage, args.multipleAlleles, sequenceMedObject,args.xtraSeq, toClear)
+					alleleCalling(sortedPath, args.reference.name, sequenceNames, args.gatk[0], run_id, args.minQuality, args.minCoverage, args.multipleAlleles, sequenceMedObject, args.xtraSeq, toClear)
 					print str(run_id) + " DONE"
-
 
 					gzSizes = 0
 
 					for files in filesDownloaded:
-						gzSizes += float(os.path.getsize(os.path.join(args.workdir, run_id, 'fastq',files)))
+						gzSizes += float(os.path.getsize(os.path.join(workdir, run_id, 'fastq', files)))
 
 					if args.rmFastq:
-						os.system('rm -r ' + os.path.join(args.workdir, run_id, 'fastq'))
+						shutil.rmtree(os.path.join(workdir, run_id, 'fastq'))
 
 					ids_no_problems.write(run_id + "\n")
 					ids_no_problems.flush()
 
 					run_time = str(datetime.now() - startTime)
 
-					with open(os.path.join(args.workdir, run_id, run_id + '_runtime.txt'), 'w') as runTimeFile:
+					with open(os.path.join(workdir, run_id, run_id + '_runtime.txt'), 'w') as runTimeFile:
 						runTimeFile.write("#runTime\tfileSize\tlibraryLayout\n")
-						runTimeFile.write(str(run_time) + '\t' + str(gzSizes) +"\t"+singOrPaired+ '\n')
+						runTimeFile.write(str(run_time) + '\t' + str(gzSizes) + "\t" + singOrPaired + '\n')
 				else:
 					ids_with_problems.write(run_id + "\n")
 					ids_with_problems.flush()
 					if args.rmFastq:
 						try:
-							shutil.rmtree(os.path.join(args.workdir, run_id, 'fastq'))
+							shutil.rmtree(os.path.join(workdir, run_id, 'fastq'))
 						except Exception as e:
 							print e
 					print run_id + ' - An error has occurred.'
 
 			if args.clean:
-				removeFromArray(toClear)
+				rematch_utils.removeFromArray(toClear)
 
 		ids_with_problems.close()
 		ids_no_problems.close()
 
 		if args.clean:
-			removeIndexes(args.r)
-
-
+			rematch_utils.removeIndexes(args.reference.name)
 
 
 if __name__ == "__main__":

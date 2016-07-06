@@ -1,30 +1,51 @@
 import os
 import csv
 import sys
-import time
+import rematch_utils
+
+
+def runMergeResults(args, version):
+
+	# Setting working directory
+	if args.mrOutdir is None:
+		workdir = os.path.abspath(os.path.join(args.mrWorkdir[0], ''))
+	else:
+		workdir = os.path.abspath(os.path.join(args.mrOutdir[0], ''))
+
+	# Create working directory
+	rematch_utils.check_create_directory(workdir)
+
+	# Start logger
+	logfile = rematch_utils.start_logger(workdir)
+
+	# Get general information
+	rematch_utils.general_information(logfile, version)
+
+	mergeResults(args.mrWorkdir[0], args.mrSequenceCoverage[0], workdir)
 
 
 def mergeResults(workdir, sequenceCoverage, outdir):
 
-	#sampleList = os.listdir(workdir)
+	# sampleList = os.listdir(workdir)
 	dirs = [d for d in os.listdir(workdir) if os.path.isdir(os.path.join(workdir, d))]
-	
+
 	print '\n' + 'Analysing ' + str(len(dirs)) + ' samples' + '\n'
-	
+
 	sampledict = {}
 	consensusdict = {}
 	prevNameSeq = ''
 	countdirs = 0
 
 	for i in dirs:
-		countdirs+=1
-		time.sleep(0.1)
+		countdirs += 1
+		# time.sleep(0.1)
 		sys.stderr.write("\rChecking " + str(countdirs) + " of " + str(len(dirs)) + " folders...")
 		sys.stderr.flush()
 		sampleName = os.path.basename(i)
-		mappingFilePath = os.path.join(workdir, sampleName, 'rematch_results', sampleName+'_mappingCheck.tab')
-		consensusFilePath = os.path.join(workdir, sampleName, 'rematch_results', sampleName+'_sequences.fasta')
-		if os.path.isfile(mappingFilePath): #parse mappingCheck file
+		mappingFilePath = os.path.join(workdir, sampleName, 'rematch_results', sampleName + '_mappingCheck.tab')
+		consensusFilePath = os.path.join(workdir, sampleName, 'rematch_results', sampleName + '_sequences.fasta')
+		# parse mappingCheck file
+		if os.path.isfile(mappingFilePath):
 			with open(mappingFilePath, 'r') as csvfile:
 				mappingreader = csv.reader(csvfile, delimiter='\t')
 				sampledict[sampleName] = {}
@@ -38,7 +59,8 @@ def mergeResults(workdir, sequenceCoverage, outdir):
 						else:
 							sampledict[sampleName][line[0]] = 'Absent (' + line[8] + ')'
 
-		if os.path.isfile(consensusFilePath): #parse consensus sequences
+		# parse consensus sequences
+		if os.path.isfile(consensusFilePath):
 			with open(consensusFilePath, 'r') as consensusFile:
 				countSequences = -1
 				for line in consensusFile:
@@ -52,16 +74,15 @@ def mergeResults(workdir, sequenceCoverage, outdir):
 							consensusdict[nameseq].append(['>' + sampleName + '-' + prevNameSeq, ''])
 						else:
 							consensusdict[nameseq].append(['>' + sampleName + '-' + prevNameSeq, ''])
-						countSequences=len(consensusdict[nameseq])-1
+						countSequences = len(consensusdict[nameseq]) - 1
 					else:
 						consensusdict[nameseq][countSequences][1] = consensusdict[nameseq][countSequences][1] + line
 	print "\nWriting results..."
-	
+
 	if not os.path.exists(os.path.join(outdir, 'merged_results')):
 		os.makedirs(os.path.join(outdir, 'merged_results'))
 
-	
-	with open(os.path.join(outdir, 'merged_results', 'mergedResults.tab'),'w') as results:
+	with open(os.path.join(outdir, 'merged_results', 'mergedResults.tab'), 'w') as results:
 		firstLine = True
 		header = 'Samples\t'
 
@@ -80,9 +101,8 @@ def mergeResults(workdir, sequenceCoverage, outdir):
 	if not os.path.exists(os.path.join(outdir, 'merged_results', 'consensus_sequences')):
 		os.makedirs(os.path.join(outdir, 'merged_results', 'consensus_sequences'))
 
-	
 	for x in consensusdict:
-		with open(os.path.join(outdir, 'merged_results', 'consensus_sequences', x + '_merged_sequences.fasta'),'w') as sequenceResults:
+		with open(os.path.join(outdir, 'merged_results', 'consensus_sequences', x + '_merged_sequences.fasta'), 'w') as sequenceResults:
 			for z in consensusdict[x]:
 				sequenceResults.write(z[0] + '\n')
 				sequenceResults.write(z[1] + '\n')
