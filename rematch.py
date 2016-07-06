@@ -6,7 +6,7 @@
 ReMatCh
 <https://github.com/bfrgoncalves/ReMatCh>
 
-Copyright (C) 2016 Bruno Gonçalves <bfgoncalves@medicina.ulisboa.pt>
+Copyright (C) 2016 Bruno Goncalves <bfgoncalves@medicina.ulisboa.pt>
 
 Last modified: July 04, 2016
 
