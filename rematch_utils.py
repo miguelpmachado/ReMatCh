@@ -296,9 +296,13 @@ def removeIndexes(referencePath):
 
 	referenceFileName, extension = os.path.splitext(referencePath)
 
-	os.remove(referenceFileName + "_picard_out.txt")
-	os.remove(referenceFileName + ".dict")
+	if os.path.isfile(referenceFileName + '_picard_out.txt'):
+		os.remove(referenceFileName + '_picard_out.txt')
+	if os.path.isfile(referenceFileName + '.dict'):
+		os.remove(referenceFileName + '.dict')
 	if os.path.isfile(referencePath + '.fai'):
 		os.remove(referencePath + '.fai')
-	os.system('rm ' + referenceFileName + ".*.bt2")
-	os.remove(referenceFileName + "_bowtiBuildLog.txt")
+	try:
+		os.system('rm ' + referenceFileName + ".*.bt2")
+	except:
+		print 'It is not possible to remove ".*.bt2" files'
