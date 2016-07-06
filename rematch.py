@@ -29,7 +29,7 @@ import shutil
 from datetime import datetime
 import time
 
-from downloadAndBowtie import downloadAndBowtie
+import downloadAndBowtie
 from scriptAfterMapping import checkCoverage
 from scriptAfterMapping import convertToBAM
 from scriptAfterMapping import rawCoverage
@@ -132,7 +132,7 @@ def runReMatCh(args, version):
 				run_id = run_id.strip()
 
 				print "\nRunning ID: " + str(run_id)
-				samFilePath, singOrPaired, filesDownloaded = downloadAndBowtie(reference_file, run_id, workdir, buildBowtie, args.picard[0], args.threads, toClear, args.asperaKey[0])
+				samFilePath, singOrPaired, filesDownloaded = downloadAndBowtie.downloadAndBowtie(reference_file, run_id, workdir, buildBowtie, args.picard[0], args.threads, toClear, args.asperaKey[0])
 
 				if samFilePath is not False:
 
