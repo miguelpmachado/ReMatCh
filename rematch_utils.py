@@ -30,7 +30,7 @@ def parseArguments(version):
 	rematch_optional.add_argument('-qual', '--minQuality', nargs='?', metavar=('N'), type=int, help='Minimum mapping quality for SNP calling', default=10, required=False)
 	rematch_optional.add_argument('-mul', '--multipleAlleles', nargs='?', metavar=('0.0 - 1.0'), type=float, help='Minimum reads frequency (confidence) of dominant nucleotide to consider absence of multiple alleles at a given SNP position.', default=0.75, required=False)
 	rematch_optional.add_argument('-threads', nargs='?', metavar=('N'), type=int, help='Number of threads used to run bowtie2', required=False, default=1)
-	rematch_optional.add_argument('--tax', nargs='?', metavar=('"Streptococcus pneumoniae"'), type=str, help='Name taxon to download sequences. Results will be stored in /path/to/idenfifiersList.txt', required=False)
+	rematch_optional.add_argument('--tax', nargs=1, metavar=('"Streptococcus pneumoniae"'), type=str, help='Name taxon to download sequences. Results will be stored in /path/to/idenfifiersList.txt', required=False, default=[None])
 	rematch_optional.add_argument('-xtraSeq', nargs='?', type=int, help='For trimming extra sequence lenght 5\' and 3\' ', required=False, default=0)
 	rematch_optional.add_argument('--asperaKey', nargs=1, type=str, metavar='/path/to/asperaweb_id_dsa.openssh', help='Tells ReMatCh to download run files from ENA using Aspera Connect. The path to Private-key file asperaweb_id_dsa.openssh normaly found in ~/.aspera/connect/etc/asperaweb_id_dsa.openssh needs to be provided.', required=False, default=None)
 	rematch_optional.add_argument('-bowtieBuild', help='Run build bowtie', action='store_true')
@@ -64,9 +64,11 @@ def useOmicsDataType(arguments):
 	arguments = arguments.split(',')
 	for argument in arguments:
 		if argument not in possible_choises:
+			print 'Choose from ' + ', '.join(possible_choises)
 			argparse.ArgumentParser.error('Choose from ' + ', '.join(possible_choises))
 	if len(arguments) > 1 and 'ALL' in arguments:
-		argparse.ArgumentParser.error('ALL omics data type should be given alone')
+		print 'ALL data type should be given alone'
+		argparse.ArgumentParser.error('ALL data type should be given alone')
 	else:
 		return list(set(arguments))
 
