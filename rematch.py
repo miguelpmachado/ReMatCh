@@ -82,13 +82,12 @@ def runReMatCh(args, version):
 	ids_no_problems = open(os.path.join(workdir, 'ids_no_problems.txt'), 'w')
 
 	with open(args.l, 'r') as run_ids:
-		reference_file = args.reference
-		reference_file = reference_file.name
+		reference_file = args.reference[0].name
 
 		count_runs = 0
 		buildBowtie = True
 		firstLine = True
-		for run_id in run_ids:
+		for run_id_line in run_ids:
 			toClear = []
 			run = False
 
@@ -96,14 +95,14 @@ def runReMatCh(args, version):
 				firstLine = False
 				continue
 			elif args.tax[0] is not None and platform is not None:
-					run_info = run_id.split("\t")
+					run_info = run_id_line.split("\t")
 					run_id = run_info[0]
 					run_plat = run_info[1]
 
 					if platform in run_plat and 'Analyzer' not in run_plat:
 						run = True
 			elif args.tax[0]:
-				run_info = run_id.split("\t")
+				run_info = run_id_line.split("\t")
 				run_id = run_info[0]
 				run_plat = run_info[1]
 
@@ -115,7 +114,7 @@ def runReMatCh(args, version):
 				if args.useOmicsDataType[0] == 'All':
 					continue
 				else:
-					run_info = run_id.split("\t")
+					run_info = run_id_line.split("\t")
 					omics = run_info[3]
 					if omics not in args.useOmicsDataType:
 						run = False
