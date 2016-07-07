@@ -12,6 +12,9 @@ from mergeResults import runMergeResults
 from threading import Timer
 
 
+possible_choises = ['GENOMIC', 'TRANSCRIPTOMIC', 'SYNTHETIC', 'ALL']
+
+
 def parseArguments(version):
 	parser = argparse.ArgumentParser(prog='rematch.py', description="ReMatCh is an application which combines a set of bioinformatic tools for reads mapping against a reference, finds the allelic variants and produces a consensus sequence. It also allows direct sample download from ENA database to be used in the analysis.", formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 	subparsers = parser.add_subparsers()
@@ -60,8 +63,6 @@ def parseArguments(version):
 
 # For parseArguments
 def useOmicsDataType(arguments):
-	global possible_choises
-	possible_choises = ['GENOMIC', 'TRANSCRIPTOMIC', 'SYNTHETIC', 'ALL']
 	arguments = arguments.split(',')
 	for argument in arguments:
 		if argument not in possible_choises:
