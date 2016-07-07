@@ -11,7 +11,7 @@ def main():
 	parser.add_argument('-i', nargs=1, type=str, help='taxon name', required=True)
 	parser.add_argument('-o', nargs=1, type=str, help='output file name', required=True)
 	parser.add_argument('-g', help='True to include sequencing machine in the output', action='store_true', required=False)
-	parser.add_argument('--getOmicsDataType', help='Informs the programme to include OMICS data type (GENOMIC / TRANSCRIPTOMIC / SYNTHETIC) in the output', action='store_true', required=False)
+	parser.add_argument('--getOmicsDataType', help='Informs the programme to include OMICS data type (examples: GENOMIC / TRANSCRIPTOMIC / SYNTHETIC) in the output', action='store_true', required=False)
 
 	args = parser.parse_args()
 

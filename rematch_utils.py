@@ -40,7 +40,7 @@ def parseArguments(version):
 	rematch_optional.add_argument('-clean', help='Clean intermediate files produced by the application (.bam, .vcf, index files, coverage file)', action='store_true')
 	rematch_optional.add_argument('-rmFastq', help='Remove fastq files after the analysis', action='store_true')
 	rematch_optional.add_argument('-allplat', help='Use all platforms. By default, only Illumina runs are used', action='store_true')
-	rematch_optional.add_argument('--useOmicsDataType', nargs=1, type=useOmicsDataType, metavar='GENOMIC,TRANSCRIPTOMIC', help=str('Tells ReMatCh to analyse these OMICS data type. Possible choises are ' + str(possible_choises)), required=False, default=['ALL'])
+	rematch_optional.add_argument('--useOmicsDataType', nargs=1, type=useOmicsDataType, metavar='GENOMIC,TRANSCRIPTOMIC', help=str('Tells ReMatCh to analyse these OMICS data type. Possible choises are ' + ','.join(possible_choises)), required=False, default=['ALL'])
 	rematch_optional.add_argument('--version', help='Version information', action='version', version=str('%(prog)s v' + version))
 
 	parser_rematch.set_defaults(func=runReMatCh)

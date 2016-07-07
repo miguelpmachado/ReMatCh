@@ -113,7 +113,7 @@ def runReMatCh(args, version):
 			if args.tax[0] is not None and run is True:
 				if 'ALL' not in args.useOmicsDataType:
 					run_info = run_id_line.split("\t")
-					omics = run_info[3].splitlines()[0]
+					omics = run_info[3].splitlines()
 					if omics not in args.useOmicsDataType:
 						run = False
 
