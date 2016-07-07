@@ -98,7 +98,7 @@ def alleleCalling(bamSortedPath, referencePath, sequenceNames, gatkPath, sampleI
 		tempFile.write(sampleID + '\t' + str(1))
 
 	print "running bcf"
-	command = ['mpileup', '--no-BAQ', '--fasta-ref', referencePath, '--uncompressed', '-t', 'DP,DPR,DV', str(bamSortedPath + '.bam'), '|', 'bcftools', 'call', '--multiallelic-caller', '--variants-only', '--samples-file', ploidytempFile, '--output-type', 'v', '--output', str(bamSortedPath + '.vcf')]
+	command = ['samtools', 'mpileup', '--no-BAQ', '--fasta-ref', referencePath, '--uncompressed', '-t', 'DP,DPR,DV', str(bamSortedPath + '.bam'), '|', 'bcftools', 'call', '--multiallelic-caller', '--variants-only', '--samples-file', ploidytempFile, '--output-type', 'v', '--output', str(bamSortedPath + '.vcf')]
 	run_successfully, stdout, stderr = rematch_utils.runCommandPopenCommunicate(command, True, None)
 	toClear.append(bamSortedPath + ".vcf")
 	toClear.append(bamSortedPath + ".vcf.idx")
