@@ -129,7 +129,7 @@ def runReMatCh(args, version):
 				run_id = run_id.strip()
 
 				print "\nRunning ID: " + str(run_id)
-				samFilePath, singOrPaired, filesDownloaded = downloadAndBowtie.downloadAndBowtie(reference_file, run_id, workdir, buildBowtie, args.picard[0], args.threads, toClear, args.asperaKey[0])
+				samFilePath, singOrPaired, filesDownloaded = downloadAndBowtie.downloadAndBowtie(reference_file, run_id, workdir, buildBowtie, args.picard[0], args.threads, toClear, args.asperaKey[0], args.rmFastq)
 
 				if samFilePath is not False:
 

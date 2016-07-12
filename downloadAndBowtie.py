@@ -28,8 +28,11 @@ import shutil
 
 import rematch_utils
 
+filesExtensions = ['fastq.gz', 'fq.gz']
+pairEnd_file = ['_1.f', '_2.f']
 
-def ftpGetFilesList(ftp, link):
+
+def ftpListFiles(ftp, link):
 	ftp.cwd(link)
 	dirs = ftp.nlst()
 
@@ -38,10 +41,38 @@ def ftpGetFilesList(ftp, link):
 	for item in dirs:
 		files.append(item)
 
+	if len(files) == 0:
+		files = None
+
 	return files
 
 
+def ftpSearchFileTypes(files):
+	files_to_download = []
+	if files is not None:
+		if len(files) == 1:
+			for extensions in filesExtensions:
+				if extensions in files[0]:
+					files_to_download.append(files)
+					break
+		else:
+			for file_ena in files:
+				for extensions in filesExtensions:
+					if extensions in file_ena:
+						for pairEnd_file_number in pairEnd_file:
+							if pairEnd_file_number in file_ena:
+								files_to_download.append(files)
+								break
+						break
+	if len(files_to_download) == 0:
+		files_to_download = None
+
+	return files_to_download
+
+
 def getFilesList(runID):
+	run_successfully = False
+
 	partial_tid = runID[0:6]
 
 	files = None
@@ -51,15 +82,18 @@ def getFilesList(runID):
 		f.login()
 
 		link = '/vol1/fastq/' + partial_tid + '/' + runID
+
 		try:
-			files = ftpGetFilesList(f, link)
+			files = ftpListFiles(f, link)
+			run_successfully = True
 		except Exception as e:
 			print link
 			print e
 
 			link = '/vol1/fastq/' + partial_tid + "/00" + runID[-1] + '/' + runID
 			try:
-				files = ftpGetFilesList(f, link)
+				files = ftpListFiles(f, link)
+				run_successfully = True
 			except Exception as e:
 				print link
 				print e
@@ -71,7 +105,9 @@ def getFilesList(runID):
 	except Exception as e:
 		print e
 
-	return files
+	files = ftpSearchFileTypes(files)
+
+	return run_successfully, files
 
 
 def download(dirs2, target_dir2, ref2, success2, f2, link2):
@@ -139,29 +175,51 @@ def download_ERR(ERR_id, target_dir):
 	return insucess
 
 
-# Download using Aspera Connect
-def downloadAspera(run_id, outdir, asperaKey):
-	aspera_command = ['ascp', '-QT', '-l', '300m', '-i', asperaKey, str('era-fasp@fasp.sra.ebi.ac.uk:/vol1/fastq/' + run_id[0:6] + '/' + run_id), outdir]
+def aspera(run_id, asperaKey, outdir, fileToDownload):
+	if fileToDownload is None:
+		fileToDownload = ''
+	else:
+		fileToDownload = '/' + fileToDownload
+
+	aspera_command = ['ascp', '-QT', '-l', '300m', '-i', asperaKey, '', outdir]
+	aspera_command[6] = str('era-fasp@fasp.sra.ebi.ac.uk:/vol1/fastq/' + run_id[0:6] + '/' + run_id + fileToDownload)
 	run_successfully, stdout, stderr = rematch_utils.runCommandPopenCommunicate(aspera_command, False, 3600)
 	if not run_successfully:
-		print "Connecting using the following command didn't work:"
-		print ' '.join(aspera_command)
-		aspera_command[6] = str('era-fasp@fasp.sra.ebi.ac.uk:/vol1/fastq/' + run_id[0:6] + '/00' + run_id[-1] + '/' + run_id)
-		print 'Trying: ' + ' '.join(aspera_command)
+		print 'It was not possible to download! Trying again:'
+		aspera_command[6] = str('era-fasp@fasp.sra.ebi.ac.uk:/vol1/fastq/' + run_id[0:6] + '/00' + run_id[-1] + '/' + run_id + fileToDownload)
 		run_successfully, stdout, stderr = rematch_utils.runCommandPopenCommunicate(aspera_command, False, 3600)
-		if not run_successfully:
-			print "Download using Aspera didn't work"
-			return run_successfully
-	files = glob.glob1(os.path.join(outdir, run_id), '*')
-	for file in files:
-		shutil.move(os.path.join(outdir, run_id, file), outdir)
-	shutil.rmtree(os.path.join(outdir, run_id))
+
+	return run_successfully
+
+
+# Download using Aspera Connect
+def downloadAspera(run_id, outdir, asperaKey, getAllFiles_Boolean, filesToDownload):
+	run_successfully = False
+
+	if getAllFiles_Boolean:
+		run_successfully = aspera(run_id, asperaKey, outdir, None)
+	else:
+		if filesToDownload is not None:
+			runs = []
+			for file_ena in filesToDownload:
+				run_successfully = aspera(run_id, asperaKey, outdir, file_ena)
+				runs.append(run_successfully)
+
+			if False in runs:
+				run_successfully = False
+			else:
+				files = glob.glob1(os.path.join(outdir, run_id), '*')
+				for file_downloaded in files:
+					shutil.move(os.path.join(outdir, run_id, file_downloaded), outdir)
+				shutil.rmtree(os.path.join(outdir, run_id))
+		else:
+			run_successfully = True
+
 	return run_successfully
 
 
 # Search Fastq files (that were downloaded or already provided by the user)
 def searchDownloadedFiles(directory):
-	filesExtensions = ['fastq.gz', 'fq.gz']
 	for extension in filesExtensions:
 		downloadedFiles = glob.glob1(directory, str('*.' + extension))
 		if len(downloadedFiles) > 0:
@@ -169,7 +227,7 @@ def searchDownloadedFiles(directory):
 	return downloadedFiles
 
 
-def downloadAndBowtie(referencePath, run_id, target_dir, buildBowtie, picardJarPath, threads, toClear, asperaKey):
+def downloadAndBowtie(referencePath, run_id, target_dir, buildBowtie, picardJarPath, threads, toClear, asperaKey, removeFastq):
 
 	bowtieBuildFileName, extension = os.path.splitext(referencePath)
 
@@ -200,19 +258,23 @@ def downloadAndBowtie(referencePath, run_id, target_dir, buildBowtie, picardJarP
 	ftp_down_insuc = 0
 
 	downloadedFiles = searchDownloadedFiles(dir_with_gz)
+	download_step_performed = False
 	if len(downloadedFiles) < 1:
 		print 'Trying download...'
-
-		files = getFilesList(run_id)
-		print files
-
 		if asperaKey is not None:
-			aspera_run = downloadAspera(run_id, dir_with_gz, asperaKey)
+			run_successfully, files = getFilesList(run_id)
+			if run_successfully:
+				aspera_run = downloadAspera(run_id, dir_with_gz, asperaKey, False, files)
+			else:
+				aspera_run = downloadAspera(run_id, dir_with_gz, asperaKey, True, None)
 			if not aspera_run:
 				print 'Trying download using FTP'
 				ftp_down_insuc = download_ERR(run_id, dir_with_gz)
 		else:
 			ftp_down_insuc = download_ERR(run_id, dir_with_gz)
+
+		download_step_performed = True
+
 	else:
 		print 'File ' + run_id + ' already exists...'
 
@@ -225,9 +287,13 @@ def downloadAndBowtie(referencePath, run_id, target_dir, buildBowtie, picardJarP
 	if len(downloadedFiles) > 2:
 		filesToUse = []
 		for i in downloadedFiles:
-			if '_1.f' in i or '_2.f' in i:
-				filesToUse.append(i)
-			else:
+			removeFile = True
+			for pairEnd_file_number in pairEnd_file:
+				if pairEnd_file_number in i:
+					filesToUse.append(i)
+					removeFile = False
+					break
+			if removeFile and download_step_performed:
 				shutil.rmtree(os.path.join(dir_with_gz, i))
 		downloadedFiles = filesToUse
 		print 'Files used: ' + str(downloadedFiles)
