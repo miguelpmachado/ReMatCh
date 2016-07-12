@@ -29,6 +29,51 @@ import shutil
 import rematch_utils
 
 
+def ftpGetFilesList(ftp, link):
+	ftp.cwd(link)
+	dirs = ftp.nlst()
+
+	files = []
+
+	for item in dirs:
+		files.append(item)
+
+	return files
+
+
+def getFilesList(runID):
+	partial_tid = runID[0:6]
+
+	files = None
+
+	try:
+		f = ftplib.FTP('ftp.sra.ebi.ac.uk', timeout=3600)
+		f.login()
+
+		link = '/vol1/fastq/' + partial_tid + '/' + runID
+		try:
+			files = ftpGetFilesList(f, link)
+		except Exception as e:
+			print link
+			print e
+
+			link = '/vol1/fastq/' + partial_tid + "/00" + runID[-1] + '/' + runID
+			try:
+				files = ftpGetFilesList(f, link)
+			except Exception as e:
+				print link
+				print e
+
+		try:
+			f.quit()
+		except Exception as e:
+			print e
+	except Exception as e:
+		print e
+
+	return files
+
+
 def download(dirs2, target_dir2, ref2, success2, f2, link2):
 	insucess = 0
 	for item in dirs2:
@@ -157,6 +202,10 @@ def downloadAndBowtie(referencePath, run_id, target_dir, buildBowtie, picardJarP
 	downloadedFiles = searchDownloadedFiles(dir_with_gz)
 	if len(downloadedFiles) < 1:
 		print 'Trying download...'
+
+		files = getFilesList(run_id)
+		print files
+
 		if asperaKey is not None:
 			aspera_run = downloadAspera(run_id, dir_with_gz, asperaKey)
 			if not aspera_run:
