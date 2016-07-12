@@ -12,14 +12,14 @@ from mergeResults import runMergeResults
 from threading import Timer
 
 
-possible_choises = ['GENOMIC', 'TRANSCRIPTOMIC', 'SYNTHETIC', 'ALL']
+possible_choises = ['GENOMIC', 'TRANSCRIPTOMIC', 'METAGENOMIC', 'SYNTHETIC', 'OTHER', 'ALL']
 
 
 def parseArguments(version):
 	parser = argparse.ArgumentParser(prog='rematch.py', description="ReMatCh is an application which combines a set of bioinformatic tools for reads mapping against a reference, finds the allelic variants and produces a consensus sequence. It also allows direct sample download from ENA database to be used in the analysis.", formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 	subparsers = parser.add_subparsers()
 
-	parser_rematch = subparsers.add_parser('ReMatCh')
+	parser_rematch = subparsers.add_parser('ReMatCh', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
 	rematch_required = parser_rematch.add_argument_group('ReMatCh required options')
 	rematch_required.add_argument('-r', '--reference', nargs=1, type=argparse.FileType('r'), metavar=('/path/reference.fasta'), help='Path for the reference sequence', required=True)
@@ -45,14 +45,14 @@ def parseArguments(version):
 
 	parser_rematch.set_defaults(func=runReMatCh)
 
-	parser_mergeResults = subparsers.add_parser('mergeResults')
+	parser_mergeResults = subparsers.add_parser('mergeResults', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
 	mergeResults_required = parser_mergeResults.add_argument_group('mergeResults required options')
-	mergeResults_required.add_argument('--mrWorkdir', nargs=1, metavar=('/path/to/workdir'), type=str, help='Merge all ReMatCh results available at --workdir. Option to be used alone or with --sequenceCoverage.', required=True)
+	mergeResults_required.add_argument('--mrWorkdir', nargs=1, metavar=('/path/to/workdir'), type=str, help='Merge all ReMatCh results available at --mrWorkdir.', required=True)
 
 	mergeResults_optional = parser_mergeResults.add_argument_group('mergeResults optional options')
-	mergeResults_optional.add_argument('--mrSequenceCoverage', nargs=1, metavar=('0.0 - 1.0'), type=float, help='Minimum sequence length to consider the gene to be present. This is a relative measure. To be used with --mrWorkdir', default=[0.8], required=False)
-	mergeResults_optional.add_argument('--mrOutdir', nargs=1, metavar=('/path/to/Results/Outdir/'), type=str, help='Specify a different directory from --workdir to output the merged results (otherwise merged results will be stored in --workdir). To be used with --mrWorkdir', required=False, default=[None])
+	mergeResults_optional.add_argument('--mrSequenceCoverage', nargs=1, metavar=('0.0 - 1.0'), type=float, help='Minimum sequence length to consider the gene to be present. This is a relative measure.', default=[0.8], required=False)
+	mergeResults_optional.add_argument('--mrOutdir', nargs=1, metavar=('/path/to/Results/Outdir/'), type=str, help='Specify a different directory from --mrWorkdir to output the merged results (otherwise merged results will be stored in --mrWorkdir).', required=False, default=[None])
 
 	parser_mergeResults.set_defaults(func=runMergeResults)
 
