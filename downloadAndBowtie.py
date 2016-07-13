@@ -204,6 +204,11 @@ def downloadAspera(run_id, outdir, asperaKey, getAllFiles_Boolean, filesToDownlo
 
 	if getAllFiles_Boolean:
 		run_successfully = aspera(run_id, asperaKey, outdir, None)
+		if run_successfully:
+			files = glob.glob1(os.path.join(outdir, run_id), '*')
+			for file_downloaded in files:
+				shutil.move(os.path.join(outdir, run_id, file_downloaded), outdir)
+			shutil.rmtree(os.path.join(outdir, run_id))
 	else:
 		if filesToDownload is not None:
 			runs = []
@@ -215,11 +220,6 @@ def downloadAspera(run_id, outdir, asperaKey, getAllFiles_Boolean, filesToDownlo
 
 			if False in runs:
 				run_successfully = False
-			else:
-				files = glob.glob1(os.path.join(outdir, run_id), '*')
-				for file_downloaded in files:
-					shutil.move(os.path.join(outdir, run_id, file_downloaded), outdir)
-				shutil.rmtree(os.path.join(outdir, run_id))
 		else:
 			run_successfully = True
 
