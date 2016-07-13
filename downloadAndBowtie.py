@@ -105,7 +105,9 @@ def getFilesList(runID):
 	except Exception as e:
 		print e
 
+	print files
 	files = ftpSearchFileTypes(files)
+	print files
 
 	return run_successfully, files
 
