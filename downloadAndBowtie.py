@@ -53,7 +53,7 @@ def ftpSearchFileTypes(files):
 		if len(files) == 1:
 			for extensions in filesExtensions:
 				if extensions in files[0]:
-					files_to_download.append(files)
+					files_to_download.append(files[0])
 					break
 		else:
 			for file_ena in files:
@@ -61,7 +61,7 @@ def ftpSearchFileTypes(files):
 					if extensions in file_ena:
 						for pairEnd_file_number in pairEnd_file:
 							if pairEnd_file_number in file_ena:
-								files_to_download.append(files)
+								files_to_download.append(file_ena)
 								break
 						break
 	if len(files_to_download) == 0:
