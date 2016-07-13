@@ -112,7 +112,11 @@ def getFilesList(runID):
 
 def download(dirs2, target_dir2, ref2, success2, f2, link2):
 	insucess = 0
-	for item in dirs2:
+
+	files = ftpListFiles(f2, link2)
+	files = ftpSearchFileTypes(files)
+
+	for item in files:
 
 		try:
 			f2.cwd(link2)
@@ -201,7 +205,9 @@ def downloadAspera(run_id, outdir, asperaKey, getAllFiles_Boolean, filesToDownlo
 	else:
 		if filesToDownload is not None:
 			runs = []
+			print filesToDownload
 			for file_ena in filesToDownload:
+				print file_ena
 				run_successfully = aspera(run_id, asperaKey, outdir, file_ena)
 				runs.append(run_successfully)
 
@@ -263,6 +269,7 @@ def downloadAndBowtie(referencePath, run_id, target_dir, buildBowtie, picardJarP
 		print 'Trying download...'
 		if asperaKey is not None:
 			run_successfully, files = getFilesList(run_id)
+			print files
 			if run_successfully:
 				aspera_run = downloadAspera(run_id, dir_with_gz, asperaKey, False, files)
 			else:
@@ -319,6 +326,7 @@ def downloadAndBowtie(referencePath, run_id, target_dir, buildBowtie, picardJarP
 			print stdout.decode("utf-8"), stderr.decode("utf-8")
 			return False, False, downloadedFiles
 	elif len(downloadedFiles) == 2:
+		pairedOrSingle = "Paired_end"
 		bowtie_command[7] = str('-1 ' + os.path.join(dir_with_gz, downloadedFiles[0]) + ' -2 ' + os.path.join(dir_with_gz, downloadedFiles[1]))
 		run_successfully, stdout, stderr = rematch_utils.runCommandPopenCommunicate(bowtie_command, False, None)
 		if not run_successfully:
