@@ -35,7 +35,7 @@ def parseArguments(version):
 	rematch_optional.add_argument('-threads', nargs='?', metavar=('N'), type=int, help='Number of threads used to run bowtie2', required=False, default=1)
 	rematch_optional.add_argument('--tax', nargs=1, metavar=('"Streptococcus pneumoniae"'), type=str, help='Name taxon to download sequences. Results will be stored in /path/to/idenfifiersList.txt', required=False, default=[None])
 	rematch_optional.add_argument('-xtraSeq', nargs='?', type=int, help='For trimming extra sequence lenght 5\' and 3\' ', required=False, default=0)
-	rematch_optional.add_argument('--asperaKey', nargs=1, type=str, metavar='/path/to/asperaweb_id_dsa.openssh', help='Tells ReMatCh to download run files from ENA using Aspera Connect. The path to Private-key file asperaweb_id_dsa.openssh normaly found in ~/.aspera/connect/etc/asperaweb_id_dsa.openssh needs to be provided.', required=False, default=None)
+	rematch_optional.add_argument('--asperaKey', nargs=1, type=str, metavar='/path/to/asperaweb_id_dsa.openssh', help='Tells ReMatCh to download run files from ENA using Aspera Connect. The path to Private-key file asperaweb_id_dsa.openssh normaly found in ~/.aspera/connect/etc/asperaweb_id_dsa.openssh needs to be provided.', required=False, default=[None])
 	rematch_optional.add_argument('-bowtieBuild', help='Run build bowtie', action='store_true')
 	rematch_optional.add_argument('-clean', help='Clean intermediate files produced by the application (.bam, .vcf, index files, coverage file)', action='store_true')
 	rematch_optional.add_argument('-rmFastq', help='Remove fastq files after the analysis', action='store_true')
