@@ -291,7 +291,7 @@ def downloadAndBowtie(referencePath, run_id, target_dir, buildBowtie, picardJarP
 
 	if ftp_down_insuc > 0 and aspera_run is False:
 		shutil.rmtree(dir_with_gz)
-		return False, False, downloadedFiles, False
+		return False, False, downloadedFiles
 
 	if len(downloadedFiles) > 2:
 		filesToUse = []
