@@ -47,9 +47,9 @@ def samToBam(samFile, sequenceFile, threads):
 
 
 # Create gene vcf
-def createVCF(bamFile, sequenceFile, geneName, minCoverage):
+def createVCF(bamFile, sequenceFile, geneName, minCoverage, minMapQual):
 	geneVCF = os.path.splitext(bamFile)[0] + '.' + geneName.replace(' ', '_') + '.vcf'
-	command = ['samtools', 'mpileup', '--count-orphans', '--no-BAQ', '--min-BQ', '13', '--fasta-ref', sequenceFile, '--region', str('"' + geneName + '"'), '--output', geneVCF, '--VCF', '--uncompressed', '--output-tags', 'AD,DP', '--min-ireads', str(minCoverage), bamFile]
+	command = ['samtools', 'mpileup', '--count-orphans', '--no-BAQ', '--min-BQ', '13', '--min-MQ', minMapQual, '--fasta-ref', sequenceFile, '--region', str('"' + geneName + '"'), '--output', geneVCF, '--VCF', '--uncompressed', '--output-tags', 'INFO/AD,AD,DP', '--min-ireads', str(minCoverage), bamFile]
 	run_successfully, stdout, stderr = rematch_utils.runCommandPopenCommunicate(command, False, None)
 	if not run_successfully:
 		geneVCF = None

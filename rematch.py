@@ -70,7 +70,7 @@ def runReMatCh(args, version):
 
 	toClear = []
 
-	if args.tax[0]:
+	if args.tax[0] is not None:
 		GetSequencesFromTaxon(args.tax[0], args.l, True, True)
 
 	if not args.allplat:
@@ -101,13 +101,14 @@ def runReMatCh(args, version):
 
 					if platform in run_plat and 'Analyzer' not in run_plat:
 						run = True
-			elif args.tax[0]:
+			elif args.tax[0] is not None:
 				run_info = run_id_line.split("\t")
 				run_id = run_info[0]
 				run_plat = run_info[1]
 
 				run = True
 			else:
+				run_id = run_id_line.strip()
 				run = True
 
 			if args.tax[0] is not None and run is True:
@@ -126,7 +127,7 @@ def runReMatCh(args, version):
 				if count_runs > 1 or not args.bowtieBuild:
 					buildBowtie = False
 
-				run_id = run_id.strip()
+				# run_id = run_id.strip()
 
 				print "\nRunning ID: " + str(run_id)
 				samFilePath, singOrPaired, filesDownloaded = downloadAndBowtie.downloadAndBowtie(reference_file, run_id, workdir, buildBowtie, args.picard[0], args.threads, toClear, args.asperaKey[0], args.rmFastq)

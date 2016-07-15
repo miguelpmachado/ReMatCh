@@ -17,6 +17,7 @@ possible_choises = ['GENOMIC', 'TRANSCRIPTOMIC', 'METAGENOMIC', 'SYNTHETIC', 'OT
 
 def parseArguments(version):
 	parser = argparse.ArgumentParser(prog='rematch.py', description="ReMatCh is an application which combines a set of bioinformatic tools for reads mapping against a reference, finds the allelic variants and produces a consensus sequence. It also allows direct sample download from ENA database to be used in the analysis.", formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+	parser.add_argument('--version', help='Version information', action='version', version=str('%(prog)s v' + version))
 	subparsers = parser.add_subparsers()
 
 	parser_rematch = subparsers.add_parser('ReMatCh', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
@@ -41,7 +42,6 @@ def parseArguments(version):
 	rematch_optional.add_argument('-rmFastq', help='Remove fastq files after the analysis', action='store_true')
 	rematch_optional.add_argument('-allplat', help='Use all platforms. By default, only Illumina runs are used', action='store_true')
 	rematch_optional.add_argument('--useOmicsDataType', nargs=1, type=useOmicsDataType, metavar='GENOMIC,TRANSCRIPTOMIC', help=str('Tells ReMatCh to analyse these OMICS data type. Possible choises are ' + ','.join(possible_choises)), required=False, default=['ALL'])
-	rematch_optional.add_argument('--version', help='Version information', action='version', version=str('%(prog)s v' + version))
 
 	parser_rematch.set_defaults(func=runReMatCh)
 

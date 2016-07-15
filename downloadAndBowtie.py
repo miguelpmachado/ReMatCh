@@ -80,34 +80,33 @@ def getFilesList(runID):
 	try:
 		f = ftplib.FTP('ftp.sra.ebi.ac.uk', timeout=3600)
 		f.login()
-
+	except Exception as e:
+		print 'It was not possible to connect to ENA!'
+		print e
+	else:
 		link = '/vol1/fastq/' + partial_tid + '/' + runID
-
 		try:
 			files = ftpListFiles(f, link)
-			run_successfully = True
-		except Exception as e:
-			print link
-			print e
-
+		except:
+			print 'The link ' + link + ' did not work. Trying a different one...'
 			link = '/vol1/fastq/' + partial_tid + "/00" + runID[-1] + '/' + runID
+			print '... ' + link
 			try:
 				files = ftpListFiles(f, link)
-				run_successfully = True
 			except Exception as e:
-				print link
 				print e
+				print link
+			else:
+				run_successfully = True
+		else:
+			run_successfully = True
 
 		try:
 			f.quit()
 		except Exception as e:
 			print e
-	except Exception as e:
-		print e
 
-	print files
 	files = ftpSearchFileTypes(files)
-	print files
 
 	return run_successfully, files
 
@@ -115,24 +114,26 @@ def getFilesList(runID):
 def download(dirs2, target_dir2, ref2, success2, f2, link2):
 	insucess = 0
 
+	print 'Get files list from ENA...'
 	files = ftpListFiles(f2, link2)
 	files = ftpSearchFileTypes(files)
 
-	for item in files:
+	if files is not None:
+		for item in files:
 
-		try:
-			f2.cwd(link2)
-			final_target_dir = target_dir2 + "/" + item
-			file = open(final_target_dir, 'wb')
-			print "Downloading: %s" % item
+			try:
+				f2.cwd(link2)
+				final_target_dir = target_dir2 + "/" + item
+				file = open(final_target_dir, 'wb')
+				print "Downloading: %s" % item
 
-			f2.retrbinary('RETR %s' % item, file.write)
-			file.close()
-			print "Downloaded %s" % item
-			success2 += 1
-		except Exception as e:
-			print e
-			insucess += 1
+				f2.retrbinary('RETR %s' % item, file.write)
+				file.close()
+				print "Downloaded %s" % item
+				success2 += 1
+			except Exception as e:
+				print e
+				insucess += 1
 
 	return success2, insucess
 
@@ -178,7 +179,7 @@ def download_ERR(ERR_id, target_dir):
 		print e
 
 	print "Downloaded %s files successfully, %s fail and %s ID references were wrong" % (success, insucess, failed)
-	return insucess
+	return success, insucess
 
 
 def aspera(run_id, asperaKey, outdir, fileToDownload):
@@ -212,9 +213,7 @@ def downloadAspera(run_id, outdir, asperaKey, getAllFiles_Boolean, filesToDownlo
 	else:
 		if filesToDownload is not None:
 			runs = []
-			print filesToDownload
 			for file_ena in filesToDownload:
-				print file_ena
 				run_successfully = aspera(run_id, asperaKey, outdir, file_ena)
 				runs.append(run_successfully)
 
@@ -268,28 +267,28 @@ def downloadAndBowtie(referencePath, run_id, target_dir, buildBowtie, picardJarP
 	downloadedFiles = searchDownloadedFiles(dir_with_gz)
 	download_step_performed = False
 	if len(downloadedFiles) < 1:
-		print 'Trying download...'
 		if asperaKey is not None:
+			print 'Get files list from ENA...'
 			run_successfully, files = getFilesList(run_id)
-			print files
 			if run_successfully:
+				print 'Trying download using Aspera...'
 				aspera_run = downloadAspera(run_id, dir_with_gz, asperaKey, False, files)
-			else:
-				aspera_run = downloadAspera(run_id, dir_with_gz, asperaKey, True, None)
 			if not aspera_run:
-				print 'Trying download using FTP'
-				ftp_down_insuc = download_ERR(run_id, dir_with_gz)
+				print 'Trying download using FTP...'
+				ftp_down_suc, ftp_down_insuc = download_ERR(run_id, dir_with_gz)
 		else:
-			ftp_down_insuc = download_ERR(run_id, dir_with_gz)
+			print 'Trying download using FTP...'
+			ftp_down_suc, ftp_down_insuc = download_ERR(run_id, dir_with_gz)
 
 		download_step_performed = True
 
 	else:
-		print 'File ' + run_id + ' already exists...'
+		ftp_down_suc = len(downloadedFiles)
+		print 'Files for ' + run_id + ' already exists...'
 
 	downloadedFiles = searchDownloadedFiles(dir_with_gz)
 
-	if ftp_down_insuc > 0 and aspera_run is False:
+	if (ftp_down_insuc > 0 or ftp_down_suc == 0) and aspera_run is False:
 		shutil.rmtree(dir_with_gz)
 		return False, False, downloadedFiles
 

@@ -1,3 +1,7 @@
+#!/usr/bin/env python
+
+# -*- coding: utf-8 -*-
+
 import urllib2
 import sys
 import urllib
@@ -12,6 +16,7 @@ def main():
 	parser.add_argument('-o', nargs=1, type=str, help='output file name', required=True)
 	parser.add_argument('-g', help='True to include sequencing machine in the output', action='store_true', required=False)
 	parser.add_argument('--getOmicsDataType', help='Informs the programme to include OMICS data type (examples: GENOMIC / TRANSCRIPTOMIC / SYNTHETIC) in the output', action='store_true', required=False)
+	parser.add_argument('--getLibraryType', help='Informs the programme to include library type (examples: PAIRED / SINGLE) in the output', action='store_true', required=False)
 
 	args = parser.parse_args()
 
@@ -19,11 +24,12 @@ def main():
 	taxonname = args.i[0]
 	outputfile = args.o[0]
 	getOmicsDataType = args.getOmicsDataType
+	getLibraryType = args.getLibraryType
 
-	GetSequencesFromTaxon(taxonname, outputfile, getmachine, getOmicsDataType)
+	GetSequencesFromTaxon(taxonname, outputfile, getmachine, getOmicsDataType, getLibraryType)
 
 
-def GetSequencesFromTaxon(taxonname, outputfile, getmachine, getOmicsDataType):
+def GetSequencesFromTaxon(taxonname, outputfile, getmachine, getOmicsDataType, getLibraryType):
 
 	taxonname = urllib.quote(taxonname)
 	url = "http://www.ebi.ac.uk/ena/data/view/Taxon%3A" + taxonname + "&display=xml"
@@ -53,12 +59,13 @@ def GetSequencesFromTaxon(taxonname, outputfile, getmachine, getOmicsDataType):
 			# models = {}
 			length_line = 0
 			omics = ''
+			libraryType = ''
 			for child in tree:
 				runid = child.get('accession')
 
 				n += 1
 
-				if getmachine is True or getOmicsDataType is True:
+				if getmachine is True or getOmicsDataType is True or getLibraryType is True:
 					for child2 in child:
 						if child2.tag == 'EXPERIMENT_REF':
 							expid = child2.get('accession')
@@ -77,17 +84,20 @@ def GetSequencesFromTaxon(taxonname, outputfile, getmachine, getOmicsDataType):
 										elif child4.tag == 'STUDY_REF':
 											prjid = child4.get('accession')
 										elif child4.tag == 'DESIGN':
-											if getOmicsDataType:
+											if getOmicsDataType is True or getLibraryType is True:
 												for child5 in child4:
 													if child5.tag == 'LIBRARY_DESCRIPTOR':
 														for child6 in child5:
-															if child6.tag == 'LIBRARY_SOURCE':
+															if child6.tag == 'LIBRARY_SOURCE' and getOmicsDataType is True:
 																omics = child6.text
+															elif child6.tag == 'LIBRARY_LAYOUT' and getLibraryType is True:
+																libraryType = child6[0]
 							except:
 								model = 'not found'
 								omics = 'not found'
-					f.write(str(runid) + "\t" + model + "\t" + prjid + "\t" + omics + "\n")
-					line = "run acession %s sequenced on %s from project %s for %s data" % (runid, model, prjid, omics)
+								libraryType = 'not found'
+					f.write(str(runid) + "\t" + model + "\t" + prjid + "\t" + omics + "\t" + libraryType + "\n")
+					line = "run acession %s sequenced on %s from project %s for %s %s end data" % (runid, model, prjid, omics, libraryType)
 					if length_line < len(line):
 						length_line = len(line)
 					sys.stderr.write("\r" + line + str(' ' * (length_line - len(line))))
