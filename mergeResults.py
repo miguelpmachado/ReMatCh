@@ -7,7 +7,7 @@ import rematch_utils
 def runMergeResults(args, version):
 
 	# Setting working directory
-	if args.mrOutdir is None:
+	if args.mrOutdir[0] is None:
 		workdir = os.path.abspath(os.path.join(args.mrWorkdir[0], ''))
 	else:
 		workdir = os.path.abspath(os.path.join(args.mrOutdir[0], ''))
