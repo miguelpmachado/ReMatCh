@@ -262,6 +262,7 @@ def downloadAndBowtie(referencePath, run_id, target_dir, buildBowtie, picardJarP
 
 	# download ERR
 	aspera_run = False
+	ftp_down_suc = 0
 	ftp_down_insuc = 0
 
 	downloadedFiles = searchDownloadedFiles(dir_with_gz)
