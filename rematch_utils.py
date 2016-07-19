@@ -252,7 +252,7 @@ def checkPrograms(args):
 	programs = {'bedtools': ['>=', '2.22'], 'java': ['>=', '1.8'], 'samtools': ['=', '1.2'], 'bcftools': ['=', '1.2'], 'bowtie2': ['>=', '2.2.6'], 'ascp': ['>=', '3.6.1']}
 	listMissings = []
 	for program in programs:
-		if program == 'ascp' and not args.asperaKey:
+		if program == 'ascp' and args.asperaKey[0] is not True:
 			print 'No aspera key defined, using ftp.'
 			continue
 		which_program[1] = program

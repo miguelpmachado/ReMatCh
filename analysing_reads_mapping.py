@@ -57,8 +57,8 @@ def createVCF(bamFile, sequenceFile, geneName, minCoverage, minMapQual):
 
 
 # Read vcf file
-class Vcf:
-	self.line = ''
+class Vcf():
+	line = ''
 
 	def __init__(self, vcfFile):
 		self.vcf = open(vcfFile, 'rtU')
@@ -72,8 +72,12 @@ class Vcf:
 		try:
 			self.line = self.vcf.readline()
 		except:
-			pass
+			print 'ERROR 1'
 		return self.line_stored
 
 	def close(self):
-		pass
+		self.vcf.close()
+
+
+# Get genes name
+def getGenesName()
