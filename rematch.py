@@ -28,6 +28,7 @@ import os
 import shutil
 from datetime import datetime
 import time
+from sys import exit as sys_exit
 
 import downloadAndBowtie
 from scriptAfterMapping import checkCoverage
@@ -65,6 +66,19 @@ def runReMatCh(args, version):
 
 	# Get general information
 	rematch_utils.general_information(logfile, version)
+
+	# Get picard file path
+	which_program = ['which', 'picard.jar']
+	run_successfully, stdout, stderr = rematch_utils.runCommandPopenCommunicate(which_program, False, None)
+	if not run_successfully:
+		sys_exit('\n' + 'Picard not found')
+	picard = stdout.splitlines()[0]
+	# Get GATK file path
+	which_program = ['which', 'GenomeAnalysisTK.jar']
+	run_successfully, stdout, stderr = rematch_utils.runCommandPopenCommunicate(which_program, False, None)
+	if not run_successfully:
+		sys_exit('\n' + 'GATK not found')
+	gatk = stdout.splitlines()[0]
 
 	rematch_utils.checkPrograms(args)
 
@@ -130,7 +144,7 @@ def runReMatCh(args, version):
 				# run_id = run_id.strip()
 
 				print "\nRunning ID: " + str(run_id)
-				samFilePath, singOrPaired, filesDownloaded = downloadAndBowtie.downloadAndBowtie(reference_file, run_id, workdir, buildBowtie, args.picard[0], args.threads, toClear, args.asperaKey[0], args.rmFastq)
+				samFilePath, singOrPaired, filesDownloaded = downloadAndBowtie.downloadAndBowtie(reference_file, run_id, workdir, buildBowtie, picard, args.threads, toClear, args.asperaKey[0], args.rmFastq)
 
 				if samFilePath is not False:
 
@@ -140,7 +154,7 @@ def runReMatCh(args, version):
 					print "Checking coverage..."
 					sequenceNames, sequenceMedObject = checkCoverage(sortedPath, args.minCoverage, args.xtraSeq, toClear)
 					print "Performing Allele Call..."
-					alleleCalling(sortedPath, reference_file, sequenceNames, args.gatk[0], run_id, args.minQuality, args.minCoverage, args.multipleAlleles, sequenceMedObject, args.xtraSeq, toClear)
+					alleleCalling(sortedPath, reference_file, sequenceNames, gatk, run_id, args.minQuality, args.minCoverage, args.multipleAlleles, sequenceMedObject, args.xtraSeq, toClear)
 					print str(run_id) + " DONE"
 
 					gzSizes = 0

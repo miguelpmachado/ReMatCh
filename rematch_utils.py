@@ -25,8 +25,6 @@ def parseArguments(version):
 	rematch_required = parser_rematch.add_argument_group('ReMatCh required options')
 	rematch_required.add_argument('-r', '--reference', nargs=1, type=argparse.FileType('r'), metavar=('/path/reference.fasta'), help='Path for the reference sequence', required=True)
 	rematch_required.add_argument('-d', '--workdir', nargs=1, type=str, metavar=('/path/to/workdir'), help='Working directory. Downloaded files will be stored here under sampleID/fastq/, but it can also already contain folders with fastq files. Results will be stored here.', required=True)
-	rematch_required.add_argument('--gatk', nargs=1, type=str, metavar=('/path/to/gatk.jar'), help='Path for the Genome Analysis Toolkit jar file', required=True)
-	rematch_required.add_argument('--picard', nargs=1, metavar=('/path/to/picard'), type=str, help='Path for Picard', required=True)
 	rematch_required.add_argument('-l', nargs="?", metavar=('/path/to/identifiersList.txt'), type=str, help='Path to a list with ids to run. IDs can be ENA run accession numbers for download or directory names where fastqs are stored in --workdir. Run accession numbers retrieved from ENA using -tax will be stored here.', required=True)
 
 	rematch_optional = parser_rematch.add_argument_group('ReMatCh optional options')
@@ -110,7 +108,8 @@ def general_information(logfile, version):
 
 	# Print command
 	print '\n' + 'COMMAND:'
-	script_path = os.path.abspath(sys.argv[0])
+	script_path = os.path.realpath(sys.argv[0])
+
 	print sys.executable + ' ' + script_path + ' ' + ' '.join(sys.argv[1:])
 
 	# Print directory where programme was lunch
@@ -119,7 +118,7 @@ def general_information(logfile, version):
 	print present_directory
 
 	# Print program version
-	print '\n' + 'VERSION INNUca.py:'
+	print '\n' + 'VERSION rematch.py:'
 	scriptVersionGit(version, present_directory, script_path)
 
 	# Print PATH variable
