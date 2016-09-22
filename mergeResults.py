@@ -51,6 +51,7 @@ def mergeResults(workdir, sequenceCoverage, outdir):
 				sampledict[sampleName] = {}
 				for line in mappingreader:
 					if not line[0].startswith("#"):
+						line[0] = line[0].replace(' ', '_').replace('/', '-')
 						if 1 - float(line[3]) >= sequenceCoverage:
 							if line[6] == 'False':
 								sampledict[sampleName][line[0]] = line[8]
@@ -68,7 +69,7 @@ def mergeResults(workdir, sequenceCoverage, outdir):
 					if line.startswith('>'):
 						nameseq = line[1:]
 						prevNameSeq = nameseq
-						nameseq = nameseq.replace(' ', '_')
+						nameseq = nameseq.replace(' ', '_').replace('/', '-')
 						if nameseq not in consensusdict:
 							consensusdict[nameseq] = []
 							consensusdict[nameseq].append(['>' + sampleName + '-' + prevNameSeq, ''])
@@ -77,26 +78,37 @@ def mergeResults(workdir, sequenceCoverage, outdir):
 						countSequences = len(consensusdict[nameseq]) - 1
 					else:
 						consensusdict[nameseq][countSequences][1] = consensusdict[nameseq][countSequences][1] + line
+
 	print "\nWriting results..."
 
 	if not os.path.exists(os.path.join(outdir, 'merged_results')):
 		os.makedirs(os.path.join(outdir, 'merged_results'))
 
 	with open(os.path.join(outdir, 'merged_results', 'mergedResults.tab'), 'w') as results:
-		firstLine = True
-		header = 'Samples\t'
+		samples = sampledict.keys()
+		genes = sampledict[samples[0]].keys()
 
-		for x in sampledict:
-			if firstLine:
-				for l in sampledict[x]:
-					header += l + '\t'
-				results.write(header + '\n')
-				firstLine = False
+		header = ['#Samples'] + genes
+		results.write('\t'.join(header) + '\n')
 
-			row = x + '\t'
-			for k in sampledict[x]:
-				row += sampledict[x][k] + '\t'
-			results.write(row + '\n')
+		for i in samples:
+			row = [i]
+			for j in genes:
+					row.append(sampledict[i][j])
+			results.write('\t'.join(row) + '\n')
+
+	with open(os.path.join(outdir, 'merged_results', 'mergedResults.transposed.tab'), 'w') as results:
+		samples = sampledict.keys()
+		genes = sampledict[samples[0]].keys()
+
+		header = ['#Genes'] + samples
+		results.write('\t'.join(header) + '\n')
+
+		for j in genes:
+			row = [j]
+			for i in samples:
+				row.append(sampledict[i][j])
+			results.write('\t'.join(row) + '\n')
 
 	if not os.path.exists(os.path.join(outdir, 'merged_results', 'consensus_sequences')):
 		os.makedirs(os.path.join(outdir, 'merged_results', 'consensus_sequences'))

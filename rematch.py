@@ -67,6 +67,7 @@ def runReMatCh(args, version):
 	# Get general information
 	rematch_utils.general_information(logfile, version)
 
+	print ''
 	# Get picard file path
 	which_program = ['which', 'picard.jar']
 	run_successfully, stdout, stderr = rematch_utils.runCommandPopenCommunicate(which_program, False, None)
