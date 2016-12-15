@@ -1,56 +1,12 @@
-# ReMaCh - Read Mapping and Check-Coverage
+DEPRECATED
+----------
 
-# Usage 
+This *ReMatCh* repository, and specially the *antibiotics_book_chapter*  branch (<https://github.com/miguelpmachado/ReMatCh/tree/antibiotics_book_chapter>) is only kept for use illustration in "Epidemiological Surveillance and Typing Methods to Track Antibiotic Resistant Strains Using High Throughput Sequencing" chapter from *Antibiotics - Methods and Protocols* book (Methods Molecular Biology Series, Springer, 2016).
 
-`remach.py [-h] [-r REFERENCE_PATH] [-t TARGET_DIR] [-gatk GATK_PATH] [-cov MIN_COVERAGE] [-qual MIN_MAP_QUALITY] [-mul MULTIPLE_ALLELES] [-ri RUN_ID]`
+Therefore, **It will not be subject to further updates!**
 
-# Description 
 
-This program performs a download and read mapping of a given *RUN_ID* against a reference sequence and returns a report based on coverage.
+SUPPORTED ReMatCh
+-----------------
 
-Arguments:
- 
-  -h show this help message and exit
-
-  -r REFERENCE_PATH 
-  			Path for the reference sequence
-
-  -t TARGET_DIR 
-  			Output directory path
-  
-  -gatk GATK_PATH
-        Path for the Genome Analysis Toolkit jar file
-  
-  -cov MIN_COVERAGE
-  			Minimum coverage
-  
-  -qual
-        Minimum mapping quality
-  
-  -mul
-        Multiple alleles
-  
-  -ri
-        Id of the sequencing run
-
-# Example of usage
-
-Mapping of the run ERR012354 against the reference.fasta file:
-
-`python remache.py -r /reference.fasta -t results/ -gatk gatk_path/GenomAnalysisTK.jar -cov 10 -qual 0.6 -mul 0.1 -ri ERR012354`
-
-#Dependencies
-
-* Bowtie http://bowtie-bio.sourceforge.net/index.shtml
-
-* SAMtools http://samtools.sourceforge.net/
-
-* BEDtools http://bedtools.readthedocs.org/en/latest/
-
-* Genome Analysis Toolkit (GATK)  https://www.broadinstitute.org/gatk/
-
-* Picard  http://broadinstitute.github.io/picard/
-
-#Modules used
-
-* NumPy http://www.numpy.org/
+The recent and supported **ReMatCh** repository can be found at <https://github.com/B-UMMI/ReMatCh>
